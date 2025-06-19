@@ -1,0 +1,19 @@
+[package]
+name = "toggl-webhooks"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+license.workspace = true
+description = "Rust client for the Toggl Track Webhooks API"
+
+[dependencies]
+toggl-core = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+
+[dev-dependencies]
+mockito = { workspace = true }
+tokio = { workspace = true }

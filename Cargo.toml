@@ -1,18 +1,25 @@
-[package]
-name = "toggl-rs"
-version = "0.0.3"
-edition = "2024"
-description = "toggl-rs is a library to interact with track.toggl.com APIs"
+[workspace]
+members = [
+    # core
+    "toggl-core",
+    "toggl",
+
+    # API implementations
+    "toggl-api",
+    "toggl-reports", 
+    "toggl-webhooks",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
 authors = ["Stefan Ruzitschka <stefan@icepuma.dev>"]
 repository = "https://github.com/icepuma/toggl-rs"
-readme = "README.md"
 license = "WTFPL"
+version = "0.0.3"
 
-[features]
-default = ["client"]
-client = []
-
-[dependencies]
+[workspace.dependencies]
+# External dependencies
 reqwest = { version = "0.12", features = ["json", "blocking", "multipart"] }
 thiserror = "2"
 url = "2"
@@ -22,7 +29,13 @@ owo-colors = "4"
 chrono = { version = "0.4", features = ["serde"] }
 base64 = "0.22"
 
-[dev-dependencies]
+# Dev dependencies
 mockito = "1"
 pretty_assertions = "1"
 tokio = { version = "1", features = ["rt", "macros", "rt-multi-thread"] }
+
+# Internal dependencies
+toggl-core = { path = "toggl-core", version = "0.0.3" }
+toggl-api = { path = "toggl-api", version = "0.0.3" }
+toggl-reports = { path = "toggl-reports", version = "0.0.3" }
+toggl-webhooks = { path = "toggl-webhooks", version = "0.0.3" }

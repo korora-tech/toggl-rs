@@ -1,0 +1,40 @@
+[package]
+name = "toggl"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+license.workspace = true
+description = "Rust client library for Toggl Track APIs - main entry point"
+readme = "../README.md"
+keywords = ["toggl", "api", "client", "time-tracking"]
+categories = ["api-bindings", "web-programming"]
+
+[features]
+# Default features - includes the most commonly used APIs
+default = ["api", "reports"]
+
+# Full feature set - includes all APIs
+full = ["api", "reports", "webhooks"]
+
+# Individual API features
+api = ["dep:toggl-api"]
+reports = ["dep:toggl-reports"]
+webhooks = ["dep:toggl-webhooks"]
+
+# Convenience feature groups
+minimal = ["api"]  # Just the core API, no reports
+analytics = ["api", "reports"]  # API + reporting capabilities
+
+[dependencies]
+toggl-core = { workspace = true }
+toggl-api = { workspace = true, optional = true }
+toggl-reports = { workspace = true, optional = true }
+toggl-webhooks = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
