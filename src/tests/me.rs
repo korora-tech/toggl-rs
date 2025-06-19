@@ -1,319 +1,183 @@
 use crate::error::Result;
+use crate::model::api::*;
 use pretty_assertions::assert_eq;
 use reqwest::Method;
 use serde_json::json;
+use std::collections::BTreeMap;
 
-use super::{with_mockito, API_TOKEN};
+use super::{API_TOKEN, with_mockito, with_mockito_params};
 
 #[test]
-fn get_me() -> Result<()> {
+fn test_get_me() -> Result<()> {
     let response = json!({
-        "api_token": API_TOKEN,
-        "at": "2020-01-01T00:00:00+00:00",
-        "beginning_of_week": 1,
-        "country_id": 82,
-        "created_at": "2020-01-01T00:00:00+00:00",
-        "default_workspace_id": 1234567,
-        "email": "hans.toggl@fkbr.org",
-        "fullname": "Hans Toggl",
         "id": 1234567,
+        "api_token": API_TOKEN,
+        "email": "test@example.com",
+        "fullname": "Test User",
+        "timezone": "Europe/Berlin",
+        "default_workspace_id": 9876543,
+        "beginning_of_week": 1,
         "image_url": "https://assets.track.toggl.com/images/profile.png",
-        "intercom_hash": null,
+        "created_at": "2020-01-01T00:00:00+00:00",
+        "updated_at": "2020-01-01T00:00:00+00:00",
         "openid_email": null,
         "openid_enabled": false,
+        "country_id": 82,
+        "at": "2020-01-01T00:00:00+00:00",
+        "intercom_hash": "hash123",
+        "has_password": true,
         "options": null,
-        "timezone": "Europe/Berlin",
-        "updated_at": "2020-01-01T00:00:00+00:00"
+        "tags": null
     });
 
-    with_mockito(Method::GET, "/me", 200, Some(response), |toggl_client| {
-        let me = toggl_client.me().get_me(true)?;
-
-        assert_eq!(Some(API_TOKEN.to_string()), me.api_token);
-        assert_eq!(1234567, me.default_workspace_id);
-
+    with_mockito(Method::GET, "/me", 200, Some(response), |client| {
+        let user = client.me().get()?;
+        assert_eq!(1234567, user.id);
+        assert_eq!("test@example.com", user.email);
+        assert_eq!("Test User", user.fullname);
+        assert_eq!(true, user.has_password);
         Ok(())
     })
 }
 
 #[test]
-fn get_me_clients() -> Result<()> {
-    let response = json!([
-      {
+fn test_update_me() -> Result<()> {
+    let update_data = UpdateUser {
+        fullname: Some("Updated Name".to_string()),
+        email: None,
+        timezone: None,
+        default_workspace_id: None,
+        beginning_of_week: None,
+        country_id: None,
+        password: None,
+        current_password: None,
+    };
+
+    let response = json!({
         "id": 1234567,
-        "wid": 1234567,
-        "archived": false,
-        "name": "aaa",
-        "at": "2022-10-03T15:47:31+00:00"
-      },
-      {
-        "id": 7654321,
-        "wid": 7654321,
-        "archived": false,
-        "name": "fsdklfkldskf",
-        "at": "2022-10-03T21:21:29+00:00"
-      }
-    ]);
+        "api_token": API_TOKEN,
+        "email": "test@example.com",
+        "fullname": "Updated Name",
+        "timezone": "Europe/Berlin",
+        "default_workspace_id": 9876543,
+        "beginning_of_week": 1,
+        "image_url": "https://assets.track.toggl.com/images/profile.png",
+        "created_at": "2020-01-01T00:00:00+00:00",
+        "updated_at": "2020-01-01T00:00:00+00:00",
+        "openid_email": null,
+        "openid_enabled": false,
+        "country_id": 82,
+        "at": "2020-01-01T00:00:00+00:00",
+        "intercom_hash": "hash123",
+        "has_password": true,
+        "options": null,
+        "tags": null
+    });
 
-    with_mockito(
-        Method::GET,
-        "/me/clients?since=1673134409",
-        200,
-        Some(response),
-        |toggl_client| {
-            let me_clients = toggl_client.me().get_me_clients(true, Some(1673134409))?;
-
-            assert_eq!(2, me_clients.len());
-            assert_eq!(1234567, me_clients[0].id);
-            assert_eq!(7654321, me_clients[1].id);
-
-            Ok(())
-        },
-    )
+    with_mockito(Method::PUT, "/me", 200, Some(response), |client| {
+        let user = client.me().update(&update_data)?;
+        assert_eq!("Updated Name", user.fullname);
+        Ok(())
+    })
 }
 
 #[test]
-fn get_me_features() -> Result<()> {
+fn test_get_clients() -> Result<()> {
+    let response = json!([
+        {
+            "id": 1234567,
+            "workspace_id": 9876543,
+            "name": "Client One",
+            "archived": false,
+            "at": "2022-10-03T15:47:31+00:00",
+            "server_deleted_at": null,
+            "permissions": null
+        },
+        {
+            "id": 7654321,
+            "workspace_id": 9876543,
+            "name": "Client Two",
+            "archived": false,
+            "at": "2022-10-03T21:21:29+00:00",
+            "server_deleted_at": null,
+            "permissions": null
+        }
+    ]);
+
+    with_mockito(Method::GET, "/me/clients", 200, Some(response), |client| {
+        let clients = client.me().get_clients(None)?;
+        assert_eq!(2, clients.len());
+        assert_eq!(1234567, clients[0].id);
+        assert_eq!("Client One", clients[0].name);
+        assert_eq!(7654321, clients[1].id);
+        assert_eq!("Client Two", clients[1].name);
+        Ok(())
+    })
+}
+
+#[test]
+fn test_get_features() -> Result<()> {
     let response = json!([{
         "workspace_id": 1234567,
         "features": [
-          {
-            "feature_id": 0,
-            "name": "free",
-            "enabled": true
-          },
-          {
-            "feature_id": 13,
-            "name": "pro",
-            "enabled": false
-          },
-          {
-            "feature_id": 15,
-            "name": "business",
-            "enabled": false
-          },
-          {
-            "feature_id": 50,
-            "name": "scheduled_reports",
-            "enabled": false
-          },
-          {
-            "feature_id": 51,
-            "name": "time_audits",
-            "enabled": false
-          },
-          {
-            "feature_id": 52,
-            "name": "locking_time_entries",
-            "enabled": false
-          },
-          {
-            "feature_id": 53,
-            "name": "edit_team_member_time_entries",
-            "enabled": false
-          },
-          {
-            "feature_id": 54,
-            "name": "edit_team_member_profile",
-            "enabled": false
-          },
-          {
-            "feature_id": 55,
-            "name": "tracking_reminders",
-            "enabled": false
-          },
-          {
-            "feature_id": 56,
-            "name": "time_entry_constraints",
-            "enabled": false
-          },
-          {
-            "feature_id": 57,
-            "name": "priority_support",
-            "enabled": false
-          },
-          {
-            "feature_id": 58,
-            "name": "labour_cost",
-            "enabled": false
-          },
-          {
-            "feature_id": 59,
-            "name": "report_employee_profitability",
-            "enabled": false
-          },
-          {
-            "feature_id": 60,
-            "name": "report_project_profitability",
-            "enabled": false
-          },
-          {
-            "feature_id": 61,
-            "name": "report_comparative",
-            "enabled": false
-          },
-          {
-            "feature_id": 62,
-            "name": "report_data_trends",
-            "enabled": false
-          },
-          {
-            "feature_id": 63,
-            "name": "report_export_xlsx",
-            "enabled": false
-          },
-          {
-            "feature_id": 64,
-            "name": "tasks",
-            "enabled": false
-          },
-          {
-            "feature_id": 65,
-            "name": "project_dashboard",
-            "enabled": false
-          },
-          {
-            "feature_id": 66,
-            "name": "outlook_calendar_integration",
-            "enabled": false
-          },
-          {
-            "feature_id": 67,
-            "name": "favorites",
-            "enabled": false
-          },
-          {
-            "feature_id": 68,
-            "name": "multi_workspace",
-            "enabled": false
-          },
-          {
-            "feature_id": 69,
-            "name": "goals",
-            "enabled": false
-          },
-          {
-            "feature_id": 70,
-            "name": "recurring_projects",
-            "enabled": false
-          },
-          {
-            "feature_id": 71,
-            "name": "only_admins_may_create_tags",
-            "enabled": false
-          },
-          {
-            "feature_id": 72,
-            "name": "billable_rates",
-            "enabled": false
-          },
-          {
-            "feature_id": 73,
-            "name": "historical_billable_rates",
-            "enabled": false
-          },
-          {
-            "feature_id": 74,
-            "name": "split_time_entry",
-            "enabled": false
-          },
-          {
-            "feature_id": 75,
-            "name": "focus_mode",
-            "enabled": false
-          },
-          {
-            "feature_id": 76,
-            "name": "fixed_fee",
-            "enabled": false
-          },
-          {
-            "feature_id": 77,
-            "name": "summary_audit",
-            "enabled": false
-          },
-          {
-            "feature_id": 78,
-            "name": "archive_client",
-            "enabled": false
-          },
-          {
-            "feature_id": 79,
-            "name": "reports_hide_weekends",
-            "enabled": false
-          },
-          {
-            "feature_id": 80,
-            "name": "multi_calendar",
-            "enabled": false
-          },
-          {
-            "feature_id": 81,
-            "name": "project_template",
-            "enabled": false
-          }
+            {
+                "feature_id": 0,
+                "name": "free",
+                "enabled": true
+            },
+            {
+                "feature_id": 13,
+                "name": "pro",
+                "enabled": false
+            },
+            {
+                "feature_id": 15,
+                "name": "business",
+                "enabled": false
+            }
         ]
-      }
-    ]);
+    }]);
 
-    with_mockito(
-        Method::GET,
-        "/me/features",
-        200,
-        Some(response),
-        |toggl_client| {
-            let me_features = toggl_client.me().get_me_features(true)?;
-
-            assert_eq!("free", me_features[0].features[0].name);
-            assert_eq!(true, me_features[0].features[0].enabled);
-
-            Ok(())
-        },
-    )
-}
-
-#[test]
-fn get_me_locations() -> Result<()> {
-    let response = json!({
-        "city": "New York",
-        "city_lat_long": "40.730610,-73.935242",
-        "state": "New York",
-        "country_code": "US",
-        "country_name": "United States",
-    });
-
-    with_mockito(
-        Method::GET,
-        "/me/location",
-        200,
-        Some(response),
-        |toggl_client| {
-            let me_location = toggl_client.me().get_me_location(true)?;
-
-            assert_eq!("New York", me_location.city);
-            assert_eq!("40.730610,-73.935242", me_location.city_lat_long);
-            assert_eq!("New York", me_location.state);
-            assert_eq!("US", me_location.country_code);
-            assert_eq!("United States", me_location.country_name);
-
-            Ok(())
-        },
-    )
-}
-
-#[test]
-fn get_me_logged() -> Result<()> {
-    with_mockito(Method::GET, "/me/logged", 200, None, |toggl_client| {
-        let me_logged = toggl_client.me().get_me_logged(true);
-
-        assert!(me_logged.is_ok());
-
+    with_mockito(Method::GET, "/me/features", 200, Some(response), |client| {
+        let features = client.me().get_features()?;
+        assert_eq!(1, features.len());
+        assert_eq!(1234567, features[0].workspace_id);
+        assert_eq!(3, features[0].features.len());
+        assert_eq!("free", features[0].features[0].name);
+        assert_eq!(true, features[0].features[0].enabled);
         Ok(())
     })
 }
 
 #[test]
-fn get_me_organizations() -> Result<()> {
+fn test_get_location() -> Result<()> {
+    let response = json!({
+        "city": "Berlin",
+        "city_lat_long": "52.520008,13.404954",
+        "state": "Berlin",
+        "country_code": "DE",
+        "country_name": "Germany"
+    });
+
+    with_mockito(Method::GET, "/me/location", 200, Some(response), |client| {
+        let location = client.me().get_location()?;
+        assert_eq!("Berlin", location.city);
+        assert_eq!("52.520008,13.404954", location.city_lat_long);
+        assert_eq!("DE", location.country_code);
+        Ok(())
+    })
+}
+
+#[test]
+fn test_get_logged() -> Result<()> {
+    with_mockito(Method::GET, "/me/logged", 200, None, |client| {
+        client.me().get_logged()?;
+        Ok(())
+    })
+}
+
+#[test]
+fn test_get_organizations() -> Result<()> {
     let response = json!([
         {
             "id": 1234567,
@@ -324,20 +188,21 @@ fn get_me_organizations() -> Result<()> {
             "server_deleted_at": null,
             "is_multi_workspace_enabled": false,
             "suspended_at": null,
-            "user_count": 1,
+            "user_count": 5,
             "trial_info": {
-              "trial": false,
-              "trial_available": false,
-              "trial_end_date": "2021-12-12T00:00:00Z",
-              "next_payment_date": null,
-              "last_pricing_plan_id": null
+                "trial": false,
+                "trial_available": false,
+                "trial_end_date": null,
+                "next_payment_date": null,
+                "last_pricing_plan_id": null
             },
             "is_chargify": false,
             "is_unified": false,
             "max_workspaces": 20,
             "admin": true,
-            "owner": true
-          }
+            "owner": true,
+            "permissions": null
+        }
     ]);
 
     with_mockito(
@@ -345,275 +210,150 @@ fn get_me_organizations() -> Result<()> {
         "/me/organizations",
         200,
         Some(response),
-        |toggl_client| {
-            let me_organizations = toggl_client.me().get_me_organizations(true)?;
-
-            assert_eq!(1234567, me_organizations[0].id);
-            assert_eq!("My Organization", me_organizations[0].name);
-            assert_eq!(0, me_organizations[0].pricing_plan_id);
-            assert_eq!(1, me_organizations[0].user_count);
-            assert_eq!(20, me_organizations[0].max_workspaces);
-            assert_eq!(true, me_organizations[0].admin);
-            assert_eq!(true, me_organizations[0].owner);
-
+        |client| {
+            let orgs = client.me().get_organizations()?;
+            assert_eq!(1, orgs.len());
+            assert_eq!(1234567, orgs[0].id);
+            assert_eq!("My Organization", orgs[0].name);
+            assert_eq!(true, orgs[0].admin);
+            assert_eq!(true, orgs[0].owner);
             Ok(())
         },
     )
 }
 
 #[test]
-fn get_me_projects() -> Result<()> {
+fn test_get_projects() -> Result<()> {
     let response = json!([
-      {
-        "id": 123456789,
-        "workspace_id": 123456789,
-        "client_id": null,
-        "name": "aaaa",
-        "is_private": true,
-        "active": true,
-        "at": "2023-01-02T23:02:17+00:00",
-        "created_at": "2022-10-03T15:47:08+00:00",
-        "server_deleted_at": null,
-        "color": "#465bb3",
-        "billable": false,
-        "template": false,
-        "auto_estimates": false,
-        "estimated_hours": null,
-        "rate": null,
-        "rate_last_updated": null,
-        "currency": null,
-        "recurring": true,
-        "recurring_parameters": [
-          {
+        {
+            "id": 123456789,
+            "workspace_id": 123456789,
+            "client_id": null,
+            "name": "Test Project",
+            "is_private": true,
+            "active": true,
+            "at": "2023-01-02T23:02:17+00:00",
+            "created_at": "2022-10-03T15:47:08+00:00",
+            "server_deleted_at": null,
+            "color": "#465bb3",
+            "billable": false,
+            "template": false,
+            "auto_estimates": false,
+            "estimated_hours": null,
+            "estimated_seconds": null,
+            "rate": null,
+            "rate_last_updated": null,
+            "currency": null,
+            "recurring": false,
+            "recurring_parameters": null,
+            "current_period": null,
+            "fixed_fee": null,
+            "actual_hours": null,
+            "actual_seconds": null,
+            "start_date": null,
+            "end_date": null,
+            "permissions": null
+        }
+    ]);
+
+    with_mockito(Method::GET, "/me/projects", 200, Some(response), |client| {
+        let projects = client.me().get_projects(None, None)?;
+        assert_eq!(1, projects.len());
+        assert_eq!(123456789, projects[0].id);
+        assert_eq!("Test Project", projects[0].name);
+        assert_eq!(true, projects[0].active);
+        Ok(())
+    })
+}
+
+#[test]
+fn test_get_tags() -> Result<()> {
+    let response = json!([
+        {
+            "id": 1234,
+            "workspace_id": 123456789,
+            "name": "important",
+            "at": "2022-10-03T15:44:20.424008Z",
+            "deleted_at": null,
+            "permissions": null
+        },
+        {
+            "id": 1235,
+            "workspace_id": 123456789,
+            "name": "urgent",
+            "at": "2022-10-03T15:49:09.73311Z",
+            "deleted_at": null,
+            "permissions": null
+        }
+    ]);
+
+    with_mockito(Method::GET, "/me/tags", 200, Some(response), |client| {
+        let tags = client.me().get_tags(None)?;
+        assert_eq!(2, tags.len());
+        assert_eq!(1234, tags[0].id);
+        assert_eq!("important", tags[0].name);
+        assert_eq!(1235, tags[1].id);
+        assert_eq!("urgent", tags[1].name);
+        Ok(())
+    })
+}
+
+#[test]
+fn test_get_tasks() -> Result<()> {
+    let response = json!([
+        {
+            "id": 1234,
+            "name": "Task One",
+            "workspace_id": 123456789,
+            "project_id": 123456789,
+            "user_id": null,
+            "recurring": false,
+            "active": true,
+            "at": "2023-01-08T00:03:11+00:00",
+            "server_deleted_at": null,
             "estimated_seconds": 0,
-            "period": "monthly",
-            "custom_period": null,
-            "project_start_date": "2022-10-03",
-            "parameter_start_date": "2023-01-02",
-            "parameter_end_date": null
-          }
-        ],
-        "current_period": {
-          "start_date": "2022-12-03",
-          "end_date": "2023-01-02"
+            "tracked_seconds": 0,
+            "permissions": null
         },
-        "fixed_fee": null,
-        "actual_hours": null,
-        "start_date": "2022-10-03T00:00:00Z",
-        "wid": 123456789,
-        "cid": null
-      }
-    ]);
-
-    with_mockito(
-        Method::GET,
-        "/me/projects?include_archived=true&since=1673134409",
-        200,
-        Some(response),
-        |toggl_client| {
-            let me_projects =
-                toggl_client
-                    .me()
-                    .get_me_projects(true, Some(true), Some(1673134409))?;
-
-            assert_eq!(123456789, me_projects[0].id);
-            assert_eq!(123456789, me_projects[0].workspace_id);
-            assert_eq!(None, me_projects[0].client_id);
-            assert_eq!("aaaa", me_projects[0].name);
-            assert_eq!(true, me_projects[0].is_private);
-            assert_eq!(true, me_projects[0].active);
-
-            Ok(())
-        },
-    )
-}
-
-#[test]
-fn get_me_projects_paginated() -> Result<()> {
-    let response = json!([
-      {
-        "id": 123456789,
-        "workspace_id": 123456789,
-        "client_id": null,
-        "name": "aaaa",
-        "is_private": true,
-        "active": true,
-        "at": "2023-01-02T23:02:17+00:00",
-        "created_at": "2022-10-03T15:47:08+00:00",
-        "server_deleted_at": null,
-        "color": "#465bb3",
-        "billable": false,
-        "template": false,
-        "auto_estimates": false,
-        "estimated_hours": null,
-        "rate": null,
-        "rate_last_updated": null,
-        "currency": null,
-        "recurring": true,
-        "recurring_parameters": [
-          {
+        {
+            "id": 1235,
+            "name": "Task Two",
+            "workspace_id": 123456789,
+            "project_id": 123456789,
+            "user_id": null,
+            "recurring": false,
+            "active": false,
+            "at": "2023-01-08T00:03:11+00:00",
+            "server_deleted_at": null,
             "estimated_seconds": 0,
-            "period": "monthly",
-            "custom_period": null,
-            "project_start_date": "2022-10-03",
-            "parameter_start_date": "2023-01-02",
-            "parameter_end_date": null
-          }
-        ],
-        "current_period": {
-          "start_date": "2022-12-03",
-          "end_date": "2023-01-02"
-        },
-        "fixed_fee": null,
-        "actual_hours": null,
-        "start_date": "2022-10-03T00:00:00Z",
-        "wid": 123456789,
-        "cid": null
-      }
+            "tracked_seconds": 0,
+            "permissions": null
+        }
     ]);
 
-    with_mockito(
-        Method::GET,
-        "/me/projects?start_project_id=123456789&since=1673134409",
-        200,
-        Some(response),
-        |toggl_client| {
-            let me_projects = toggl_client.me().get_me_projects_paginated(
-                true,
-                Some(123456789),
-                Some(1673134409),
-            )?;
-
-            assert_eq!(123456789, me_projects[0].id);
-            assert_eq!(123456789, me_projects[0].workspace_id);
-            assert_eq!(None, me_projects[0].client_id);
-            assert_eq!("aaaa", me_projects[0].name);
-            assert_eq!(true, me_projects[0].is_private);
-            assert_eq!(true, me_projects[0].active);
-
-            Ok(())
-        },
-    )
+    with_mockito(Method::GET, "/me/tasks", 200, Some(response), |client| {
+        let tasks = client.me().get_tasks(None, None)?;
+        assert_eq!(2, tasks.len());
+        assert_eq!(1234, tasks[0].id);
+        assert_eq!("Task One", tasks[0].name);
+        assert_eq!(true, tasks[0].active);
+        assert_eq!(false, tasks[1].active);
+        Ok(())
+    })
 }
 
 #[test]
-fn get_me_tags() -> Result<()> {
+fn test_get_track_reminders() -> Result<()> {
     let response = json!([
-      {
-        "id": 1234,
-        "workspace_id": 123456789,
-        "name": "aaa",
-        "at": "2022-10-03T15:44:20.424008Z"
-      },
-      {
-        "id": 1235,
-        "workspace_id": 123456789,
-        "name": "aaaa",
-        "at": "2022-10-03T15:49:09.73311Z"
-      },
-      {
-        "id": 1236,
-        "workspace_id": 123456789,
-        "name": "aaaa, fdsfsd",
-        "at": "2022-10-03T15:44:41.464544Z"
-      },
-      {
-        "id": 1237,
-        "workspace_id": 123456789,
-        "name": "aaa,bbb",
-        "at": "2022-10-03T15:43:46.015571Z"
-      },
-      {
-        "id": 1238,
-        "workspace_id": 123456789,
-        "name": "klklk",
-        "at": "2022-10-03T15:49:09.73311Z"
-      }
-    ]);
-
-    with_mockito(
-        Method::GET,
-        "/me/tags?since=1673134409",
-        200,
-        Some(response),
-        |toggl_client| {
-            let me_tags = toggl_client.me().get_me_tags(true, Some(1673134409))?;
-
-            assert_eq!(1234, me_tags[0].id);
-            assert_eq!(123456789, me_tags[0].workspace_id);
-            assert_eq!("aaa", me_tags[0].name);
-
-            Ok(())
-        },
-    )
-}
-
-#[test]
-fn get_me_tasks() -> Result<()> {
-    let response = json!([
-      {
-        "id": 1234,
-        "name": "fsdfs",
-        "workspace_id": 123456789,
-        "project_id": 123456789,
-        "user_id": null,
-        "recurring": false,
-        "active": true,
-        "at": "2023-01-08T00:03:11+00:00",
-        "server_deleted_at": null,
-        "estimated_seconds": 0,
-        "tracked_seconds": 0
-      },
-      {
-        "id": 1235,
-        "name": "fsdfs",
-        "workspace_id": 123456789,
-        "project_id": 123456789,
-        "user_id": null,
-        "recurring": false,
-        "active": false,
-        "at": "2023-01-08T00:03:11+00:00",
-        "server_deleted_at": null,
-        "estimated_seconds": 0,
-        "tracked_seconds": 0
-      }
-    ]);
-
-    with_mockito(
-        Method::GET,
-        "/me/tasks?include_not_active=true&since=1673134409",
-        200,
-        Some(response),
-        |toggl_client| {
-            let me_tasks = toggl_client
-                .me()
-                .get_me_tasks(true, Some(true), Some(1673134409))?;
-
-            assert_eq!(1234, me_tasks[0].id);
-            assert_eq!("fsdfs", me_tasks[0].name);
-            assert_eq!(123456789, me_tasks[0].workspace_id);
-            assert_eq!(123456789, me_tasks[0].project_id);
-            assert_eq!(None, me_tasks[0].user_id);
-            assert_eq!(false, me_tasks[0].recurring);
-            assert_eq!(true, me_tasks[0].active);
-
-            Ok(())
-        },
-    )
-}
-
-#[test]
-fn get_me_track_reminders() -> Result<()> {
-    let response = json!([
-      {
-        "reminder_id": 5490,
-        "workspace_id": 6967122,
-        "frequency": 1,
-        "threshold": 2,
-        "created_at": "2023-01-08T00:10:32.840314Z",
-        "user_ids": null,
-        "group_ids": null
-      }
+        {
+            "reminder_id": 5490,
+            "workspace_id": 6967122,
+            "frequency": 1,
+            "threshold": 2,
+            "created_at": "2023-01-08T00:10:32.840314Z",
+            "user_ids": null,
+            "group_ids": null
+        }
     ]);
 
     with_mockito(
@@ -621,16 +361,303 @@ fn get_me_track_reminders() -> Result<()> {
         "/me/track_reminders",
         200,
         Some(response),
-        |toggl_client| {
-            let me_track_reminders = toggl_client.me().get_me_track_reminders(true)?;
+        |client| {
+            let reminders = client.me().get_track_reminders()?;
+            assert_eq!(1, reminders.len());
+            assert_eq!(5490, reminders[0].reminder_id);
+            assert_eq!(1, reminders[0].frequency);
+            assert_eq!(2, reminders[0].threshold);
+            Ok(())
+        },
+    )
+}
 
-            assert_eq!(5490, me_track_reminders[0].reminder_id);
-            assert_eq!(6967122, me_track_reminders[0].workspace_id);
-            assert_eq!(1, me_track_reminders[0].frequency);
-            assert_eq!(2, me_track_reminders[0].threshold);
-            assert_eq!(None, me_track_reminders[0].user_ids);
-            assert_eq!(None, me_track_reminders[0].group_ids);
+#[test]
+fn test_get_workspaces() -> Result<()> {
+    let response = json!([
+        {
+            "id": 1234567,
+            "organization_id": 7654321,
+            "name": "My Workspace",
+            "profile": 0,
+            "premium": false,
+            "business_ws": false,
+            "admin": true,
+            "default_hourly_rate": null,
+            "rate_last_updated": null,
+            "default_currency": "USD",
+            "only_admins_may_create_projects": false,
+            "only_admins_may_create_tags": false,
+            "only_admins_see_billable_rates": false,
+            "only_admins_see_team_dashboard": false,
+            "projects_billable_by_default": true,
+            "projects_enforce_billable": false,
+            "projects_private_by_default": false,
+            "reports_collapse": true,
+            "rounding": 1,
+            "rounding_minutes": 0,
+            "api_token": null,
+            "at": "2022-10-03T15:44:00.289146Z",
+            "ical_enabled": false,
+            "ical_url": null,
+            "csv_upload": null,
+            "subscription": null,
+            "working_hours_in_minutes": null,
+            "logo_url": null,
+            "permissions": null,
+            "max_data_retention_days": null
+        }
+    ]);
 
+    with_mockito(
+        Method::GET,
+        "/me/workspaces",
+        200,
+        Some(response),
+        |client| {
+            let workspaces = client.me().get_workspaces(None)?;
+            assert_eq!(1, workspaces.len());
+            assert_eq!(1234567, workspaces[0].id);
+            assert_eq!("My Workspace", workspaces[0].name);
+            assert_eq!(true, workspaces[0].admin);
+            Ok(())
+        },
+    )
+}
+
+#[test]
+fn test_accept_tos() -> Result<()> {
+    with_mockito(Method::GET, "/me/accept_tos", 200, None, |client| {
+        client.me().accept_tos()?;
+        Ok(())
+    })
+}
+
+#[test]
+fn test_close_account() -> Result<()> {
+    with_mockito(Method::POST, "/me/close_account", 200, None, |client| {
+        client.me().close_account()?;
+        Ok(())
+    })
+}
+
+#[test]
+fn test_disable_product_emails() -> Result<()> {
+    with_mockito(
+        Method::POST,
+        "/me/disable_product_emails/test123",
+        200,
+        None,
+        |client| {
+            client.me().disable_product_emails("test123")?;
+            Ok(())
+        },
+    )
+}
+
+#[test]
+fn test_disable_weekly_report() -> Result<()> {
+    with_mockito(
+        Method::POST,
+        "/me/disable_weekly_report/test456",
+        200,
+        None,
+        |client| {
+            client.me().disable_weekly_report("test456")?;
+            Ok(())
+        },
+    )
+}
+
+#[test]
+fn test_get_flags() -> Result<()> {
+    let response = json!({
+        "feature_a": true,
+        "feature_b": false,
+        "feature_c": "value",
+        "feature_d": 123
+    });
+
+    with_mockito(Method::GET, "/me/flags", 200, Some(response), |client| {
+        let flags = client.me().get_flags()?;
+        assert_eq!(4, flags.0.len());
+        assert_eq!(Some(&json!(true)), flags.0.get("feature_a"));
+        assert_eq!(Some(&json!(false)), flags.0.get("feature_b"));
+        Ok(())
+    })
+}
+
+#[test]
+fn test_get_preferences() -> Result<()> {
+    let response = json!({
+        "date_format": "MM/DD/YYYY",
+        "duration_format": "improved",
+        "timeofday_format": "h:mm A",
+        "beginning_of_week": 1,
+        "theme": "dark"
+    });
+
+    with_mockito(
+        Method::GET,
+        "/me/preferences",
+        200,
+        Some(response),
+        |client| {
+            let prefs = client.me().get_preferences()?;
+            assert_eq!(Some("MM/DD/YYYY".to_string()), prefs.date_format);
+            assert_eq!(Some("improved".to_string()), prefs.duration_format);
+            assert_eq!(Some("dark".to_string()), prefs.theme);
+            Ok(())
+        },
+    )
+}
+
+#[test]
+fn test_get_push_services() -> Result<()> {
+    let response = json!([{
+        "id": 12345,
+        "token": "test-token-123",
+        "platform": "ios",
+        "device_name": "iPhone 12"
+    }]);
+
+    with_mockito(
+        Method::GET,
+        "/me/push_services",
+        200,
+        Some(response),
+        |client| {
+            let services = client.me().get_push_services()?;
+            assert_eq!(1, services.len());
+            assert_eq!(12345, services[0].id);
+            assert_eq!("ios", services[0].platform);
+            Ok(())
+        },
+    )
+}
+
+#[test]
+fn test_get_quota() -> Result<()> {
+    let response = json!({
+        "total": 1000000,
+        "used": 250000,
+        "available": 750000
+    });
+
+    with_mockito(Method::GET, "/me/quota", 200, Some(response), |client| {
+        let quota = client.me().get_quota()?;
+        assert_eq!(1000000, quota.total);
+        assert_eq!(250000, quota.used);
+        assert_eq!(750000, quota.available);
+        Ok(())
+    })
+}
+
+#[test]
+fn test_get_shared_time_entries() -> Result<()> {
+    let response = json!([{
+        "time_entry_id": 987654321,
+        "user_id": 123456,
+        "user_name": "John Doe",
+        "user_email": "john@example.com",
+        "shared_at": "2023-01-01T10:00:00Z"
+    }]);
+
+    with_mockito(
+        Method::GET,
+        "/me/time_entries_shared_with",
+        200,
+        Some(response),
+        |client| {
+            let shared = client.me().get_shared_time_entries()?;
+            assert_eq!(1, shared.len());
+            assert_eq!(987654321, shared[0].time_entry_id.value());
+            assert_eq!("John Doe", shared[0].user_name);
+            Ok(())
+        },
+    )
+}
+
+#[test]
+fn test_get_web_timer() -> Result<()> {
+    let response = json!({
+        "web_timer_id": "timer-12345",
+        "web_timer_seconds": 3600
+    });
+
+    with_mockito(
+        Method::GET,
+        "/me/web-timer",
+        200,
+        Some(response),
+        |client| {
+            let web_timer = client.me().get_web_timer()?;
+            assert_eq!(web_timer.web_timer_id, "timer-12345");
+            assert_eq!(web_timer.web_timer_seconds, 3600);
+            Ok(())
+        },
+    )
+}
+
+#[test]
+fn test_request_export() -> Result<()> {
+    let response = json!("export-uuid-12345");
+
+    let mut params = BTreeMap::new();
+    params.insert("export_type", "csv");
+
+    with_mockito_params(
+        Method::GET,
+        "/me/export",
+        Some(params),
+        200,
+        Some(response),
+        |client| {
+            let export_uuid = client.me().request_export("csv")?;
+            assert_eq!(export_uuid, "export-uuid-12345");
+            Ok(())
+        },
+    )
+}
+
+#[test]
+fn test_reset_token() -> Result<()> {
+    let reset_request = ResetToken {
+        token: "current-token".to_string(),
+        password: "password123".to_string(),
+        email: "user@example.com".to_string(),
+    };
+
+    let response = json!({
+        "id": 98765,
+        "email": "user@example.com",
+        "fullname": "Test User",
+        "api_token": "new-token-12345",
+        "timezone": "America/New_York",
+        "default_workspace_id": 54321,
+        "beginning_of_week": 1,
+        "image_url": "https://example.com/avatar.jpg",
+        "created_at": "2023-01-01T10:00:00Z",
+        "updated_at": "2024-01-16T15:00:00Z",
+        "at": "2024-01-16T15:00:00Z",
+        "openid_email": null,
+        "openid_enabled": false,
+        "country_id": null,
+        "intercom_hash": null,
+        "has_password": true,
+        "options": null,
+        "tags": null
+    });
+
+    with_mockito(
+        Method::POST,
+        "/me/lost_password/token",
+        200,
+        Some(response),
+        |client| {
+            let user = client.me().reset_token(&reset_request)?;
+            assert_eq!(user.id, 98765);
+            assert_eq!(user.api_token, Some("new-token-12345".to_string()));
             Ok(())
         },
     )

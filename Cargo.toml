@@ -1,7 +1,7 @@
 [package]
 name = "toggl-rs"
 version = "0.0.3"
-edition = "2021"
+edition = "2024"
 description = "toggl-rs is a library to interact with track.toggl.com APIs"
 authors = ["Stefan Ruzitschka <stefan@icepuma.dev>"]
 repository = "https://github.com/icepuma/toggl-rs"
@@ -13,18 +13,16 @@ default = ["client"]
 client = []
 
 [dependencies]
-reqwest = { version = "0.11", default-features = false, features = [
-    "blocking",
-    "json",
-    "rustls-tls",
-] }
-thiserror = "1"
+reqwest = { version = "0.12", features = ["json", "blocking", "multipart"] }
+thiserror = "2"
 url = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-owo-colors = "3"
+owo-colors = "4"
 chrono = { version = "0.4", features = ["serde"] }
+base64 = "0.22"
 
 [dev-dependencies]
-mockito = "0.31"
+mockito = "1"
 pretty_assertions = "1"
+tokio = { version = "1", features = ["rt", "macros", "rt-multi-thread"] }

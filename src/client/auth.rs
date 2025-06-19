@@ -1,0 +1,23 @@
+use super::TogglClient;
+use crate::error::Result;
+use crate::model::api::auth::SamlLoginResponse;
+use reqwest::Method;
+
+pub struct AuthClient {
+    client: TogglClient,
+}
+
+impl AuthClient {
+    pub fn new(client: TogglClient) -> Self {
+        Self { client }
+    }
+
+    /// Initiate SAML2 login
+    pub fn saml2_login(&self, workspace_id: Option<u64>) -> Result<SamlLoginResponse> {
+        let path = match workspace_id {
+            Some(id) => format!("auth/saml2/login/{}", id),
+            None => "auth/saml2/login".to_string(),
+        };
+        self.client.request(Method::POST, &path)
+    }
+}
