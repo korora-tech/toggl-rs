@@ -1,7 +1,7 @@
 use super::TogglClient;
 use crate::models::api::country::{Country, Subdivision};
-use crate::models::api::ids::CountryId;
 use reqwest::Method;
+use toggl_core::CountryId;
 use toggl_core::Result;
 
 pub struct CountriesClient {

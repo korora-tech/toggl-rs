@@ -1,6 +1,7 @@
 //! Data trends report models
 
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, ProjectId, UserId};
 
 /// Data trends response for clients
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -12,7 +13,7 @@ pub struct ClientDataTrendsReport {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ClientDataTrend {
     /// Client ID
-    pub client_id: Option<i64>,
+    pub client_id: Option<ClientId>,
 
     /// Client name
     pub client_name: Option<String>,
@@ -34,13 +35,13 @@ pub struct ProjectDataTrendsReport {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectDataTrend {
     /// Project ID
-    pub project_id: i64,
+    pub project_id: ProjectId,
 
     /// Project name
     pub project_name: String,
 
     /// Client ID
-    pub client_id: Option<i64>,
+    pub client_id: Option<ClientId>,
 
     /// Client name
     pub client_name: Option<String>,
@@ -62,7 +63,7 @@ pub struct UserDataTrendsReport {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserDataTrend {
     /// User ID
-    pub user_id: i64,
+    pub user_id: UserId,
 
     /// User name
     pub user_name: String,

@@ -1,10 +1,10 @@
 use super::TogglClient;
 use crate::models::api::audit::AuditLog;
-use crate::models::api::ids::{OrganizationId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{OrganizationId, UserId, WorkspaceId};
 
 #[derive(Debug, Default)]
 pub struct AuditLogFilters {

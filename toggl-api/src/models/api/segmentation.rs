@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::ids::{GroupId, UserId, WorkspaceId};
+use toggl_core::{GroupId, UserId, WorkspaceId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OrganizationSegmentation {

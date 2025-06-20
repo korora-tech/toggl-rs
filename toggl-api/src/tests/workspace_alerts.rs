@@ -1,9 +1,9 @@
 use crate::models::api::alert::{CreateAlert, UpdateAlert};
-use crate::models::api::ids::{AlertId, WorkspaceId};
 use crate::tests::*;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{AlertId, WorkspaceId};
 
 #[test]
 fn test_get_alerts() -> Result<()> {

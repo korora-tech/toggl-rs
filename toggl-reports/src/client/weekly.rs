@@ -1,7 +1,7 @@
 //! Weekly report endpoints
 
 use reqwest::Method;
-use toggl_core::Result;
+use toggl_core::{Result, WorkspaceId};
 
 use super::ReportsClient;
 use crate::models::weekly::*;
@@ -16,21 +16,35 @@ impl WeeklyClient {
     }
 
     /// Get weekly report for a workspace
-    pub fn get(&self, workspace_id: i64, request: &WeeklyPost) -> Result<WeeklyReport> {
-        let path = format!("/workspace/{}/weekly/time_entries", workspace_id);
+    pub fn get(&self, workspace_id: WorkspaceId, request: &WeeklyPost) -> Result<WeeklyReport> {
+        let path = format!("/workspace/{}/weekly/time_entries", workspace_id.value());
         self.client.request_with_body(Method::POST, &path, request)
     }
 
     /// Export weekly report as CSV
-    pub fn export_csv(&self, workspace_id: i64, request: &WeeklyExportPost) -> Result<Vec<u8>> {
-        let path = format!("/workspace/{}/weekly/time_entries.csv", workspace_id);
+    pub fn export_csv(
+        &self,
+        workspace_id: WorkspaceId,
+        request: &WeeklyExportPost,
+    ) -> Result<Vec<u8>> {
+        let path = format!(
+            "/workspace/{}/weekly/time_entries.csv",
+            workspace_id.value()
+        );
         self.client
             .request_bytes_with_body(Method::POST, &path, request)
     }
 
     /// Export weekly report as PDF
-    pub fn export_pdf(&self, workspace_id: i64, request: &WeeklyExportPDFPost) -> Result<Vec<u8>> {
-        let path = format!("/workspace/{}/weekly/time_entries.pdf", workspace_id);
+    pub fn export_pdf(
+        &self,
+        workspace_id: WorkspaceId,
+        request: &WeeklyExportPDFPost,
+    ) -> Result<Vec<u8>> {
+        let path = format!(
+            "/workspace/{}/weekly/time_entries.pdf",
+            workspace_id.value()
+        );
         self.client
             .request_bytes_with_body(Method::POST, &path, request)
     }

@@ -1,8 +1,8 @@
 use super::TogglClient;
-use crate::models::api::ids::{TimeEntryInvitationId, WorkspaceId};
 use crate::models::api::time_entry_invitations::TimeEntryInvitation;
 use reqwest::Method;
 use toggl_core::Result;
+use toggl_core::{TimeEntryInvitationId, WorkspaceId};
 
 pub struct TimeEntryInvitationsClient {
     client: TogglClient,

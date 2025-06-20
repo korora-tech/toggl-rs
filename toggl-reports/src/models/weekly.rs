@@ -2,6 +2,7 @@
 
 use super::base::Post;
 use serde::{Deserialize, Serialize};
+use toggl_core::UserId;
 
 /// Weekly report post parameters
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -30,7 +31,7 @@ pub struct WeeklyReport {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WeeklyData {
     /// User ID
-    pub user_id: i64,
+    pub user_id: UserId,
 
     /// User details
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,7 +55,7 @@ pub struct WeeklyData {
 /// User details in weekly report
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserDetails {
-    pub id: i64,
+    pub id: UserId,
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,

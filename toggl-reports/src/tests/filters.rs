@@ -4,7 +4,7 @@ mod tests {
     use crate::models::filters::*;
     use reqwest::Method;
     use serde_json::json;
-    use toggl_core::Result;
+    use toggl_core::{ProjectId, Result, TaskId, UserId, WorkspaceId};
 
     #[test]
     fn test_filter_clients() -> Result<()> {
@@ -32,7 +32,7 @@ mod tests {
                     status: None,
                 };
 
-                let result = client.filters().clients(123, &request)?;
+                let result = client.filters().clients(WorkspaceId(123), &request)?;
                 assert_eq!(result.len(), 2);
                 assert_eq!(result[0].name, "Client ABC");
                 assert!(!result[0].archived);
@@ -69,7 +69,7 @@ mod tests {
                     per_page: None,
                 };
 
-                let result = client.filters().projects(123, &request)?;
+                let result = client.filters().projects(WorkspaceId(123), &request)?;
                 assert_eq!(result.len(), 1);
                 assert_eq!(result[0].name, "Project Alpha");
                 assert!(result[0].active);
@@ -100,7 +100,7 @@ mod tests {
                     is_active: Some(true),
                 };
 
-                let result = client.filters().users(123, &request)?;
+                let result = client.filters().users(WorkspaceId(123), &request)?;
                 assert_eq!(result.len(), 1);
                 assert_eq!(result[0].name, "John Doe");
                 assert!(result[0].active);
@@ -131,10 +131,12 @@ mod tests {
             Some(response),
             |client| {
                 let request = ProjectStatusParamsRequest {
-                    project_ids: vec![1, 2],
+                    project_ids: vec![ProjectId(1), ProjectId(2)],
                 };
 
-                let result = client.filters().project_status(123, &request)?;
+                let result = client
+                    .filters()
+                    .project_status(WorkspaceId(123), &request)?;
                 assert_eq!(result.len(), 2);
                 assert!(result[0].active);
                 assert!(!result[1].active);
@@ -169,7 +171,9 @@ mod tests {
                     project_ids: None,
                 };
 
-                let result = client.filters().project_groups(123, &request)?;
+                let result = client
+                    .filters()
+                    .project_groups(WorkspaceId(123), &request)?;
                 assert_eq!(result.len(), 2);
                 assert_eq!(result[0].name, "Group Alpha");
                 assert_eq!(result[0].project_ids, vec![1, 2, 3]);
@@ -201,13 +205,13 @@ mod tests {
             |client| {
                 let request = ProjectUserParamsRequest {
                     name: Some("John".to_string()),
-                    project_ids: Some(vec![1]),
+                    project_ids: Some(vec![ProjectId(1)]),
                 };
 
-                let result = client.filters().project_users(123, &request)?;
+                let result = client.filters().project_users(WorkspaceId(123), &request)?;
                 assert_eq!(result.len(), 2);
                 assert_eq!(result[0].name, "John Doe");
-                assert_eq!(result[0].id, 1);
+                assert_eq!(result[0].id, UserId(1));
                 Ok(())
             },
         )
@@ -233,12 +237,12 @@ mod tests {
             Some(response),
             |client| {
                 let request = TaskStatusParamsRequest {
-                    task_ids: vec![1, 2],
+                    task_ids: vec![TaskId(1), TaskId(2)],
                 };
 
-                let result = client.filters().task_status(123, &request)?;
+                let result = client.filters().task_status(WorkspaceId(123), &request)?;
                 assert_eq!(result.len(), 2);
-                assert_eq!(result[0].id, 1);
+                assert_eq!(result[0].id, TaskId(1));
                 assert!(result[0].active);
                 assert!(!result[1].active);
                 Ok(())
@@ -285,12 +289,14 @@ mod tests {
                     name: Some("Task".to_string()),
                     page_size: Some(10),
                     project_active: None,
-                    project_ids: Some(vec![1, 2]),
+                    project_ids: Some(vec![ProjectId(1), ProjectId(2)]),
                     start: None,
                     user_ids: None,
                 };
 
-                let result = client.filters().tasks(123, "search", &request)?;
+                let result = client
+                    .filters()
+                    .tasks(WorkspaceId(123), "search", &request)?;
                 assert_eq!(result.len(), 2);
                 assert_eq!(result[0].name, "Task Alpha");
                 assert_eq!(result[0].project_name, Some("Project Alpha".to_string()));
@@ -322,7 +328,7 @@ mod tests {
             |client| {
                 let request = TasksRequest {
                     active: Some(true),
-                    ids: Some(vec![3]),
+                    ids: Some(vec![TaskId(3)]),
                     name: None,
                     page_size: None,
                     project_active: Some(true),
@@ -331,10 +337,12 @@ mod tests {
                     user_ids: None,
                 };
 
-                let result = client.filters().tasks(123, "filters", &request)?;
+                let result = client
+                    .filters()
+                    .tasks(WorkspaceId(123), "filters", &request)?;
                 assert_eq!(result.len(), 1);
                 assert_eq!(result[0].name, "Task Gamma");
-                assert_eq!(result[0].id, 3);
+                assert_eq!(result[0].id, TaskId(3));
                 assert!(result[0].active);
                 Ok(())
             },

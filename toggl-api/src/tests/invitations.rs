@@ -1,11 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use crate::models::api::ids::{
-        InvitationId, InvitationItemId, OrganizationId, UserId, WorkspaceId,
-    };
     use crate::tests::*;
     use reqwest::Method;
     use serde_json::json;
+    use toggl_core::{InvitationId, InvitationItemId, OrganizationId, UserId, WorkspaceId};
 
     #[test]
     fn test_get_invitation() -> Result<()> {

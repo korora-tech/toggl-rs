@@ -5,7 +5,7 @@ mod tests {
     use crate::models::summary::*;
     use reqwest::Method;
     use serde_json::json;
-    use toggl_core::Result;
+    use toggl_core::{Result, WorkspaceId};
 
     #[test]
     fn test_get_summary_report() -> Result<()> {
@@ -59,7 +59,7 @@ mod tests {
                     hide_amounts: None,
                 };
 
-                let report = client.summary().get(123, &request)?;
+                let report = client.summary().get(WorkspaceId(123), &request)?;
                 assert_eq!(report.data.len(), 1);
                 assert_eq!(report.totals.time, 7200);
                 Ok(())
@@ -106,7 +106,7 @@ mod tests {
                     extension: Some("csv".to_string()),
                 };
 
-                let data = client.summary().export_csv(123, &request)?;
+                let data = client.summary().export_csv(WorkspaceId(123), &request)?;
                 assert_eq!(data, csv_data);
                 Ok(())
             },
@@ -152,7 +152,7 @@ mod tests {
                     extension: Some("xlsx".to_string()),
                 };
 
-                let data = client.summary().export_xlsx(123, &request)?;
+                let data = client.summary().export_xlsx(WorkspaceId(123), &request)?;
                 assert_eq!(&data[0..4], &[0x50, 0x4B, 0x03, 0x04]);
                 Ok(())
             },
@@ -198,7 +198,7 @@ mod tests {
                     display_mode: Some("compact".to_string()),
                 };
 
-                let data = client.summary().export_pdf(123, &request)?;
+                let data = client.summary().export_pdf(WorkspaceId(123), &request)?;
                 assert!(data.starts_with(b"%PDF"));
                 Ok(())
             },

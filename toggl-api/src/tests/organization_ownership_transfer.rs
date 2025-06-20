@@ -1,9 +1,9 @@
-use crate::models::api::ids::{OrganizationId, TransferId, UserId};
 use crate::models::api::organization::CreateOwnershipTransfer;
 use crate::tests::*;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{OrganizationId, TransferId, UserId};
 
 #[test]
 fn test_accept_ownership_transfer() -> Result<()> {

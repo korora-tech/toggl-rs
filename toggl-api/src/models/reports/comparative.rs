@@ -1,7 +1,7 @@
 use super::{ReportFilters, ReportTimeRange};
-use crate::models::api::ids::{ClientId, ProjectId, WorkspaceId};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, ProjectId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ComparativeReportRequest {

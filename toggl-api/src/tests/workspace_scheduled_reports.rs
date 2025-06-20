@@ -1,9 +1,9 @@
-use crate::models::api::ids::{BookmarkId, ReportId, ScheduledReportId, UserId, WorkspaceId};
 use crate::models::api::scheduled_reports::*;
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{BookmarkId, ReportId, ScheduledReportId, UserId, WorkspaceId};
 
 #[test]
 fn test_get_scheduled_reports() -> Result<()> {

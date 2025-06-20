@@ -1,7 +1,7 @@
 use super::TogglClient;
 use crate::models::api::favorite::*;
-use crate::models::api::ids::FavoriteId;
 use reqwest::Method;
+use toggl_core::FavoriteId;
 use toggl_core::Result;
 
 pub struct FavoritesClient {

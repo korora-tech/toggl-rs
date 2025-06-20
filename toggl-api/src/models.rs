@@ -46,7 +46,6 @@ pub mod api {
     pub mod feedback;
     pub mod goals;
     pub mod group;
-    pub mod ids;
     pub mod invitation;
     pub mod invoices;
     pub mod keys;
@@ -79,13 +78,23 @@ pub mod reports;
 
 // Core re-exports - only the most commonly used types
 pub use api::client::{Client, CreateClient, UpdateClient};
-pub use api::ids::*;
 pub use api::project::{CreateProject, Project, UpdateProject};
 pub use api::tag::{CreateTag, Tag as ApiTag, UpdateTag};
 pub use api::task::{CreateTask, Task, UpdateTask};
 pub use api::time_entry::{CreateTimeEntry, TimeEntry, UpdateTimeEntry};
 pub use api::user::{Tag as UserTag, User};
 pub use api::workspace::{CreateWorkspace, UpdateWorkspace, Workspace, WorkspaceUser};
+pub use toggl_core::{
+    AlertId, ApiKeyId, AssigneeId, AuditId, AvatarId, BookmarkId, CalendarId, CategoryId, ClientId,
+    CompanyId, ContactDetailId, CountryId, CountrySubdivisionId, CreatorId, CurrencyCode,
+    CurrencyId, CustomerId, DashboardId, ExpenseId, ExportId, FavoriteId, FeatureId, GoalId,
+    GroupId, IntegrationId, InvitationId, InvitationItemId, InvoiceId, InvoiceInfoId,
+    InvoiceItemId, InvoiceLineItemId, LevelId, OrganizationId, PaymentMethodId, PaymentRecordId,
+    PricingPlanId, ProductId, ProjectGroupId, ProjectId, ProjectUserId, ProviderUserId, RateId,
+    ReminderId, ReportId, RoleId, SamlConfigurationId, ScheduledReportId, SetupId, SmailId,
+    SsoProfileId, SubscriptionId, SubscriptionPeriodId, TagId, TaskId, TimeEntryId,
+    TimeEntryInvitationId, TimelineId, TransferId, UserId, WebhookId, WorkspaceId, WorkspaceUserId,
+};
 
 // Authentication and status
 pub use api::auth::{SamlLoginRequest, SamlLoginResponse};

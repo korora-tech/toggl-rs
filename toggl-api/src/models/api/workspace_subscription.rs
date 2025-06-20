@@ -1,8 +1,8 @@
-use super::ids::{
+use serde::{Deserialize, Serialize};
+use toggl_core::{
     CompanyId, ContactDetailId, CountryId, CountrySubdivisionId, CreatorId, CurrencyId, CustomerId,
     PricingPlanId, SubscriptionId, SubscriptionPeriodId, UserId,
 };
-use serde::{Deserialize, Serialize};
 
 /// Workspace subscription response from API
 #[derive(Debug, Clone, Serialize, Deserialize)]

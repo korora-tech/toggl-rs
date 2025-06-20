@@ -1,10 +1,10 @@
 use crate::client::TogglClient;
-use crate::models::api::ids::{ClientId, TagId, UserId, WorkspaceId};
 use crate::models::api::workspace::*;
 use pretty_assertions::assert_eq;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{ClientId, TagId, UserId, WorkspaceId};
 
 use super::with_mockito;
 

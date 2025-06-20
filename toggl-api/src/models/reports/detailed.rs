@@ -1,7 +1,7 @@
 use super::{Pagination, ReportFilters, ReportTimeRange, ReportTotals};
-use crate::models::api::ids::{ClientId, ProjectId, TaskId, TimeEntryId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, ProjectId, TaskId, TimeEntryId, UserId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DetailedReportRequest {

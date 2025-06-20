@@ -1,9 +1,9 @@
-use crate::models::api::ids::{OrganizationId, PricingPlanId};
 use crate::models::api::organization_subscription::*;
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{OrganizationId, PricingPlanId};
 
 #[test]
 fn test_get_subscription() -> Result<()> {

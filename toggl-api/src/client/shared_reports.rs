@@ -1,5 +1,4 @@
 use super::TogglClient;
-use crate::models::api::ids::{ReportId, WorkspaceId};
 use crate::models::api::shared_reports::{
     BulkDeleteRequest, CreateSavedReportPayload, SavedReport, SharedReportsQuery,
     UpdateSavedReportPayload,
@@ -7,6 +6,7 @@ use crate::models::api::shared_reports::{
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{ReportId, WorkspaceId};
 
 pub struct SharedReportsClient {
     client: TogglClient,

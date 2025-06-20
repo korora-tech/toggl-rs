@@ -1,9 +1,9 @@
 use crate::models::api::goals::{CreateGoalRequest, UpdateGoalRequest, WorkspaceGoalsQuery};
-use crate::models::api::ids::{GoalId, TagId, UserId, WorkspaceId};
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{GoalId, TagId, UserId, WorkspaceId};
 
 #[test]
 fn test_get_workspace_goals() -> Result<()> {

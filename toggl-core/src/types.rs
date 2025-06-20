@@ -6,24 +6,6 @@ use serde::{Deserialize, Serialize};
 /// Common ID type used across Toggl APIs
 pub type Id = i64;
 
-/// Workspace ID type
-pub type WorkspaceId = Id;
-
-/// User ID type
-pub type UserId = Id;
-
-/// Project ID type
-pub type ProjectId = Id;
-
-/// Client ID type
-pub type ClientId = Id;
-
-/// Tag ID type
-pub type TagId = Id;
-
-/// Time entry ID type
-pub type TimeEntryId = Id;
-
 /// Common timestamp type
 pub type Timestamp = DateTime<Utc>;
 

@@ -3,6 +3,7 @@
 use super::base::{GroupingOption, OrderDirection, Post, SubGroupingOption};
 use super::dictionary::ReportDictionaries;
 use serde::{Deserialize, Serialize};
+use toggl_core::{Id, ProjectId};
 
 /// Summary report post parameters
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -56,7 +57,7 @@ pub struct Report {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReportData {
     /// Group ID (project, client, or user ID depending on grouping)
-    pub id: Option<i64>,
+    pub id: Option<Id>,
 
     /// Time in seconds
     pub time: i64,
@@ -71,7 +72,7 @@ pub struct ReportData {
 
     /// Project IDs if grouped by something else
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub project_ids: Option<Vec<i64>>,
+    pub project_ids: Option<Vec<ProjectId>>,
 
     /// Amount (if billable)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -86,7 +87,7 @@ pub struct ReportData {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubGroupData {
     /// Sub-group ID
-    pub id: Option<i64>,
+    pub id: Option<Id>,
 
     /// Title/name
     pub title: Option<String>,

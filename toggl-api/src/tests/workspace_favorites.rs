@@ -1,9 +1,9 @@
 use crate::models::api::favorite::{CreateFavorite, UpdateFavorite};
-use crate::models::api::ids::{FavoriteId, ProjectId, WorkspaceId};
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{FavoriteId, ProjectId, WorkspaceId};
 
 #[test]
 fn test_get_workspace_favorites() -> Result<()> {

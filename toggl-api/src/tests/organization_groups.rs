@@ -1,9 +1,9 @@
-use crate::models::api::ids::{GroupId, OrganizationId, WorkspaceId};
 use crate::models::api::organization::{CreateOrganizationGroup, UpdateOrganizationGroup};
 use crate::tests::*;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{GroupId, OrganizationId, WorkspaceId};
 
 #[test]
 fn test_get_organization_groups() -> Result<()> {

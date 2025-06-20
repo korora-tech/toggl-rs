@@ -12,10 +12,6 @@ use crate::models::api::goals::{
     WorkspaceGoalsQuery,
 };
 use crate::models::api::group::{CreateGroup, Group, UpdateGroup};
-use crate::models::api::ids::{
-    AlertId, ClientId, FavoriteId, GoalId, GroupId, ProjectId, ProjectUserId, ReminderId, SetupId,
-    SsoProfileId, TagId, UserId, WorkspaceId, WorkspaceUserId,
-};
 use crate::models::api::preferences::{Logo, TimeEntryConstraints, WorkspacePreferences};
 use crate::models::api::project::{
     CreateProjectUser, PatchOperation, Project, ProjectGroup, ProjectGroupPayload, ProjectUser,
@@ -34,6 +30,10 @@ use crate::models::api::workspace_subscription::WorkspaceSubscriptionResponse;
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{
+    AlertId, ClientId, FavoriteId, GoalId, GroupId, ProjectId, ProjectUserId, ReminderId, SetupId,
+    SsoProfileId, TagId, UserId, WorkspaceId, WorkspaceUserId,
+};
 
 pub struct WorkspacesClient {
     client: TogglClient,

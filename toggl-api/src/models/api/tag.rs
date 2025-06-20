@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use super::ids::{TagId, WorkspaceId};
+use toggl_core::{TagId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Tag {

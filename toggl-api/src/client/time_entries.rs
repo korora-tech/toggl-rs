@@ -1,10 +1,10 @@
 use super::TogglClient;
-use crate::models::api::ids::{TimeEntryId, TimeEntryInvitationId, WorkspaceId};
 use crate::models::api::time_entry::*;
 use crate::models::api::time_entry_invitations::{InvitationAction, TimeEntryInvitation};
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{TimeEntryId, TimeEntryInvitationId, WorkspaceId};
 
 pub struct TimeEntriesClient {
     client: TogglClient,

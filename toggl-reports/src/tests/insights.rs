@@ -4,7 +4,7 @@ mod tests {
     use crate::models::profitability::*;
     use reqwest::Method;
     use serde_json::json;
-    use toggl_core::Result;
+    use toggl_core::{ProjectId, Result, WorkspaceId};
 
     #[test]
     fn test_get_project_trends() -> Result<()> {
@@ -35,15 +35,17 @@ mod tests {
                 let request = ProjectTrendsRequest {
                     start_date: "2024-01-01".to_string(),
                     end_date: "2024-01-31".to_string(),
-                    project_ids: Some(vec![123]),
+                    project_ids: Some(vec![ProjectId(123)]),
                     client_ids: None,
                     billable: None,
                     resolution: Some("day".to_string()),
                 };
 
-                let result = client.insights().project_trends(123, &request)?;
+                let result = client
+                    .insights()
+                    .project_trends(WorkspaceId(123), &request)?;
                 assert_eq!(result.len(), 1);
-                assert_eq!(result[0].project_id, 123);
+                assert_eq!(result[0].project_id, ProjectId(123));
                 assert_eq!(result[0].trends.len(), 2);
                 Ok(())
             },
@@ -70,7 +72,7 @@ mod tests {
 
                 let data = client
                     .insights()
-                    .employee_profitability_csv(123, &request)?;
+                    .employee_profitability_csv(WorkspaceId(123), &request)?;
                 assert_eq!(data, csv_data);
                 Ok(())
             },
@@ -96,7 +98,9 @@ mod tests {
                     resolution: None,
                 };
 
-                let data = client.insights().project_trends_xlsx(123, &request)?;
+                let data = client
+                    .insights()
+                    .project_trends_xlsx(WorkspaceId(123), &request)?;
                 assert_eq!(&data[0..4], &[0x50, 0x4B, 0x03, 0x04]);
                 Ok(())
             },
@@ -116,13 +120,15 @@ mod tests {
                 let request = ProjectTrendsRequest {
                     start_date: "2024-01-01".to_string(),
                     end_date: "2024-01-31".to_string(),
-                    project_ids: Some(vec![123]),
+                    project_ids: Some(vec![ProjectId(123)]),
                     client_ids: None,
                     billable: None,
                     resolution: None,
                 };
 
-                let data = client.insights().project_profitability_csv(123, &request)?;
+                let data = client
+                    .insights()
+                    .project_profitability_csv(WorkspaceId(123), &request)?;
                 assert_eq!(data, csv_data);
                 Ok(())
             },
@@ -142,7 +148,7 @@ mod tests {
                 let request = ProjectTrendsRequest {
                     start_date: "2024-01-01".to_string(),
                     end_date: "2024-01-31".to_string(),
-                    project_ids: Some(vec![123]),
+                    project_ids: Some(vec![ProjectId(123)]),
                     client_ids: None,
                     billable: None,
                     resolution: None,
@@ -150,7 +156,7 @@ mod tests {
 
                 let data = client
                     .insights()
-                    .project_profitability_xlsx(123, &request)?;
+                    .project_profitability_xlsx(WorkspaceId(123), &request)?;
                 assert_eq!(&data[0..4], &[0x50, 0x4B, 0x03, 0x04]);
                 Ok(())
             },

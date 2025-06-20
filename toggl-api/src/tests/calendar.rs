@@ -1,12 +1,12 @@
 #[cfg(test)]
 mod tests {
     use crate::models::api::calendar::*;
-    use crate::models::api::ids::{IntegrationId, ProjectId};
     use crate::tests::*;
     use chrono::DateTime;
     use reqwest::Method;
     use serde_json::json;
     use std::collections::BTreeMap;
+    use toggl_core::{IntegrationId, ProjectId};
 
     #[test]
     fn test_update_integration() -> Result<()> {

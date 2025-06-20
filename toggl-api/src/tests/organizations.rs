@@ -1,10 +1,10 @@
-use crate::models::api::ids::{OrganizationId, PricingPlanId, TransferId, UserId, WorkspaceId};
 use crate::models::api::organization::*;
 use crate::models::api::workspace::CreateWorkspace;
 use pretty_assertions::assert_eq;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{OrganizationId, PricingPlanId, TransferId, UserId, WorkspaceId};
 
 use super::with_mockito;
 

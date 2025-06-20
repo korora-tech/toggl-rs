@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use super::ids::{InvitationId, InvitationItemId, OrganizationId, UserId, WorkspaceId};
+use toggl_core::{InvitationId, InvitationItemId, OrganizationId, UserId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Invitation {

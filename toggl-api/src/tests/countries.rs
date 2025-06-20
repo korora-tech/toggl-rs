@@ -1,7 +1,7 @@
-use crate::models::api::ids::CountryId;
 use pretty_assertions::assert_eq;
 use reqwest::Method;
 use serde_json::json;
+use toggl_core::CountryId;
 use toggl_core::Result;
 
 use super::with_mockito;

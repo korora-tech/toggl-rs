@@ -1,13 +1,13 @@
 #[cfg(test)]
 mod tests {
     use crate::{
-        models::api::ids::{ProjectId, ProjectUserId, UserId, WorkspaceId},
         models::api::project::{CreateProjectUser, PatchOperation, UpdateProjectUser},
         tests::with_mockito,
     };
     use reqwest::Method;
     use serde_json::json;
     use toggl_core::Result;
+    use toggl_core::{ProjectId, ProjectUserId, UserId, WorkspaceId};
 
     #[test]
     fn test_get_project_users() -> Result<()> {

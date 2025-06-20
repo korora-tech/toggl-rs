@@ -1,9 +1,9 @@
-use crate::models::api::ids::{LevelId, ProjectId, WorkspaceId, WorkspaceUserId};
 use crate::models::api::rates::{CreateRate, RateLevel, RateMode};
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{LevelId, ProjectId, WorkspaceId, WorkspaceUserId};
 
 #[test]
 fn test_create_workspace_rate() -> Result<()> {

@@ -14,9 +14,9 @@ pub use summary::*;
 pub use trends::*;
 pub use weekly::*;
 
-use crate::models::api::ids::{ClientId, ProjectId, TagId, TaskId, UserId};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, ProjectId, TagId, TaskId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ReportTimeRange {

@@ -2,7 +2,6 @@ use super::TogglClient;
 use crate::models::api::client::Client;
 use crate::models::api::favorite::{CreateFavorite, Favorite, UpdateFavorite};
 use crate::models::api::features::{Features, Location, TrackReminder};
-use crate::models::api::ids::{FavoriteId, TimeEntryId, WorkspaceId};
 use crate::models::api::organization::Organization;
 use crate::models::api::preferences::*;
 use crate::models::api::project::Project;
@@ -16,6 +15,7 @@ use crate::models::api::workspace::Workspace;
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{FavoriteId, TimeEntryId, WorkspaceId};
 
 pub struct MeClient {
     client: TogglClient,

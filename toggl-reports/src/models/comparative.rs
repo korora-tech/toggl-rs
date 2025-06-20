@@ -2,6 +2,7 @@
 
 use super::base::RangePost;
 use serde::{Deserialize, Serialize};
+use toggl_core::{ProjectId, UserId};
 
 /// Comparative report post parameters
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -12,11 +13,11 @@ pub struct ComparativePost {
 
     /// Project IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub project_ids: Option<Vec<i64>>,
+    pub project_ids: Option<Vec<ProjectId>>,
 
     /// User IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<i64>>,
+    pub user_ids: Option<Vec<UserId>>,
 
     /// Resolution (day, week, month)
     #[serde(skip_serializing_if = "Option::is_none")]

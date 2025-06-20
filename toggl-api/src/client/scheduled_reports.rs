@@ -1,8 +1,8 @@
 use super::TogglClient;
-use crate::models::api::ids::WorkspaceId;
 use crate::models::api::scheduled_reports::{CreateScheduledReportPayload, ScheduledReport};
 use reqwest::Method;
 use toggl_core::Result;
+use toggl_core::WorkspaceId;
 
 pub struct ScheduledReportsClient {
     client: TogglClient,

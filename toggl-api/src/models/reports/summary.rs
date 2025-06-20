@@ -1,6 +1,6 @@
 use super::{ReportFilters, ReportGrouping, ReportOrdering, ReportTimeRange};
-use crate::models::api::ids::WorkspaceId;
 use serde::{Deserialize, Serialize};
+use toggl_core::WorkspaceId;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SummaryReportRequest {

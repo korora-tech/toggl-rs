@@ -1,9 +1,9 @@
-use super::ids::{
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use toggl_core::{
     CompanyId, CountryId, CustomerId, GroupId, OrganizationId, PricingPlanId, SubscriptionId,
     UserId, WorkspaceId, WorkspaceUserId,
 };
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Workspace {

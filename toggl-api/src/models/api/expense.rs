@@ -1,6 +1,6 @@
-use crate::models::api::ids::{CategoryId, ExpenseId, ProjectId, TaskId, UserId, WorkspaceId};
 use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
+use toggl_core::{CategoryId, ExpenseId, ProjectId, TaskId, UserId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Expense {

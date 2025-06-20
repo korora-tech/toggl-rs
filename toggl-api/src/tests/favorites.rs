@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod tests {
     use crate::models::api::favorite::*;
-    use crate::models::api::ids::{FavoriteId, ProjectId, TagId, TaskId, WorkspaceId};
     use crate::tests::*;
     use reqwest::Method;
     use serde_json::json;
+    use toggl_core::{FavoriteId, ProjectId, TagId, TaskId, WorkspaceId};
 
     #[test]
     fn test_list_favorites() -> Result<()> {

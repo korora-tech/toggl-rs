@@ -1,6 +1,6 @@
-use super::ids::{ClientId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Client {

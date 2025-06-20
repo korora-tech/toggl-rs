@@ -3,6 +3,7 @@
 use super::base::{OrderDirection, Post};
 use super::dictionary::ReportDictionaries;
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, ProjectId, TagId, TaskId, TimeEntryId, UserId};
 
 /// Detailed report post parameters
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -60,17 +61,17 @@ pub enum DetailedReportData {
 /// Single time entry in detailed report
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SingleTimeEntry {
-    pub id: i64,
-    pub user_id: i64,
-    pub project_id: Option<i64>,
-    pub task_id: Option<i64>,
-    pub client_id: Option<i64>,
+    pub id: TimeEntryId,
+    pub user_id: UserId,
+    pub project_id: Option<ProjectId>,
+    pub task_id: Option<TaskId>,
+    pub client_id: Option<ClientId>,
     pub description: Option<String>,
     pub billable: bool,
     pub start: String,
     pub stop: Option<String>,
     pub duration: i64,
-    pub tag_ids: Option<Vec<i64>>,
+    pub tag_ids: Option<Vec<TagId>>,
 
     /// Amount (if billable)
     #[serde(skip_serializing_if = "Option::is_none")]

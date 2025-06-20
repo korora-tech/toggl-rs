@@ -1,14 +1,11 @@
 #[cfg(test)]
 mod tests {
-    use crate::{
-        models::api::ids::{ProjectId, TimeEntryId, WorkspaceId},
-        models::api::time_entry::*,
-        tests::with_mockito,
-    };
+    use crate::{models::api::time_entry::*, tests::with_mockito};
     use chrono::Utc;
     use reqwest::Method;
     use serde_json::json;
     use toggl_core::Result;
+    use toggl_core::{ProjectId, TimeEntryId, WorkspaceId};
 
     #[test]
     fn test_get_time_entries() -> Result<()> {

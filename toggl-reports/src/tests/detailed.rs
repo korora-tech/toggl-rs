@@ -5,7 +5,7 @@ mod tests {
     use crate::models::detailed::*;
     use reqwest::Method;
     use serde_json::json;
-    use toggl_core::Result;
+    use toggl_core::{Result, TimeEntryId, WorkspaceId};
 
     #[test]
     fn test_get_detailed_report() -> Result<()> {
@@ -60,10 +60,10 @@ mod tests {
                     hide_amounts: None,
                 };
 
-                let report = client.detailed().get(123, &request)?;
+                let report = client.detailed().get(WorkspaceId(123), &request)?;
                 if let DetailedReportData::Single(entries) = report.data {
                     assert_eq!(entries.len(), 1);
-                    assert_eq!(entries[0].id, 1);
+                    assert_eq!(entries[0].id, TimeEntryId(1));
                     assert_eq!(entries[0].duration, 7200);
                 } else {
                     panic!("Expected single entries");
@@ -112,7 +112,7 @@ mod tests {
                     hide_amounts: None,
                 };
 
-                let totals = client.detailed().totals(123, &request)?;
+                let totals = client.detailed().totals(WorkspaceId(123), &request)?;
                 assert_eq!(totals.time, 28800);
                 assert_eq!(totals.count, 4);
                 Ok(())
@@ -159,7 +159,7 @@ mod tests {
                     extension: Some("csv".to_string()),
                 };
 
-                let data = client.detailed().export_csv(123, &request)?;
+                let data = client.detailed().export_csv(WorkspaceId(123), &request)?;
                 assert_eq!(data, csv_data);
                 Ok(())
             },
@@ -204,7 +204,7 @@ mod tests {
                     extension: Some("xlsx".to_string()),
                 };
 
-                let data = client.detailed().export_xlsx(123, &request)?;
+                let data = client.detailed().export_xlsx(WorkspaceId(123), &request)?;
                 assert_eq!(&data[0..4], &[0x50, 0x4B, 0x03, 0x04]);
                 Ok(())
             },
@@ -251,7 +251,7 @@ mod tests {
                     duration_format: None,
                 };
 
-                let data = client.detailed().export_pdf(123, &request)?;
+                let data = client.detailed().export_pdf(WorkspaceId(123), &request)?;
                 assert_eq!(&data[0..4], &[0x25, 0x50, 0x44, 0x46]);
                 Ok(())
             },

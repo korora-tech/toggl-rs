@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::ids::{CountryId, CountrySubdivisionId};
+use toggl_core::{CountryId, CountrySubdivisionId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Country {

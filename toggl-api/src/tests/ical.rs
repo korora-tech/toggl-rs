@@ -1,8 +1,8 @@
-use crate::models::api::ids::WorkspaceId;
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::WorkspaceId;
 
 #[test]
 fn test_get_ical_file() -> Result<()> {

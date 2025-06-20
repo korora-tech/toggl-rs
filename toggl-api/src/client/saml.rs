@@ -1,9 +1,9 @@
 use super::TogglClient;
-use crate::models::api::ids::{SsoProfileId, WorkspaceId};
 use crate::models::api::saml::*;
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{SsoProfileId, WorkspaceId};
 
 pub struct SamlClient {
     client: TogglClient,

@@ -1,6 +1,6 @@
-use super::ids::{ProjectId, TagId, TaskId, TimeEntryId, UserId};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use toggl_core::{ProjectId, TagId, TaskId, TimeEntryId, UserId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Flags(pub HashMap<String, serde_json::Value>);

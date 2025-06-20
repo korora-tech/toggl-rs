@@ -15,7 +15,6 @@ pub mod features;
 pub mod feedback;
 pub mod goals;
 pub mod group;
-pub mod ids;
 pub mod invitation;
 pub mod invoices;
 pub mod keys;
@@ -43,16 +42,18 @@ pub mod user;
 pub mod workspace;
 pub mod workspace_subscription;
 
-// Re-export ID types
-pub use ids::{
-    AlertId, ApiKeyId, AssigneeId, AvatarId, BookmarkId, CalendarId, CategoryId, ClientId, 
-    CompanyId, ContactDetailId, CountryId, CountrySubdivisionId, CreatorId, CurrencyId, 
-    CustomerId, DashboardId, ExpenseId, ExportId, FavoriteId, GoalId, GroupId, 
-    IntegrationId, InvitationId, InvitationItemId, InvoiceId, InvoiceLineItemId, LevelId, OrganizationId, 
-    PricingPlanId, ProjectId, ProjectUserId, ProviderUserId, RateId, ReminderId, ReportId, 
-    SamlConfigurationId, ScheduledReportId, SetupId, SmailId, SubscriptionId, 
-    SubscriptionPeriodId, TagId, TaskId, TimeEntryId, TimeEntryInvitationId, TimelineId, 
-    TransferId, UserId, WebhookId, WorkspaceId, WorkspaceUserId,
+// Re-export ID types from toggl_core
+pub use toggl_core::{
+    AlertId, ApiKeyId, AssigneeId, AuditId, AvatarId, BookmarkId, CalendarId, CategoryId, 
+    ClientId, CompanyId, ContactDetailId, CountryId, CountrySubdivisionId, CreatorId, 
+    CurrencyCode, CurrencyId, CustomerId, DashboardId, ExpenseId, ExportId, FavoriteId, 
+    FeatureId, GoalId, GroupId, IntegrationId, InvitationId, InvitationItemId, InvoiceId, 
+    InvoiceInfoId, InvoiceItemId, InvoiceLineItemId, LevelId, OrganizationId, PaymentMethodId, 
+    PaymentRecordId, PricingPlanId, ProductId, ProjectGroupId, ProjectId, ProjectUserId, 
+    ProviderUserId, RateId, ReminderId, ReportId, RoleId, SamlConfigurationId, 
+    ScheduledReportId, SetupId, SmailId, SsoProfileId, SubscriptionId, SubscriptionPeriodId, 
+    TagId, TaskId, TimeEntryId, TimeEntryInvitationId, TimelineId, TransferId, UserId, 
+    WebhookId, WorkspaceId, WorkspaceUserId,
 };
 
 // Re-export specific types to avoid conflicts

@@ -1,10 +1,10 @@
-use crate::models::api::ids::{ReportId, WorkspaceId};
 use crate::models::api::shared_reports::*;
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
 use std::collections::HashMap;
 use toggl_core::Result;
+use toggl_core::{ReportId, WorkspaceId};
 
 #[test]
 fn test_get_shared_reports() -> Result<()> {

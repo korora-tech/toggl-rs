@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::ids::{AlertId, WorkspaceId};
+use toggl_core::{AlertId, WorkspaceId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Alert {

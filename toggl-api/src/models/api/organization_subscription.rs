@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::ids::{
+use toggl_core::{
     CompanyId, CurrencyCode, CustomerId, InvoiceInfoId, PaymentRecordId, PricingPlanId,
 };
 

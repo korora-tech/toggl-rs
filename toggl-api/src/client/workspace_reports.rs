@@ -1,10 +1,10 @@
 use super::TogglClient;
-use crate::models::api::ids::{ReportId, ScheduledReportId, WorkspaceId};
 use crate::models::api::scheduled_reports::*;
 use crate::models::api::shared_reports::*;
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{ReportId, ScheduledReportId, WorkspaceId};
 
 pub struct WorkspaceReportsClient {
     client: TogglClient,

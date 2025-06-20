@@ -1,6 +1,7 @@
 //! Search models for reports API
 
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, ProjectId, UserId};
 
 /// Search clients response
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -11,7 +12,7 @@ pub struct SearchClientsResponse {
 /// Client search result
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ClientSearchResult {
-    pub id: i64,
+    pub id: ClientId,
     pub name: String,
     pub archived: bool,
 }
@@ -25,9 +26,9 @@ pub struct SearchProjectsResponse {
 /// Project search result
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectSearchResult {
-    pub id: i64,
+    pub id: ProjectId,
     pub name: String,
-    pub client_id: Option<i64>,
+    pub client_id: Option<ClientId>,
     pub active: bool,
     pub billable: bool,
     pub color: String,
@@ -42,7 +43,7 @@ pub struct SearchUsersResponse {
 /// User search result
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserSearchResult {
-    pub id: i64,
+    pub id: UserId,
     pub name: String,
     pub email: String,
     pub active: bool,

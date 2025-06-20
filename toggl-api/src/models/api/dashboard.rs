@@ -1,5 +1,5 @@
-use crate::models::api::ids::{ProjectId, UserId};
 use serde::{Deserialize, Serialize};
+use toggl_core::{ProjectId, UserId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AllActivity {

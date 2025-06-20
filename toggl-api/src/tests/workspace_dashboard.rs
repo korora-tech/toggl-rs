@@ -1,8 +1,8 @@
-use crate::models::api::ids::{ProjectId, UserId, WorkspaceId};
 use crate::tests::*;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{ProjectId, UserId, WorkspaceId};
 
 #[test]
 fn test_get_all_activity() -> Result<()> {

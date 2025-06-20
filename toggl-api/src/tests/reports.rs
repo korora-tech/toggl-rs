@@ -1,12 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use crate::models::api::ids::{
-        ClientId, ExportId, ProjectId, TimeEntryId, UserId, WorkspaceId,
-    };
     use crate::tests::*;
     use reqwest::Method;
     use serde_json::json;
     use std::collections::BTreeMap;
+    use toggl_core::{ClientId, ExportId, ProjectId, TimeEntryId, UserId, WorkspaceId};
 
     #[test]
     fn test_summary_report() -> Result<()> {

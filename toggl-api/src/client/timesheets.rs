@@ -1,10 +1,10 @@
 use super::TogglClient;
-use crate::models::api::ids::{SetupId, WorkspaceId};
 use crate::models::api::time_entry::TimeEntry;
 use crate::models::api::timesheets::*;
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{SetupId, WorkspaceId};
 
 pub struct TimesheetsClient {
     client: TogglClient,

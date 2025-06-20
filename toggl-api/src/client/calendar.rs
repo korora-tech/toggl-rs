@@ -1,8 +1,8 @@
 use super::TogglClient;
 use crate::models::api::calendar::*;
-use crate::models::api::ids::IntegrationId;
 use reqwest::Method;
 use std::collections::BTreeMap;
+use toggl_core::IntegrationId;
 use toggl_core::Result;
 
 pub struct CalendarClient {

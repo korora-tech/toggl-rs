@@ -4,7 +4,7 @@ mod tests {
     use crate::models::projects::*;
     use reqwest::Method;
     use serde_json::json;
-    use toggl_core::Result;
+    use toggl_core::{ProjectId, Result, WorkspaceId};
 
     #[test]
     fn test_get_projects_summary() -> Result<()> {
@@ -47,7 +47,7 @@ mod tests {
                     include_time_entry_ids: None,
                 };
 
-                let result = client.projects().summary(123, &request)?;
+                let result = client.projects().summary(WorkspaceId(123), &request)?;
                 assert_eq!(result.data.len(), 2);
                 assert_eq!(result.data[0].project_name, "Project Alpha");
                 assert_eq!(result.data[0].tracked_seconds, 144000);
@@ -80,8 +80,10 @@ mod tests {
                     include_time_entry_ids: Some(true),
                 };
 
-                let result = client.projects().project_summary(123, 456, &request)?;
-                assert_eq!(result.project_id, 123);
+                let result = client
+                    .projects()
+                    .project_summary(WorkspaceId(123), 456, &request)?;
+                assert_eq!(result.project_id, ProjectId(123));
                 assert_eq!(result.tracked_seconds, 144000);
                 assert!(result.time_entry_ids.is_some());
                 assert_eq!(result.time_entry_ids.unwrap().len(), 5);

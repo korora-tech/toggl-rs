@@ -2,9 +2,9 @@ use super::TogglClient;
 use crate::models::api::goals::{
     CreateGoalRequest, Goal, UpdateGoalRequest, WorkspaceGoal, WorkspaceGoalsQuery,
 };
-use crate::models::api::ids::{GoalId, WorkspaceId};
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{GoalId, WorkspaceId};
 
 pub struct GoalsClient {
     client: TogglClient,

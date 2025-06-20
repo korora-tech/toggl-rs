@@ -1,11 +1,11 @@
 use crate::client::TogglClient;
 use crate::models::api::expense::CreateExpense;
-use crate::models::api::ids::{CategoryId, ExpenseId, ProjectId, WorkspaceId};
 use crate::tests::*;
 use chrono::NaiveDate;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{CategoryId, ExpenseId, ProjectId, WorkspaceId};
 
 #[test]
 fn test_get_expenses() -> Result<()> {

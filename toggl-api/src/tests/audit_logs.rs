@@ -1,11 +1,11 @@
 use crate::client::audit::AuditLogFilters;
-use crate::models::api::ids::{OrganizationId, UserId, WorkspaceId};
 use crate::tests::*;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_json::json;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{OrganizationId, UserId, WorkspaceId};
 
 #[test]
 fn test_get_audit_logs() -> Result<()> {

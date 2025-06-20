@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use super::ids::{
+use toggl_core::{
     GroupId, OrganizationId, PricingPlanId, RoleId, TransferId, UserId, WorkspaceId,
     WorkspaceUserId,
 };

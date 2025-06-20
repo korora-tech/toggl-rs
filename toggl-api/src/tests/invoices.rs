@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
     use crate::client::TogglClient;
-    use crate::models::api::ids::{InvoiceId, OrganizationId, WorkspaceId};
     use crate::models::api::invoices::*;
     use crate::tests::*;
     use reqwest::Method;
     use serde_json::json;
+    use toggl_core::{InvoiceId, OrganizationId, WorkspaceId};
 
     #[test]
     fn test_get_organization_invoice_pdf() -> Result<()> {

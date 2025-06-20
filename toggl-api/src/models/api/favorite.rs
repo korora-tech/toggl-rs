@@ -1,6 +1,6 @@
-use crate::models::api::ids::{FavoriteId, ProjectId, TagId, TaskId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use toggl_core::{FavoriteId, ProjectId, TagId, TaskId, UserId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Favorite {

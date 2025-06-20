@@ -1,6 +1,6 @@
-use super::ids::{GroupId, OrganizationId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use toggl_core::{GroupId, OrganizationId, UserId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Group {

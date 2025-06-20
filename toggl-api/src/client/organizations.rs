@@ -1,7 +1,4 @@
 use super::TogglClient;
-use crate::models::api::ids::{
-    GroupId, OrganizationId, PricingPlanId, TransferId, UserId, WorkspaceId,
-};
 use crate::models::api::invitation::*;
 use crate::models::api::organization::*;
 use crate::models::api::organization_subscription::*;
@@ -9,6 +6,7 @@ use crate::models::api::segmentation::*;
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{GroupId, OrganizationId, PricingPlanId, TransferId, UserId, WorkspaceId};
 
 pub struct OrganizationsClient {
     client: TogglClient,

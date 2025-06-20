@@ -1,12 +1,13 @@
 //! Profitability report models
 
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, GroupId, ProjectId, UserId};
 
 /// Project profitability request
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectProfitabilityRequest {
     /// Project IDs
-    pub project_ids: Vec<i64>,
+    pub project_ids: Vec<ProjectId>,
 
     /// Filter parameters
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -24,11 +25,11 @@ pub struct EmployeeProfitabilityRequest {
 
     /// User IDs
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<i64>>,
+    pub user_ids: Option<Vec<UserId>>,
 
     /// Group IDs
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub group_ids: Option<Vec<i64>>,
+    pub group_ids: Option<Vec<GroupId>>,
 
     /// Resolution
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,11 +47,11 @@ pub struct ProjectTrendsRequest {
 
     /// Project IDs
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub project_ids: Option<Vec<i64>>,
+    pub project_ids: Option<Vec<ProjectId>>,
 
     /// Client IDs
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub client_ids: Option<Vec<i64>>,
+    pub client_ids: Option<Vec<ClientId>>,
 
     /// Billable filter
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -83,7 +84,7 @@ pub struct ProjectProfitabilityReport {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectProfitability {
     /// Project ID
-    pub project_id: i64,
+    pub project_id: ProjectId,
 
     /// Total tracked seconds
     pub total_tracked_seconds: i64,
@@ -115,7 +116,7 @@ pub struct ProjectProfitability {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EmployeeProfitability {
     /// User ID
-    pub user_id: i64,
+    pub user_id: UserId,
 
     /// User name
     pub user_name: String,
@@ -146,7 +147,7 @@ pub struct EmployeeProfitability {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectTrends {
     /// Project ID
-    pub project_id: i64,
+    pub project_id: ProjectId,
 
     /// Trend data points
     pub trends: Vec<TrendDataPoint>,

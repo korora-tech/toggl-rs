@@ -1,10 +1,10 @@
-use crate::models::api::ids::{GroupId, ProjectId, ProjectUserId, TaskId, UserId, WorkspaceId};
 use crate::models::api::project::*;
 use crate::tests::{with_mockito, with_mockito_params};
 use reqwest::Method;
 use serde_json::json;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{GroupId, ProjectId, ProjectUserId, TaskId, UserId, WorkspaceId};
 
 #[test]
 fn test_bulk_edit_projects() -> Result<()> {

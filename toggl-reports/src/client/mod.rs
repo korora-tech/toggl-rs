@@ -1,13 +1,10 @@
 //! Toggl Reports API client implementation
 
-use reqwest::{
-    blocking::{Client, Response},
-    Method,
-};
+use reqwest::Method;
 use serde::{de::DeserializeOwned, Serialize};
 use std::collections::BTreeMap;
 
-use toggl_core::{Error, Result};
+use toggl_core::{BaseClient, Result};
 
 pub mod comparative;
 pub mod data_trends;
@@ -25,10 +22,9 @@ const INSIGHTS_BASE_URL: &str = "https://api.track.toggl.com/insights/api/v1";
 
 #[derive(Clone)]
 pub struct ReportsClient {
-    api_token: String,
     reports_base_url: String,
     insights_base_url: String,
-    client: Client,
+    base_client: BaseClient,
 }
 
 impl ReportsClient {
@@ -41,23 +37,12 @@ impl ReportsClient {
         reports_base_url: &str,
         insights_base_url: &str,
     ) -> Result<Self> {
-        let client = Client::builder()
-            .build()
-            .map_err(|e| Error::NetworkError(format!("Failed to create HTTP client: {}", e)))?;
-
+        let base_client = BaseClient::new(api_token)?;
         Ok(Self {
-            api_token,
             reports_base_url: reports_base_url.to_string(),
             insights_base_url: insights_base_url.to_string(),
-            client,
+            base_client,
         })
-    }
-
-    fn auth_header(&self) -> String {
-        use base64::Engine;
-        let credentials = format!("{}:api_token", self.api_token);
-        let encoded = base64::engine::general_purpose::STANDARD.encode(credentials);
-        format!("Basic {}", encoded)
     }
 
     pub(crate) fn request<T: DeserializeOwned>(&self, method: Method, path: &str) -> Result<T> {
@@ -70,23 +55,8 @@ impl ReportsClient {
         path: &str,
         params: &BTreeMap<String, String>,
     ) -> Result<T> {
-        let (base_url, clean_path) = if path.starts_with("/insights") {
-            (
-                &self.insights_base_url,
-                path.trim_start_matches("/insights"),
-            )
-        } else {
-            (&self.reports_base_url, path)
-        };
-
-        let url = if clean_path.starts_with('/') {
-            format!("{}{}", base_url, clean_path)
-        } else {
-            format!("{}/{}", base_url, clean_path)
-        };
-
-        let response = self.send_request(method, &url, params, None::<&()>)?;
-        self.handle_response(response)
+        let url = self.build_url(path);
+        self.base_client.request_with_params(method, &url, params)
     }
 
     pub(crate) fn request_with_body<T: DeserializeOwned, B: Serialize>(
@@ -95,23 +65,8 @@ impl ReportsClient {
         path: &str,
         body: &B,
     ) -> Result<T> {
-        let (base_url, clean_path) = if path.starts_with("/insights") {
-            (
-                &self.insights_base_url,
-                path.trim_start_matches("/insights"),
-            )
-        } else {
-            (&self.reports_base_url, path)
-        };
-
-        let url = if clean_path.starts_with('/') {
-            format!("{}{}", base_url, clean_path)
-        } else {
-            format!("{}/{}", base_url, clean_path)
-        };
-
-        let response = self.send_request(method, &url, &BTreeMap::new(), Some(body))?;
-        self.handle_response(response)
+        let url = self.build_url(path);
+        self.base_client.request_with_body(method, &url, body)
     }
 
     pub(crate) fn request_bytes_with_body<B: Serialize>(
@@ -120,36 +75,16 @@ impl ReportsClient {
         path: &str,
         body: &B,
     ) -> Result<Vec<u8>> {
-        let (base_url, clean_path) = if path.starts_with("/insights") {
-            (
-                &self.insights_base_url,
-                path.trim_start_matches("/insights"),
-            )
-        } else {
-            (&self.reports_base_url, path)
-        };
-
-        let url = if clean_path.starts_with('/') {
-            format!("{}{}", base_url, clean_path)
-        } else {
-            format!("{}/{}", base_url, clean_path)
-        };
-
-        let response = self.send_request(method, &url, &BTreeMap::new(), Some(body))?;
-
-        if response.status().is_success() {
-            response
-                .bytes()
-                .map(|b| b.to_vec())
-                .map_err(|e| Error::NetworkError(e.to_string()))
-        } else {
-            let status = response.status();
-            let error_text = response.text().unwrap_or_else(|_| status.to_string());
-            Err(Error::api_error(status.as_u16(), error_text, None))
-        }
+        let url = self.build_url(path);
+        self.base_client.request_bytes_with_body(method, &url, body)
     }
 
     pub(crate) fn request_bytes(&self, method: Method, path: &str) -> Result<Vec<u8>> {
+        let url = self.build_url(path);
+        self.base_client.request_binary(method, &url)
+    }
+
+    fn build_url(&self, path: &str) -> String {
         let (base_url, clean_path) = if path.starts_with("/insights") {
             (
                 &self.insights_base_url,
@@ -159,62 +94,10 @@ impl ReportsClient {
             (&self.reports_base_url, path)
         };
 
-        let url = if clean_path.starts_with('/') {
+        if clean_path.starts_with('/') {
             format!("{}{}", base_url, clean_path)
         } else {
             format!("{}/{}", base_url, clean_path)
-        };
-
-        let response = self.send_request(method, &url, &BTreeMap::new(), None::<&()>)?;
-
-        if response.status().is_success() {
-            response
-                .bytes()
-                .map(|b| b.to_vec())
-                .map_err(|e| Error::NetworkError(e.to_string()))
-        } else {
-            let status = response.status();
-            let error_text = response.text().unwrap_or_else(|_| status.to_string());
-            Err(Error::api_error(status.as_u16(), error_text, None))
-        }
-    }
-
-    fn send_request<B: Serialize>(
-        &self,
-        method: Method,
-        url: &str,
-        params: &BTreeMap<String, String>,
-        body: Option<&B>,
-    ) -> Result<Response> {
-        #[cfg(test)]
-        println!("Sending request to: {} {}", method, url);
-
-        let mut request = self.client.request(method.clone(), url);
-        request = request.header("Authorization", self.auth_header());
-
-        if !params.is_empty() {
-            request = request.query(params);
-        }
-
-        if let Some(body) = body {
-            request = request.header("Content-Type", "application/json");
-            request = request.json(body);
-        }
-
-        request
-            .send()
-            .map_err(|e| Error::NetworkError(e.to_string()))
-    }
-
-    fn handle_response<T: DeserializeOwned>(&self, response: Response) -> Result<T> {
-        if response.status().is_success() {
-            response
-                .json::<T>()
-                .map_err(|e| Error::ResponseParseError(e.to_string()))
-        } else {
-            let status = response.status();
-            let error_text = response.text().unwrap_or_else(|_| status.to_string());
-            Err(Error::api_error(status.as_u16(), error_text, None))
         }
     }
 }

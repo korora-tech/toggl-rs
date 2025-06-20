@@ -1,5 +1,5 @@
-use super::ids::{CreatorId, GoalId, ProjectId, TagId, TaskId, UserId, WorkspaceId};
 use serde::{Deserialize, Serialize};
+use toggl_core::{CreatorId, GoalId, ProjectId, TagId, TaskId, UserId, WorkspaceId};
 
 /// Workspace goal response from API
 #[derive(Debug, Clone, Serialize, Deserialize)]

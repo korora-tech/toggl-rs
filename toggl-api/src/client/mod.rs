@@ -25,14 +25,11 @@
 //! let workspace = client.workspaces().get(12345).unwrap();
 //! ```
 
-use reqwest::{
-    blocking::{Client, Response},
-    Method,
-};
+use reqwest::Method;
 use serde::{de::DeserializeOwned, Serialize};
 use std::collections::BTreeMap;
 
-use toggl_core::{Error, Result};
+use toggl_core::{BaseClient, Result};
 
 pub mod audit;
 pub mod auth;
@@ -72,9 +69,8 @@ const BASE_URL: &str = "https://api.track.toggl.com/api/v9";
 
 #[derive(Clone)]
 pub struct TogglClient {
-    api_token: String,
     base_url: String,
-    client: Client,
+    base_client: BaseClient,
 }
 
 impl TogglClient {
@@ -83,22 +79,11 @@ impl TogglClient {
     }
 
     pub fn new_with_base_url(api_token: String, base_url: &str) -> Result<Self> {
-        let client = Client::builder()
-            .build()
-            .map_err(|e| Error::NetworkError(format!("Failed to create HTTP client: {}", e)))?;
-
+        let base_client = BaseClient::new(api_token)?;
         Ok(Self {
-            api_token,
             base_url: base_url.to_string(),
-            client,
+            base_client,
         })
-    }
-
-    fn auth_header(&self) -> String {
-        use base64::Engine;
-        let credentials = format!("{}:api_token", self.api_token);
-        let encoded = base64::engine::general_purpose::STANDARD.encode(credentials);
-        format!("Basic {}", encoded)
     }
 
     pub(crate) fn request<T: DeserializeOwned>(&self, method: Method, path: &str) -> Result<T> {
@@ -111,14 +96,8 @@ impl TogglClient {
         path: &str,
         params: &BTreeMap<String, String>,
     ) -> Result<T> {
-        let url = if path.starts_with('/') {
-            format!("{}{}", self.base_url, path)
-        } else {
-            format!("{}/{}", self.base_url, path)
-        };
-
-        let response = self.send_request(method, &url, params, None::<&()>)?;
-        self.handle_response(response)
+        let url = self.build_url(path);
+        self.base_client.request_with_params(method, &url, params)
     }
 
     pub(crate) fn request_with_body<T: DeserializeOwned, B: Serialize>(
@@ -127,38 +106,13 @@ impl TogglClient {
         path: &str,
         body: &B,
     ) -> Result<T> {
-        let url = if path.starts_with('/') {
-            format!("{}{}", self.base_url, path)
-        } else {
-            format!("{}/{}", self.base_url, path)
-        };
-
-        let response = self.send_request(method, &url, &BTreeMap::new(), Some(body))?;
-        self.handle_response(response)
+        let url = self.build_url(path);
+        self.base_client.request_with_body(method, &url, body)
     }
 
     pub(crate) fn request_empty(&self, method: Method, path: &str) -> Result<()> {
-        let url = if path.starts_with('/') {
-            format!("{}{}", self.base_url, path)
-        } else {
-            format!("{}/{}", self.base_url, path)
-        };
-
-        let response = self.send_request(method, &url, &BTreeMap::new(), None::<&()>)?;
-
-        if response.status().is_success() {
-            Ok(())
-        } else {
-            let status = response.status();
-            let error_text = response
-                .text()
-                .unwrap_or_else(|_| "Unknown error".to_string());
-            Err(Error::ApiError {
-                status: status.as_u16(),
-                message: error_text,
-                details: None,
-            })
-        }
+        let url = self.build_url(path);
+        self.base_client.request_empty(method, &url)
     }
 
     pub(crate) fn request_with_body_empty<B: Serialize>(
@@ -167,54 +121,13 @@ impl TogglClient {
         path: &str,
         body: &B,
     ) -> Result<()> {
-        let url = if path.starts_with('/') {
-            format!("{}{}", self.base_url, path)
-        } else {
-            format!("{}/{}", self.base_url, path)
-        };
-
-        let response = self.send_request(method, &url, &BTreeMap::new(), Some(body))?;
-
-        if response.status().is_success() {
-            Ok(())
-        } else {
-            let status = response.status();
-            let error_text = response
-                .text()
-                .unwrap_or_else(|_| "Unknown error".to_string());
-            Err(Error::ApiError {
-                status: status.as_u16(),
-                message: error_text,
-                details: None,
-            })
-        }
+        let url = self.build_url(path);
+        self.base_client.request_with_body_empty(method, &url, body)
     }
 
-    #[allow(unused_mut)]
     pub(crate) fn request_binary(&self, method: Method, path: &str) -> Result<Vec<u8>> {
-        let url = if path.starts_with('/') {
-            format!("{}{}", self.base_url, path)
-        } else {
-            format!("{}/{}", self.base_url, path)
-        };
-
-        let mut response = self.send_request(method, &url, &BTreeMap::new(), None::<&()>)?;
-        let status = response.status();
-
-        if status.is_success() {
-            response.bytes().map(|b| b.to_vec()).map_err(|e| {
-                Error::ResponseParseError(format!("Failed to read response bytes: {}", e))
-            })
-        } else {
-            let error_text = response
-                .text()
-                .unwrap_or_else(|_| "Unknown error".to_string());
-            Err(Error::ApiError {
-                status: status.as_u16(),
-                message: error_text,
-                details: None,
-            })
-        }
+        let url = self.build_url(path);
+        self.base_client.request_binary(method, &url)
     }
 
     pub(crate) fn request_multipart(
@@ -224,7 +137,9 @@ impl TogglClient {
         file_data: &[u8],
         file_name: &str,
     ) -> Result<()> {
-        self.request_multipart_with_mime(method, path, file_data, file_name, "text/csv")
+        let url = self.build_url(path);
+        self.base_client
+            .request_multipart(method, &url, file_data, file_name)
     }
 
     pub(crate) fn request_multipart_with_mime(
@@ -235,44 +150,9 @@ impl TogglClient {
         file_name: &str,
         mime_type: &str,
     ) -> Result<()> {
-        let url = if path.starts_with('/') {
-            format!("{}{}", self.base_url, path)
-        } else {
-            format!("{}/{}", self.base_url, path)
-        };
-
-        #[cfg(test)]
-        println!("Sending multipart request to: {} {}", method, url);
-
-        // Use reqwest's multipart support
-        let part = reqwest::blocking::multipart::Part::bytes(file_data.to_vec())
-            .file_name(file_name.to_string())
-            .mime_str(mime_type)
-            .map_err(|e| Error::RequestBuildError(format!("Failed to create multipart: {}", e)))?;
-
-        let form = reqwest::blocking::multipart::Form::new().part("file", part);
-
-        let response = self
-            .client
-            .request(method, &url)
-            .header("Authorization", self.auth_header())
-            .multipart(form)
-            .send()
-            .map_err(|e| Error::NetworkError(format!("Failed to send request: {}", e)))?;
-
-        if response.status().is_success() {
-            Ok(())
-        } else {
-            let status = response.status();
-            let error_text = response
-                .text()
-                .unwrap_or_else(|_| "Unknown error".to_string());
-            Err(Error::ApiError {
-                status: status.as_u16(),
-                message: error_text,
-                details: None,
-            })
-        }
+        let url = self.build_url(path);
+        self.base_client
+            .request_multipart_with_mime(method, &url, file_data, file_name, mime_type)
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -286,149 +166,23 @@ impl TogglClient {
         file_field_name: &str,
         mime_type: &str,
     ) -> Result<T> {
-        let url = if path.starts_with('/') {
+        let url = self.build_url(path);
+        self.base_client.request_multipart_json_file(
+            method,
+            &url,
+            json_data,
+            file_data,
+            file_name,
+            file_field_name,
+            mime_type,
+        )
+    }
+
+    fn build_url(&self, path: &str) -> String {
+        if path.starts_with('/') {
             format!("{}{}", self.base_url, path)
         } else {
             format!("{}/{}", self.base_url, path)
-        };
-
-        #[cfg(test)]
-        println!("Sending multipart JSON+file request to: {} {}", method, url);
-
-        // Serialize JSON data
-        let json_string = serde_json::to_string(json_data)
-            .map_err(|e| Error::SerializationError(format!("Failed to serialize JSON: {}", e)))?;
-
-        // Create multipart form with both JSON and file
-        let json_part = reqwest::blocking::multipart::Part::text(json_string)
-            .mime_str("application/json")
-            .map_err(|e| Error::RequestBuildError(format!("Failed to create JSON part: {}", e)))?;
-
-        let file_part = reqwest::blocking::multipart::Part::bytes(file_data.to_vec())
-            .file_name(file_name.to_string())
-            .mime_str(mime_type)
-            .map_err(|e| Error::RequestBuildError(format!("Failed to create file part: {}", e)))?;
-
-        let form = reqwest::blocking::multipart::Form::new()
-            .part("data", json_part)
-            .part(file_field_name.to_string(), file_part);
-
-        let response = self
-            .client
-            .request(method, &url)
-            .header("Authorization", self.auth_header())
-            .multipart(form)
-            .send()
-            .map_err(|e| Error::NetworkError(format!("Failed to send request: {}", e)))?;
-
-        if response.status().is_success() {
-            response.json::<T>().map_err(|e| {
-                Error::ResponseParseError(format!("Failed to deserialize response: {}", e))
-            })
-        } else {
-            let status = response.status();
-            let error_text = response
-                .text()
-                .unwrap_or_else(|_| "Unknown error".to_string());
-            Err(Error::ApiError {
-                status: status.as_u16(),
-                message: error_text,
-                details: None,
-            })
-        }
-    }
-
-    fn send_request<B: Serialize>(
-        &self,
-        method: Method,
-        url: &str,
-        params: &BTreeMap<String, String>,
-        body: Option<&B>,
-    ) -> Result<Response> {
-        #[cfg(test)]
-        println!("Sending request to: {} {}", method, url);
-
-        let mut request = self
-            .client
-            .request(method, url)
-            .header("Authorization", self.auth_header())
-            .header("Content-Type", "application/json");
-
-        // Add query parameters
-        for (key, value) in params {
-            request = request.query(&[(key, value)]);
-        }
-
-        // Add body if provided
-        if let Some(body) = body {
-            request = request.json(body);
-        }
-
-        request
-            .send()
-            .map_err(|e| Error::NetworkError(format!("Failed to send request: {}", e)))
-    }
-
-    #[allow(unused_mut)]
-    fn handle_response<T: DeserializeOwned>(&self, mut response: Response) -> Result<T> {
-        let status = response.status();
-
-        if status.is_success() {
-            response.json::<T>().map_err(|e| {
-                Error::ResponseParseError(format!("Failed to deserialize JSON: {}", e))
-            })
-        } else {
-            let status_code = status.as_u16();
-
-            // Extract retry-after header before consuming response
-            let retry_after = if status_code == 429 {
-                response
-                    .headers()
-                    .get("retry-after")
-                    .and_then(|v| v.to_str().ok())
-                    .and_then(|v| v.parse::<u64>().ok())
-                    .unwrap_or(60) // Default to 60 seconds
-            } else {
-                0
-            };
-
-            let error_text = response
-                .text()
-                .unwrap_or_else(|_| "Unknown error".to_string());
-
-            // Try to parse as JSON to get structured error details
-            let details = serde_json::from_str::<serde_json::Value>(&error_text).ok();
-            let message = if let Some(ref json) = details {
-                // Try to extract message from common error response formats
-                json.get("message")
-                    .or_else(|| json.get("error"))
-                    .and_then(|v| v.as_str())
-                    .unwrap_or(&error_text)
-                    .to_string()
-            } else {
-                error_text
-            };
-
-            // Map specific status codes to more specific error types
-            match status_code {
-                401 => Err(Error::AuthError(message)),
-                403 => Err(Error::PermissionError(message)),
-                404 => {
-                    // Try to extract resource info from the path
-                    Err(Error::ApiError {
-                        status: status_code,
-                        message,
-                        details,
-                    })
-                }
-                429 => Err(Error::RateLimitError { retry_after }),
-                422 => Err(Error::ValidationError(message)),
-                _ => Err(Error::ApiError {
-                    status: status_code,
-                    message,
-                    details,
-                }),
-            }
         }
     }
 

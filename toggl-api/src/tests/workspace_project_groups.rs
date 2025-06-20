@@ -1,13 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use crate::{
-        models::api::ids::{GroupId, ProjectGroupId, ProjectId, WorkspaceId},
-        models::api::project::ProjectGroupPayload,
-        tests::with_mockito,
-    };
+    use crate::{models::api::project::ProjectGroupPayload, tests::with_mockito};
     use reqwest::Method;
     use serde_json::json;
     use toggl_core::Result;
+    use toggl_core::{GroupId, ProjectGroupId, ProjectId, WorkspaceId};
 
     #[test]
     fn test_get_project_groups() -> Result<()> {

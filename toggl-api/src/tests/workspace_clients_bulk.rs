@@ -1,8 +1,8 @@
-use crate::models::api::ids::{ClientId, WorkspaceId};
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{ClientId, WorkspaceId};
 
 #[test]
 fn test_archive_clients_bulk() -> Result<()> {

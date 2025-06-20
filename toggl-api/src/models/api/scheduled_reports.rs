@@ -1,5 +1,5 @@
-use super::ids::{BookmarkId, CreatorId, GroupId, ReportId, UserId, WorkspaceId};
 use serde::{Deserialize, Serialize};
+use toggl_core::{BookmarkId, CreatorId, GroupId, ReportId, UserId, WorkspaceId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ScheduledReport {

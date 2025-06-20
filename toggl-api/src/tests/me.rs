@@ -1,13 +1,13 @@
-use crate::models::api::ids::{
-    ClientId, OrganizationId, ProjectId, ReminderId, TagId, TaskId, TimeEntryId, UserId,
-    WorkspaceId,
-};
 use crate::models::api::user::{ResetToken, UpdateUser};
 use pretty_assertions::assert_eq;
 use reqwest::Method;
 use serde_json::json;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{
+    ClientId, OrganizationId, ProjectId, ReminderId, TagId, TaskId, TimeEntryId, UserId,
+    WorkspaceId,
+};
 
 use super::{with_mockito, with_mockito_params, API_TOKEN};
 

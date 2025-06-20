@@ -5,7 +5,7 @@ mod tests {
     use crate::models::weekly::*;
     use reqwest::Method;
     use serde_json::json;
-    use toggl_core::Result;
+    use toggl_core::{Result, UserId, WorkspaceId};
 
     #[test]
     fn test_get_weekly_report() -> Result<()> {
@@ -69,9 +69,9 @@ mod tests {
                     calculate: None,
                 };
 
-                let report = client.weekly().get(123, &request)?;
+                let report = client.weekly().get(WorkspaceId(123), &request)?;
                 assert_eq!(report.data.len(), 1);
-                assert_eq!(report.data[0].user_id, 123);
+                assert_eq!(report.data[0].user_id, UserId(123));
                 assert_eq!(report.data[0].total_seconds, 28800);
                 assert_eq!(report.week_totals.len(), 1);
                 Ok(())
@@ -111,7 +111,7 @@ mod tests {
                     },
                 };
 
-                let data = client.weekly().export_csv(123, &request)?;
+                let data = client.weekly().export_csv(WorkspaceId(123), &request)?;
                 assert_eq!(data, csv_data);
                 Ok(())
             },
@@ -151,7 +151,7 @@ mod tests {
                     display_mode: Some("compact".to_string()),
                 };
 
-                let data = client.weekly().export_pdf(123, &request)?;
+                let data = client.weekly().export_pdf(WorkspaceId(123), &request)?;
                 assert_eq!(&data[0..4], &[0x25, 0x50, 0x44, 0x46]);
                 Ok(())
             },

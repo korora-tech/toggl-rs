@@ -1,6 +1,7 @@
 //! Filter models for reports API
 
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, ProjectId, TaskId, UserId};
 
 /// Client filter parameters request
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -17,7 +18,7 @@ pub struct ClientFilterParamsRequest {
 /// Client filter response
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ClientFilterResponse {
-    pub id: i64,
+    pub id: ClientId,
     pub name: String,
     pub archived: bool,
 }
@@ -31,7 +32,7 @@ pub struct ProjectFilterParamRequest {
 
     /// Client IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub client_ids: Option<Vec<i64>>,
+    pub client_ids: Option<Vec<ClientId>>,
 
     /// Active status filter
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,9 +54,9 @@ pub struct ProjectFilterParamRequest {
 /// Project filter response
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectFilterResponse {
-    pub id: i64,
+    pub id: ProjectId,
     pub name: String,
-    pub client_id: Option<i64>,
+    pub client_id: Option<ClientId>,
     pub active: bool,
     pub billable: bool,
     pub color: String,
@@ -76,7 +77,7 @@ pub struct UserFilterParamsRequest {
 /// User filter response
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserFilterResponse {
-    pub id: i64,
+    pub id: UserId,
     pub name: String,
     pub email: String,
     pub active: bool,
@@ -86,13 +87,13 @@ pub struct UserFilterResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectStatusParamsRequest {
     /// Project IDs
-    pub project_ids: Vec<i64>,
+    pub project_ids: Vec<ProjectId>,
 }
 
 /// Project status response
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectStatusResponse {
-    pub id: i64,
+    pub id: ProjectId,
     pub active: bool,
     pub billable: bool,
 }
@@ -101,13 +102,13 @@ pub struct ProjectStatusResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaskStatusParamsRequest {
     /// Task IDs
-    pub task_ids: Vec<i64>,
+    pub task_ids: Vec<TaskId>,
 }
 
 /// Task status response
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaskStatusResponse {
-    pub id: i64,
+    pub id: TaskId,
     pub active: bool,
 }
 
@@ -120,7 +121,7 @@ pub struct ProjectGroupParamsRequest {
 
     /// Project IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub project_ids: Option<Vec<i64>>,
+    pub project_ids: Option<Vec<ProjectId>>,
 }
 
 /// Project group response
@@ -140,13 +141,13 @@ pub struct ProjectUserParamsRequest {
 
     /// Project IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub project_ids: Option<Vec<i64>>,
+    pub project_ids: Option<Vec<ProjectId>>,
 }
 
 /// Project user response
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectUserResponse {
-    pub id: i64,
+    pub id: UserId,
     pub name: String,
     pub email: String,
 }
@@ -155,7 +156,7 @@ pub struct ProjectUserResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectUsersRequest {
     /// Project IDs
-    pub project_ids: Vec<i64>,
+    pub project_ids: Vec<ProjectId>,
 }
 
 /// Task request parameters
@@ -167,7 +168,7 @@ pub struct TasksRequest {
 
     /// Task IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub ids: Option<Vec<i64>>,
+    pub ids: Option<Vec<TaskId>>,
 
     /// Name filter
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -183,7 +184,7 @@ pub struct TasksRequest {
 
     /// Project IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub project_ids: Option<Vec<i64>>,
+    pub project_ids: Option<Vec<ProjectId>>,
 
     /// Start index
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -191,14 +192,14 @@ pub struct TasksRequest {
 
     /// User IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<i64>>,
+    pub user_ids: Option<Vec<UserId>>,
 }
 
 /// Task response model
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
     /// Task ID
-    pub id: i64,
+    pub id: TaskId,
 
     /// Task name
     pub name: String,
@@ -207,7 +208,7 @@ pub struct Task {
     pub active: bool,
 
     /// Project ID
-    pub project_id: i64,
+    pub project_id: ProjectId,
 
     /// Project name
     #[serde(skip_serializing_if = "Option::is_none")]

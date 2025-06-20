@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use super::ids::{FeatureId, PaymentMethodId, PricingPlanId, ProductId};
+use toggl_core::{FeatureId, PaymentMethodId, PricingPlanId, ProductId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Plan {

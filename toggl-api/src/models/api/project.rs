@@ -1,8 +1,8 @@
-use super::ids::{
-    ClientId, GroupId, ProjectGroupId, ProjectId, ProjectUserId, UserId, WorkspaceId,
-};
 use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
+use toggl_core::{
+    ClientId, GroupId, ProjectGroupId, ProjectId, ProjectUserId, UserId, WorkspaceId,
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Project {

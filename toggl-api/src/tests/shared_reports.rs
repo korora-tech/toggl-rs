@@ -1,9 +1,9 @@
-use crate::models::api::ids::{ReportId, WorkspaceId};
 use crate::models::api::shared_reports::{
     BulkDeleteRequest, CreateSavedReportPayload, SharedReportsQuery, UpdateSavedReportPayload,
 };
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{ReportId, WorkspaceId};
 
 use super::with_mockito;
 use reqwest::Method;

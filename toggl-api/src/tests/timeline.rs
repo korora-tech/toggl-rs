@@ -1,10 +1,10 @@
-use crate::models::api::ids::{ProjectId, TimelineId};
 use crate::models::api::timeline::CreateTimelineEvent;
 use pretty_assertions::assert_eq;
 use reqwest::Method;
 use serde_json::json;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{ProjectId, TimelineId};
 
 use super::{with_mockito, with_mockito_params};
 

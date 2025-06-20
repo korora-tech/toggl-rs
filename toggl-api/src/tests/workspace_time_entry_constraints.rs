@@ -1,9 +1,9 @@
-use crate::models::api::ids::WorkspaceId;
 use crate::models::api::preferences::TimeEntryConstraints;
 use crate::tests::*;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::WorkspaceId;
 
 #[test]
 fn test_get_time_entry_constraints() -> Result<()> {

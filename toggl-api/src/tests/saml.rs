@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
-    use crate::models::api::ids::{SsoProfileId, WorkspaceId};
     use crate::models::api::saml::*;
     use crate::tests::*;
     use reqwest::Method;
     use serde_json::json;
     use std::collections::BTreeMap;
+    use toggl_core::{SsoProfileId, WorkspaceId};
 
     #[test]
     fn test_saml2_login() -> Result<()> {

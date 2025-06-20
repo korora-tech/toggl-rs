@@ -1,9 +1,9 @@
 use super::TogglClient;
-use crate::models::api::ids::TimelineId;
 use crate::models::api::timeline::{CreateTimelineEvent, TimelineEvent};
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::TimelineId;
 
 pub struct TimelineClient {
     client: TogglClient,

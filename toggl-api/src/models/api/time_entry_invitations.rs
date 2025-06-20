@@ -1,6 +1,6 @@
-use super::ids::{TimeEntryInvitationId, UserId, WorkspaceId};
 use super::time_entry::TimeEntry;
 use serde::{Deserialize, Serialize};
+use toggl_core::{TimeEntryInvitationId, UserId, WorkspaceId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TimeEntryInvitation {

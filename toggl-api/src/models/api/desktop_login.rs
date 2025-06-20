@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::ids::UserId;
+use toggl_core::UserId;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DesktopLoginToken {

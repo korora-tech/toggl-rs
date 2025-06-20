@@ -4,7 +4,7 @@ mod tests {
     use reqwest::Method;
     use serde_json::json;
     use std::collections::BTreeMap;
-    use toggl_core::Result;
+    use toggl_core::{Result, WorkspaceId};
 
     #[test]
     fn test_search_clients() -> Result<()> {
@@ -33,7 +33,7 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let result = client.search().clients(123, "Client")?;
+                let result = client.search().clients(WorkspaceId(123), "Client")?;
                 assert_eq!(result.data.len(), 2);
                 assert_eq!(result.data[0].name, "Client ABC");
                 Ok(())
@@ -66,7 +66,7 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let result = client.search().projects(123, "Alpha")?;
+                let result = client.search().projects(WorkspaceId(123), "Alpha")?;
                 assert_eq!(result.data.len(), 1);
                 assert_eq!(result.data[0].name, "Project Alpha");
                 assert!(result.data[0].active);
@@ -104,7 +104,7 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let result = client.search().users(123, "John")?;
+                let result = client.search().users(WorkspaceId(123), "John")?;
                 assert_eq!(result.data.len(), 2);
                 assert_eq!(result.data[0].name, "John Doe");
                 assert!(result.data[0].active);

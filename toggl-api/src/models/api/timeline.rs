@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::ids::{ProjectId, TaskId, TimelineId};
+use toggl_core::{ProjectId, TaskId, TimelineId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TimelineEvent {

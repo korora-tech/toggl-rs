@@ -1,7 +1,7 @@
 use crate::models::api::goals::{CreateGoalRequest, UpdateGoalRequest, WorkspaceGoalsQuery};
-use crate::models::api::ids::{GoalId, ProjectId, TagId, UserId, WorkspaceId};
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{GoalId, ProjectId, TagId, UserId, WorkspaceId};
 
 use super::with_mockito;
 use reqwest::Method;

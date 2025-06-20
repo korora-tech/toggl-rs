@@ -1,9 +1,9 @@
-use super::ids::{
+use chrono::{DateTime, NaiveDate, Utc};
+use serde::{Deserialize, Serialize};
+use toggl_core::{
     CustomerId, InvoiceItemId, OrganizationId, PaymentMethodId, PricingPlanId, SubscriptionId,
     WorkspaceId,
 };
-use chrono::{DateTime, NaiveDate, Utc};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Subscription {

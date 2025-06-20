@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use super::ids::{AuditId, UserId};
+use toggl_core::{AuditId, UserId};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuditLog {

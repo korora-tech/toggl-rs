@@ -1,8 +1,8 @@
 use super::TogglClient;
 use crate::models::api::auth::SamlLoginResponse;
-use crate::models::api::ids::WorkspaceId;
 use reqwest::Method;
 use toggl_core::Result;
+use toggl_core::WorkspaceId;
 
 pub struct AuthClient {
     client: TogglClient,

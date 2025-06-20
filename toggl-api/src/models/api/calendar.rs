@@ -1,8 +1,8 @@
-use crate::models::api::ids::{IntegrationId, ProjectId, TaskId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use toggl_core::{IntegrationId, ProjectId, TaskId, WorkspaceId};
 
-use super::ids::{CalendarId, ProviderUserId};
+use toggl_core::{CalendarId, ProviderUserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Integration {

@@ -5,7 +5,7 @@ mod tests {
     use crate::models::comparative::*;
     use reqwest::Method;
     use serde_json::json;
-    use toggl_core::Result;
+    use toggl_core::{Result, WorkspaceId};
 
     #[test]
     fn test_get_comparative_report() -> Result<()> {
@@ -61,7 +61,7 @@ mod tests {
                     include_time_entry_ids: None,
                 };
 
-                let report = client.comparative().get(123, &request)?;
+                let report = client.comparative().get(WorkspaceId(123), &request)?;
                 assert_eq!(report.data.graph.len(), 2);
                 assert_eq!(report.data.total_current, 61200);
                 assert_eq!(report.data.total_previous, 54000);

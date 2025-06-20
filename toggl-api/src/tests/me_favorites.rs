@@ -1,13 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use crate::{
-        models::api::favorite::*,
-        models::api::ids::{FavoriteId, ProjectId, TagId, WorkspaceId},
-        tests::with_mockito,
-    };
+    use crate::{models::api::favorite::*, tests::with_mockito};
     use reqwest::Method;
     use serde_json::json;
     use toggl_core::Result;
+    use toggl_core::{FavoriteId, ProjectId, TagId, WorkspaceId};
 
     #[test]
     fn test_get_favorites() -> Result<()> {

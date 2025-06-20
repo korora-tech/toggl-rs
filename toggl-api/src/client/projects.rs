@@ -1,10 +1,10 @@
 use super::TogglClient;
-use crate::models::api::ids::{GroupId, ProjectId, ProjectUserId, TaskId, WorkspaceId};
 use crate::models::api::project::*;
 use crate::models::api::task::Task;
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{GroupId, ProjectId, ProjectUserId, TaskId, WorkspaceId};
 
 pub struct ProjectsClient {
     client: TogglClient,

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::ids::{GoalId, ProjectId, WorkspaceId};
+use toggl_core::{GoalId, ProjectId, WorkspaceId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Goal {

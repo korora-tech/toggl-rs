@@ -1,6 +1,6 @@
-use crate::models::api::ids::WorkspaceId;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::WorkspaceId;
 
 use super::with_mockito;
 use reqwest::Method;

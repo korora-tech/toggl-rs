@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use crate::models::api::ids::WorkspaceId;
     use crate::tests::*;
     use reqwest::Method;
     use serde_json::json;
+    use toggl_core::WorkspaceId;
 
     #[test]
     fn test_saml2_login_without_workspace() -> Result<()> {

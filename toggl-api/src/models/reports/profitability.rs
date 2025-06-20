@@ -1,6 +1,6 @@
 use super::{ReportFilters, ReportTimeRange};
-use crate::models::api::ids::{ClientId, ProjectId, UserId, WorkspaceId};
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, ProjectId, UserId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProfitabilityReportRequest {

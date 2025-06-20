@@ -1,6 +1,6 @@
-use super::ids::{ProjectId, TaskId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use toggl_core::{ProjectId, TaskId, UserId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Task {

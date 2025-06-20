@@ -1,7 +1,7 @@
 //! Profitability report endpoints
 
 use reqwest::Method;
-use toggl_core::Result;
+use toggl_core::{Result, WorkspaceId};
 
 use super::ReportsClient;
 use crate::models::profitability::*;
@@ -18,10 +18,10 @@ impl ProfitabilityClient {
     /// Get project profitability report
     pub fn projects(
         &self,
-        workspace_id: i64,
+        workspace_id: WorkspaceId,
         request: &ProjectProfitabilityRequest,
     ) -> Result<ProjectProfitabilityReport> {
-        let path = format!("/workspace/{}/profitability/projects", workspace_id);
+        let path = format!("/workspace/{}/profitability/projects", workspace_id.value());
         self.client.request_with_body(Method::POST, &path, request)
     }
 }

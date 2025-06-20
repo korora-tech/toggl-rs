@@ -1,7 +1,7 @@
-use super::ids::{GroupId, ReminderId, UserId, WorkspaceId};
 use serde::{Deserialize, Serialize};
+use toggl_core::{GroupId, ReminderId, UserId, WorkspaceId};
 
-use super::ids::FeatureId;
+use toggl_core::FeatureId;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Feature {

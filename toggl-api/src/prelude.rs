@@ -7,18 +7,9 @@
 pub use crate::client::TogglClient;
 pub use toggl_core::{Error, Result};
 
-// Common model types
-pub use crate::models::api::ids::{
-    // IDs (from ids module)
-    ClientId,
-    GroupId,
-    OrganizationId,
-    ProjectId,
-    TagId,
-    TaskId,
-    TimeEntryId,
-    UserId,
-    WorkspaceId,
+// Common ID types from toggl_core
+pub use toggl_core::{
+    ClientId, GroupId, OrganizationId, ProjectId, TagId, TaskId, TimeEntryId, UserId, WorkspaceId,
 };
 
 // User and workspace basics

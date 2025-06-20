@@ -4,7 +4,7 @@ mod tests {
     use crate::models::DataTrendsPost;
     use reqwest::Method;
     use serde_json::json;
-    use toggl_core::Result;
+    use toggl_core::{ProjectId, Result, UserId, WorkspaceId};
 
     #[test]
     fn test_get_client_data_trends() -> Result<()> {
@@ -43,7 +43,7 @@ mod tests {
                     billable: None,
                 };
 
-                let report = client.data_trends().clients(123, &request)?;
+                let report = client.data_trends().clients(WorkspaceId(123), &request)?;
                 assert_eq!(report.data.len(), 1);
                 assert_eq!(report.data[0].client_name.as_ref().unwrap(), "Client ABC");
                 assert_eq!(report.data[0].total_seconds, 61200);
@@ -81,13 +81,13 @@ mod tests {
                 let request = DataTrendsPost {
                     start_date: "2024-01-01".to_string(),
                     end_date: "2024-01-31".to_string(),
-                    project_ids: Some(vec![456]),
+                    project_ids: Some(vec![ProjectId(456)]),
                     client_ids: None,
                     user_ids: None,
                     billable: None,
                 };
 
-                let report = client.data_trends().projects(123, &request)?;
+                let report = client.data_trends().projects(WorkspaceId(123), &request)?;
                 assert_eq!(report.data.len(), 1);
                 assert_eq!(report.data[0].project_name, "Project Alpha");
                 assert_eq!(report.data[0].total_seconds, 14400);
@@ -125,11 +125,11 @@ mod tests {
                     end_date: "2024-01-31".to_string(),
                     project_ids: None,
                     client_ids: None,
-                    user_ids: Some(vec![789]),
+                    user_ids: Some(vec![UserId(789)]),
                     billable: None,
                 };
 
-                let report = client.data_trends().users(123, &request)?;
+                let report = client.data_trends().users(WorkspaceId(123), &request)?;
                 assert_eq!(report.data.len(), 1);
                 assert_eq!(report.data[0].user_name, "John Doe");
                 assert_eq!(report.data[0].total_seconds, 28800);

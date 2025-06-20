@@ -1,7 +1,7 @@
-use super::ids::{CountryId, TagId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use toggl_core::{CountryId, TagId, UserId, WorkspaceId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct User {

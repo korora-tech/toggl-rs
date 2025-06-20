@@ -1,10 +1,10 @@
-use crate::models::api::ids::{TimeEntryId, WorkspaceId};
 use crate::models::api::time_entry::*;
 use chrono::{DateTime, Utc};
 use pretty_assertions::assert_eq;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{TimeEntryId, WorkspaceId};
 
 use super::with_mockito;
 

@@ -1,9 +1,9 @@
 use super::TogglClient;
-use crate::models::api::ids::{InvoiceId, OrganizationId, WorkspaceId};
 use crate::models::api::invoices::*;
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::{InvoiceId, OrganizationId, WorkspaceId};
 
 pub struct InvoicesClient {
     client: TogglClient,

@@ -4,7 +4,7 @@ mod tests {
     use crate::models::profitability::*;
     use reqwest::Method;
     use serde_json::json;
-    use toggl_core::Result;
+    use toggl_core::{ProjectId, Result, WorkspaceId};
 
     #[test]
     fn test_get_project_profitability() -> Result<()> {
@@ -31,16 +31,18 @@ mod tests {
             Some(response),
             |client| {
                 let request = ProjectProfitabilityRequest {
-                    project_ids: vec![123],
+                    project_ids: vec![ProjectId(123)],
                     filter: Some(ProfitabilityFilter {
                         start_date: Some("2024-01-01".to_string()),
                         end_date: Some("2024-01-31".to_string()),
                     }),
                 };
 
-                let report = client.profitability().projects(123, &request)?;
+                let report = client
+                    .profitability()
+                    .projects(WorkspaceId(123), &request)?;
                 assert_eq!(report.data.len(), 1);
-                assert_eq!(report.data[0].project_id, 123);
+                assert_eq!(report.data[0].project_id, ProjectId(123));
                 assert_eq!(report.data[0].billable_amount, 5400.0);
                 assert_eq!(report.data[0].profit, 1800.0);
                 assert_eq!(report.data[0].currency, "USD");

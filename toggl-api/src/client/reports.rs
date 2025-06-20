@@ -1,9 +1,9 @@
 use super::TogglClient;
-use crate::models::api::ids::WorkspaceId;
 use crate::models::reports::*;
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
+use toggl_core::WorkspaceId;
 
 pub struct ReportsClient {
     client: TogglClient,

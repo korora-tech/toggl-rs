@@ -1,6 +1,7 @@
 //! Dictionary models for shared reference data
 
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, GroupId, ProjectId, ProjectUserId, TagId, TaskId, UserId};
 
 /// Report dictionaries containing reference data
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -16,7 +17,7 @@ pub struct ReportDictionaries {
 /// Client dictionary entry
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ClientDict {
-    pub id: i64,
+    pub id: ClientId,
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub archived: Option<bool>,
@@ -25,9 +26,9 @@ pub struct ClientDict {
 /// Project dictionary entry
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectDict {
-    pub id: i64,
+    pub id: ProjectId,
     pub name: String,
-    pub client_id: Option<i64>,
+    pub client_id: Option<ClientId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,7 +40,7 @@ pub struct ProjectDict {
 /// User dictionary entry
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserDict {
-    pub id: i64,
+    pub id: UserId,
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
@@ -50,9 +51,9 @@ pub struct UserDict {
 /// Task dictionary entry
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaskDict {
-    pub id: i64,
+    pub id: TaskId,
     pub name: String,
-    pub project_id: i64,
+    pub project_id: ProjectId,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
 }
@@ -60,14 +61,14 @@ pub struct TaskDict {
 /// Tag dictionary entry
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TagDict {
-    pub id: i64,
+    pub id: TagId,
     pub name: String,
 }
 
 /// Group dictionary entry
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GroupDict {
-    pub id: i64,
+    pub id: GroupId,
     pub name: String,
 }
 
@@ -124,7 +125,7 @@ pub struct TaskDictionary {
 /// Project user dictionary entry
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectUserDict {
-    pub id: i64,
+    pub id: ProjectUserId,
     pub name: String,
     pub email: String,
     #[serde(skip_serializing_if = "Option::is_none")]

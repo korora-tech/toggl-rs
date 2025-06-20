@@ -1,6 +1,7 @@
 //! Base models for reports API
 
 use serde::{Deserialize, Serialize};
+use toggl_core::{ClientId, ProjectId, TagId, TaskId, UserId};
 
 /// Common post parameters for reports
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -13,23 +14,23 @@ pub struct Post {
 
     /// Client IDs filter, can include null
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub client_ids: Option<Vec<Option<i64>>>,
+    pub client_ids: Option<Vec<Option<ClientId>>>,
 
     /// Project IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub project_ids: Option<Vec<i64>>,
+    pub project_ids: Option<Vec<ProjectId>>,
 
     /// User IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<i64>>,
+    pub user_ids: Option<Vec<UserId>>,
 
     /// Tag IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub tag_ids: Option<Vec<i64>>,
+    pub tag_ids: Option<Vec<TagId>>,
 
     /// Task IDs filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub task_ids: Option<Vec<i64>>,
+    pub task_ids: Option<Vec<TaskId>>,
 
     /// Filter by billable status
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -85,15 +86,15 @@ pub struct DataTrendsPost {
 
     /// Filter by project IDs
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub project_ids: Option<Vec<i64>>,
+    pub project_ids: Option<Vec<ProjectId>>,
 
     /// Filter by client IDs
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub client_ids: Option<Vec<Option<i64>>>,
+    pub client_ids: Option<Vec<Option<ClientId>>>,
 
     /// Filter by user IDs
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<i64>>,
+    pub user_ids: Option<Vec<UserId>>,
 
     /// Filter by billable status
     #[serde(skip_serializing_if = "Option::is_none")]

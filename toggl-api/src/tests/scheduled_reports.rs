@@ -1,7 +1,7 @@
-use crate::models::api::ids::{BookmarkId, GroupId, ReportId, UserId, WorkspaceId};
 use crate::models::api::scheduled_reports::CreateScheduledReportPayload;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{BookmarkId, GroupId, ReportId, UserId, WorkspaceId};
 
 use super::with_mockito;
 use reqwest::Method;

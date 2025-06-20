@@ -41,9 +41,13 @@
 //! ```
 
 pub mod auth;
+pub mod client;
 pub mod error;
+pub mod ids;
 pub mod types;
 
 pub use auth::*;
+pub use client::BaseClient;
 pub use error::*;
+pub use ids::*;
 pub use types::*;

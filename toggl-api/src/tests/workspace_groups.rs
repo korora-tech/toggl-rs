@@ -1,9 +1,9 @@
 use crate::models::api::group::{CreateGroup, UpdateGroup};
-use crate::models::api::ids::{GroupId, WorkspaceId};
 use crate::tests::*;
 use reqwest::Method;
 use serde_json::json;
 use toggl_core::Result;
+use toggl_core::{GroupId, WorkspaceId};
 
 #[test]
 fn test_get_groups() -> Result<()> {

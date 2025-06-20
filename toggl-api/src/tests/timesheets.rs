@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
-    use crate::models::api::ids::{SetupId, TimeEntryId, WorkspaceId};
     use crate::models::api::timesheets::*;
     use crate::tests::*;
     use reqwest::Method;
     use serde_json::json;
     use std::collections::BTreeMap;
+    use toggl_core::{SetupId, TimeEntryId, WorkspaceId};
 
     #[test]
     fn test_get_me_timesheets() -> Result<()> {

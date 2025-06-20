@@ -1,8 +1,8 @@
 use super::{ReportFilters, ReportTimeRange};
-use crate::models::api::ids::WorkspaceId;
 use serde::{Deserialize, Serialize};
+use toggl_core::WorkspaceId;
 
-use crate::models::api::ids::ExportId;
+use toggl_core::ExportId;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ExportRequest {
