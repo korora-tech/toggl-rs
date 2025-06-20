@@ -68,6 +68,28 @@ fn test_verify_signature_empty_payload() {
 }
 
 #[test]
+fn test_verify_signature_with_sha256_prefix() {
+    let payload = b"test webhook payload";
+    let secret = "my-secret-key";
+
+    use hmac::{Hmac, Mac};
+    use sha2::Sha256;
+
+    type HmacSha256 = Hmac<Sha256>;
+    let mut mac = HmacSha256::new_from_slice(secret.as_bytes()).unwrap();
+    mac.update(payload);
+    let result = mac.finalize();
+    let hash = hex::encode(result.into_bytes());
+
+    // Test with the sha256= prefix (as per Toggl documentation)
+    let signature_with_prefix = format!("sha256={}", hash);
+    assert!(verify_signature(payload, &signature_with_prefix, secret));
+
+    // Test backward compatibility (without prefix)
+    assert!(verify_signature(payload, &hash, secret));
+}
+
+#[test]
 fn test_event_serialization() {
     use chrono::Utc;
     use serde_json::json;

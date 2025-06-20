@@ -176,6 +176,7 @@ pub enum EventEntityType {
 }
 
 /// Helper functions for webhook signature verification
+#[cfg(feature = "client")]
 pub mod verification {
     use hmac::{Hmac, Mac};
     use sha2::Sha256;
@@ -186,12 +187,32 @@ pub mod verification {
     ///
     /// # Arguments
     /// * `payload` - The raw webhook payload
-    /// * `signature` - The signature from the X-Webhook-Signature header
+    /// * `signature` - The signature from the X-Webhook-Signature-256 header (format: "sha256=...")
     /// * `secret` - Your webhook secret
     ///
     /// # Returns
     /// True if the signature is valid
+    ///
+    /// # Example
+    /// ```
+    /// let payload = b"webhook payload";
+    /// let signature = "sha256=1234abcd..."; // From X-Webhook-Signature-256 header
+    /// let secret = "your-webhook-secret";
+    ///
+    /// if verify_signature(payload, signature, secret) {
+    ///     // Process webhook
+    /// }
+    /// ```
     pub fn verify_signature(payload: &[u8], signature: &str, secret: &str) -> bool {
+        // Extract the hash from the "sha256=..." format
+        let hash = match signature.strip_prefix("sha256=") {
+            Some(h) => h,
+            None => {
+                // For backward compatibility, try using the signature as-is
+                signature
+            }
+        };
+
         let mut mac = match HmacSha256::new_from_slice(secret.as_bytes()) {
             Ok(mac) => mac,
             Err(_) => return false,
@@ -202,9 +223,10 @@ pub mod verification {
         let expected = hex::encode(result.into_bytes());
 
         // Constant-time comparison
-        signature == expected
+        hash == expected
     }
 }
 
 // Re-export for convenience
+#[cfg(feature = "client")]
 pub use verification::verify_signature;
