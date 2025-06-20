@@ -13,12 +13,14 @@
 //! - Profitability analysis
 //! - Insights API
 
+#[cfg(feature = "client")]
 pub mod client;
 pub mod models;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "client"))]
 mod tests;
 
+#[cfg(feature = "client")]
 pub use client::ReportsClient;
 pub use toggl_core::{Error, Result};
 

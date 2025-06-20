@@ -220,3 +220,86 @@ fn test_subscription_error_handling() -> Result<()> {
         },
     )
 }
+
+#[test]
+fn test_create_subscription_with_wildcards() -> Result<()> {
+    let request = CreateSubscription {
+        workspace_id: WorkspaceId::new(12345),
+        url_callback: "https://example.com/webhook".to_string(),
+        enabled: Some(true),
+        description: Some("Wildcard subscription".to_string()),
+        event_filters: Some(vec![
+            SubscriptionInEventFilter {
+                entity: "*".to_string(), // All entities
+                action: "created".to_string(),
+            },
+            SubscriptionInEventFilter {
+                entity: "project".to_string(),
+                action: "*".to_string(), // All actions
+            },
+            SubscriptionInEventFilter {
+                entity: "*".to_string(), // All entities
+                action: "*".to_string(), // All actions
+            },
+        ]),
+        secret: Some("test-secret".to_string()),
+        user_agent: None,
+        has_pending_events: None,
+    };
+
+    let response = json!({
+        "subscription_id": "sub_wildcard",
+        "workspace_id": 12345,
+        "url_callback": "https://example.com/webhook",
+        "enabled": true,
+        "description": "Wildcard subscription",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z",
+        "event_filters": [
+            {
+                "entity": "*",
+                "action": "created"
+            },
+            {
+                "entity": "project",
+                "action": "*"
+            },
+            {
+                "entity": "*",
+                "action": "*"
+            }
+        ]
+    });
+
+    with_mockito(
+        Method::POST,
+        "/api/v9/subscriptions",
+        201,
+        Some(response),
+        |client| {
+            let subscription = client.create_subscription(&request)?;
+            assert_eq!(subscription.subscription_id, "sub_wildcard");
+
+            // Verify wildcard filters were accepted
+            if let Some(filters) = subscription.event_filters {
+                assert_eq!(filters.len(), 3);
+
+                // Check first filter: all entities, created action
+                assert_eq!(filters[0].entity, Some("*".to_string()));
+                assert_eq!(filters[0].action, Some("created".to_string()));
+
+                // Check second filter: project entity, all actions
+                assert_eq!(filters[1].entity, Some("project".to_string()));
+                assert_eq!(filters[1].action, Some("*".to_string()));
+
+                // Check third filter: all entities, all actions
+                assert_eq!(filters[2].entity, Some("*".to_string()));
+                assert_eq!(filters[2].action, Some("*".to_string()));
+            } else {
+                panic!("Expected event filters in response");
+            }
+
+            Ok(())
+        },
+    )
+}

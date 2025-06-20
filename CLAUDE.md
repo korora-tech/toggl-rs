@@ -50,20 +50,28 @@ cargo build --release
 
 ### Available Features
 
-The library provides feature flags to control what functionality is included:
+The library is organized with models always available and clients behind feature flags:
 
 ```toml
 [dependencies]
-toggl-api = { version = "0.1", features = ["full"] }
+# Models only (default)
+toggl = "0.0.3"
+
+# With API client
+toggl = { version = "0.0.3", features = ["api-client"] }
+
+# With Reports client  
+toggl = { version = "0.0.3", features = ["reports-client"] }
+
+# With all clients
+toggl = { version = "0.0.3", features = ["api-client", "reports-client", "webhooks-client"] }
 ```
 
 Available features:
-- `default`: Core API functionality
-- `reports`: Reporting API support
-- `webhooks`: Webhook support (placeholder)
-- `minimal`: Just core API without extras
-- `analytics`: API + reports
-- `full`: All features enabled
+- No features (default): All model types from all APIs are available
+- `api-client`: Enables the main Toggl Track API client
+- `reports-client`: Enables the Reports API client
+- `webhooks-client`: Enables the Webhooks API client
 
 ### Using the Library
 
@@ -391,6 +399,7 @@ When working on this codebase:
 15. Run `cargo nextest run --no-capture` to debug test failures
 16. Use strong typing - prefer specific ID types over generic i64
 17. Handle optional fields properly - use `Option<T>` for nullable API fields
+18. **Never create example files** - Do not create files in the examples/ directory
 
 ### Quick Reference for Common Patterns
 

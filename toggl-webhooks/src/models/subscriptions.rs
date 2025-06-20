@@ -39,12 +39,16 @@ pub struct SubscriptionInDto {
 }
 
 /// Event filter for subscription input
+///
+/// Supports wildcards:
+/// - Use "*" for action to match all actions (created, updated, deleted)
+/// - Use "*" for entity to match all entity types
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubscriptionInEventFilter {
-    /// Action type (e.g., "created", "updated", "deleted")
+    /// Action type (e.g., "created", "updated", "deleted", or "*" for all)
     pub action: String,
 
-    /// Entity type (e.g., "time_entry", "project", "client")
+    /// Entity type (e.g., "time_entry", "project", "client", or "*" for all)
     pub entity: String,
 }
 
@@ -100,13 +104,17 @@ pub struct SubscriptionOutDto {
 }
 
 /// Event filter for subscription output
+///
+/// Supports wildcards:
+/// - Use "*" for action to match all actions (created, updated, deleted)
+/// - Use "*" for entity to match all entity types
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubscriptionOutEventFilter {
-    /// Action type (e.g., "created", "updated", "deleted")
+    /// Action type (e.g., "created", "updated", "deleted", or "*" for all)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub action: Option<String>,
 
-    /// Entity type (e.g., "time_entry", "project", "client")
+    /// Entity type (e.g., "time_entry", "project", "client", or "*" for all)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entity: Option<String>,
 }
@@ -144,13 +152,17 @@ pub struct SubscriptionUpdateDto {
 }
 
 /// Event filter for subscription update
+///
+/// Supports wildcards:
+/// - Use "*" for action to match all actions (created, updated, deleted)
+/// - Use "*" for entity to match all entity types
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubscriptionUpdateEventFilter {
-    /// Action type (e.g., "created", "updated", "deleted")
+    /// Action type (e.g., "created", "updated", "deleted", or "*" for all)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub action: Option<String>,
 
-    /// Entity type (e.g., "time_entry", "project", "client")
+    /// Entity type (e.g., "time_entry", "project", "client", or "*" for all)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entity: Option<String>,
 }

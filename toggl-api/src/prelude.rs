@@ -4,6 +4,7 @@
 //! needed when working with the Toggl API.
 
 // Core types
+#[cfg(feature = "client")]
 pub use crate::client::TogglClient;
 pub use toggl_core::{Error, Result};
 

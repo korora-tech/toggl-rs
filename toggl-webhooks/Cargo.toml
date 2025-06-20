@@ -7,15 +7,19 @@ repository.workspace = true
 license.workspace = true
 description = "Rust client for the Toggl Track Webhooks API"
 
+[features]
+default = ["client"]
+client = ["dep:reqwest", "dep:hmac", "dep:sha2", "dep:hex"]
+
 [dependencies]
 toggl-core = { workspace = true }
-reqwest = { workspace = true }
+reqwest = { workspace = true, optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 chrono = { workspace = true }
-hmac = "0.12"
-sha2 = "0.10"
-hex = "0.4"
+hmac = { version = "0.12", optional = true }
+sha2 = { version = "0.10", optional = true }
+hex = { version = "0.4", optional = true }
 
 [dev-dependencies]
 mockito = { workspace = true }

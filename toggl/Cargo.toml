@@ -11,26 +11,20 @@ keywords = ["toggl", "api", "client", "time-tracking"]
 categories = ["api-bindings", "web-programming"]
 
 [features]
-# Default features - includes the most commonly used APIs
-default = ["api", "reports"]
+# Default features - no clients enabled by default, only models
+default = []
 
-# Full feature set - includes all APIs
-full = ["api", "reports", "webhooks"]
-
-# Individual API features
-api = ["dep:toggl-api"]
-reports = ["dep:toggl-reports"]
-webhooks = ["dep:toggl-webhooks"]
-
-# Convenience feature groups
-minimal = ["api"]  # Just the core API, no reports
-analytics = ["api", "reports"]  # API + reporting capabilities
+# Individual client features
+api-client = ["toggl-api/client"]
+reports-client = ["toggl-reports/client"]
+webhooks-client = ["toggl-webhooks/client"]
 
 [dependencies]
 toggl-core = { workspace = true }
-toggl-api = { workspace = true, optional = true }
-toggl-reports = { workspace = true, optional = true }
-toggl-webhooks = { workspace = true, optional = true }
+# Models are always included, clients are feature-gated
+toggl-api = { workspace = true }
+toggl-reports = { workspace = true }
+toggl-webhooks = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true }

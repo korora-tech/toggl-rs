@@ -32,6 +32,15 @@
 //!         SubscriptionInEventFilter {
 //!             entity: "time_entry".to_string(),
 //!             action: "created".to_string(),
+//!         },
+//!         // You can also use wildcards
+//!         SubscriptionInEventFilter {
+//!             entity: "project".to_string(),
+//!             action: "*".to_string(), // All actions
+//!         },
+//!         SubscriptionInEventFilter {
+//!             entity: "*".to_string(), // All entities
+//!             action: "deleted".to_string(),
 //!         }
 //!     ]),
 //!     secret: Some("my-secret-key".to_string()),
@@ -54,15 +63,19 @@
 //! }
 //! ```
 
+#[cfg(feature = "client")]
 pub mod client;
 pub mod events;
 pub mod models;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "client"))]
 mod tests;
 
+#[cfg(feature = "client")]
 pub use client::{WebhooksClient, WEBHOOKS_API_BASE_URL};
-pub use toggl_core::{Auth, Error, Result};
+#[cfg(feature = "client")]
+pub use toggl_core::Auth;
+pub use toggl_core::{Error, Result};
 
 // Re-export webhook types
 pub use models::{
@@ -73,8 +86,10 @@ pub use models::{
     UpdateSubscription, ValidationRequest, ValidationResponse,
 };
 
+#[cfg(feature = "client")]
+pub use events::verify_signature;
 pub use events::{
-    verify_signature, ClientEventData, EventAction, EventEntityType, EventMetadata, EventPayload,
-    GroupEventData, ProjectEventData, TagEventData, TaskEventData, TimeEntryEventData,
-    UserEventData, WebhookEvent, WorkspaceUserEventData,
+    ClientEventData, EventAction, EventEntityType, EventMetadata, EventPayload, GroupEventData,
+    ProjectEventData, ProjectGroupEventData, ProjectUserEventData, TagEventData, TaskEventData,
+    TimeEntryEventData, UserEventData, WebhookEvent, WorkspaceUserEventData,
 };

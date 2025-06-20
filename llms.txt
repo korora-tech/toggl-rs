@@ -1,0 +1,2540 @@
+# Toggl Track API Documentation (llms.txt)
+
+This file contains comprehensive documentation for the Toggl Track API ecosystem, including the main API (v9), Reports API (v3), Webhooks API (v1), and Accounts API. This documentation is compiled from both the official documentation and OpenAPI specifications.
+
+## API Endpoint Summary
+
+- **Main API (v9)**: 206 endpoints covering core functionality
+- **Reports API (v3)**: 38 endpoints for reporting and analytics
+- **Webhooks API (v1)**: 6 endpoints for webhook management
+- **Accounts API**: 6 endpoints for authentication and account management
+- **Total**: 256+ endpoints across all APIs
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Authentication](#authentication)
+3. [Base URLs](#base-urls)
+4. [Common Data Types and Enums](#common-data-types-and-enums)
+5. [Main API (v9)](#main-api-v9)
+6. [Reports API (v3)](#reports-api-v3)
+7. [Webhooks API (v1)](#webhooks-api-v1)
+8. [Accounts API](#accounts-api)
+9. [Error Handling](#error-handling)
+10. [Best Practices](#best-practices)
+
+## Overview
+
+Toggl Track provides a comprehensive set of APIs for time tracking, project management, reporting, and integrations. The API ecosystem consists of:
+
+- **Main API (v9)**: Core functionality for time tracking, projects, users, and organizations
+- **Reports API (v3)**: Advanced reporting and data export capabilities
+- **Webhooks API (v1)**: Real-time event notifications
+- **Accounts API**: Authentication and account management
+
+All APIs use RESTful principles with JSON request/response formats.
+
+## Authentication
+
+### Methods
+
+1. **API Token (Recommended)**
+   - Use as username with "api_token" as password in Basic Auth
+   - Token available in user profile settings
+   - Example: `Authorization: Basic base64(token:api_token)`
+
+2. **Email and Password**
+   - Basic Auth with email as username and password
+   - Example: `Authorization: Basic base64(email:password)`
+
+3. **Session Cookie**
+   - Obtain via POST to https://accounts.toggl.com/api/sessions
+   - Use `__Secure-accounts-session` cookie for subsequent requests
+   - Session creation requires different domain than main API
+
+### Authentication Requirements
+
+- All endpoints require authentication except:
+  - GET /accounts/get_cookie_domain
+  - POST /accounts/sessions
+  - POST /accounts/signup
+  - POST /accounts/me/close_account/track
+  - POST /accounts/me/password_reset/request
+  - POST /accounts/me/password_reset/confirm/{code}
+
+## Base URLs
+
+- **Main API**: `https://api.track.toggl.com/api/v9`
+- **Reports API**: `https://api.track.toggl.com/reports/api/v3`
+- **Webhooks API**: Uses Main API URL with `/api/v9` prefix (not separate URL)
+- **Accounts API**: `https://accounts.toggl.com/api` (different domain)
+- **Insights API**: `https://api.track.toggl.com/insights/api/v1`
+
+## Common Data Types and Enums
+
+### Date/Time Formats
+- **Timestamps**: ISO 8601 format in UTC - `2006-01-02T15:04:05Z`
+- **Date only**: `2006-01-02` (YYYY-MM-DD)
+- **Duration**: Integer in seconds (negative values for running entries, preferably -1)
+
+### Common Enums
+
+#### Weekday
+- 0: Sunday
+- 1: Monday
+- 2: Tuesday
+- 3: Wednesday
+- 4: Thursday
+- 5: Friday
+- 6: Saturday
+
+#### Project Status
+- `upcoming`: Not yet started
+- `active`: Currently active
+- `ended`: Completed
+- `archived`: Archived (hidden from lists)
+- `deleted`: Soft deleted
+
+#### Rate Change Mode
+- `override-all`: Override all rates
+- `override-current`: Override only current rates
+- `start-today`: Apply new rate from today
+
+#### Billable Status
+- `true`: Billable time
+- `false`: Non-billable time
+- `both`: Include both (for filters)
+
+#### Rounding Mode
+- `0`: Round to nearest
+- `1`: Round up
+- `-1`: Round down
+
+#### Integration Providers
+- `asana`: Asana integration
+- `jira`: Jira integration
+- `salesforce`: Salesforce integration
+
+## Main API (v9)
+
+### User/Me Endpoints
+
+#### Get current user
+```
+GET /me
+```
+
+Response schema (User):
+```json
+{
+  "id": integer,                           // User ID
+  "email": string,                        // Email address
+  "fullname": string,                     // Full name
+  "timezone": string,                     // User timezone (e.g., "Europe/London")
+  "default_workspace_id": integer,        // Default workspace ID
+  "beginning_of_week": integer,           // 0-6 (Sunday-Saturday)
+  "image_url": string,                    // Profile picture URL
+  "api_token": string,                    // API token (omitted if empty)
+  "created_at": string,                   // Account creation timestamp
+  "updated_at": string,                   // Last update timestamp
+  "openid_email": string,                 // OpenID email if used
+  "openid_enabled": boolean,              // OpenID authentication enabled
+  "country_id": integer,                  // Country ID
+  "has_password": boolean,                // User has password set
+  "intercom_hash": string,                // Intercom integration hash
+  "oauth_providers": [string],            // OAuth providers used
+  "tag_updated_at": string,               // Last tag update
+  "at": string,                          // Timestamp of last user change
+  "options": object                       // User preferences/options
+}
+
+#### Get user with related data
+```
+GET /me/with_related_data
+```
+
+Query parameters:
+- `since`: integer (timestamp) - Retrieve data modified after this time
+- `meta`: boolean - Include meta information
+- `include_sharing`: boolean - Include sharing details
+
+Response includes User object plus:
+- `clients`: array of Client objects
+- `projects`: array of Project objects
+- `tags`: array of Tag objects
+- `tasks`: array of Task objects
+- `time_entries`: array of TimeEntry objects
+- `workspaces`: array of Workspace objects
+- `organizations`: array of Organization objects
+
+#### Update current user
+```
+PUT /me
+```
+Request body:
+```json
+{
+  "beginning_of_week": 1,
+  "country_id": 123,
+  "current_password": "old_password",
+  "email": "new@email.com",
+  "fullname": "John Doe",
+  "password": "new_password",
+  "timezone": "Europe/London"
+}
+```
+
+#### Get logged time
+```
+GET /me/logged
+```
+Returns milliseconds logged for the user
+
+#### Get organizations
+```
+GET /me/organizations
+```
+Returns user's organizations with workspace relationships
+
+### Organizations
+
+#### Get organization
+```
+GET /organizations/{organization_id}
+```
+
+#### Update organization
+```
+PUT /organizations/{organization_id}
+```
+
+#### Get organization users
+```
+GET /organizations/{organization_id}/users
+```
+Query parameters:
+- filter: string to filter users
+- active_status: filter by active status
+- only_admins: show only admins
+- groups: comma-separated group IDs
+- workspaces: comma-separated workspace IDs
+- page: page number
+- per_page: results per page
+- sort: sort field
+
+#### Update user (organization owner)
+```
+PUT /organizations/{organization_id}/users/{user_id}
+```
+Request body:
+```json
+{
+  "admin": true,
+  "inactive": false,
+  "labor_cost": 50,
+  "labor_cost_change_mode": "start-today",
+  "postedFields": ["labor_cost"],
+  "rate": 100,
+  "rate_change_mode": "start-today",
+  "role": "user"
+}
+```
+
+#### Delete user from organization
+```
+DELETE /organizations/{organization_id}/users/{user_id}
+```
+
+#### Get organization groups
+```
+GET /organizations/{organization_id}/groups
+```
+
+#### Create organization group
+```
+POST /organizations/{organization_id}/groups
+```
+Request body:
+```json
+{
+  "group_ids": [1, 2, 3],
+  "name": "Developers",
+  "workspace_id": 123
+}
+```
+
+#### Update organization group
+```
+PUT /organizations/{organization_id}/groups/{group_id}
+```
+
+#### Delete organization group
+```
+DELETE /organizations/{organization_id}/groups/{group_id}
+```
+
+### Workspaces
+
+#### Get workspaces
+```
+GET /workspaces
+```
+Returns all workspaces accessible to the user
+
+#### Get workspace
+```
+GET /workspaces/{workspace_id}
+```
+
+Response schema (Workspace):
+```json
+{
+  "id": integer,                                    // Workspace ID
+  "name": string,                                   // Workspace name
+  "organization_id": integer,                       // Organization ID
+  "premium": boolean,                               // On Starter subscription
+  "business_ws": boolean,                           // On Premium subscription
+  "admin": boolean,                                 // User is workspace admin (deprecated)
+  "role": string,                                   // User's role in workspace
+  "suspended_at": string,                           // Suspension timestamp
+  "default_currency": string,                       // Default currency (premium)
+  "default_hourly_rate": number,                    // Default hourly rate (premium)
+  "only_admins_may_create_projects": boolean,       // Project creation restriction
+  "only_admins_may_create_tags": boolean,           // Tag creation restriction
+  "only_admins_see_billable_rates": boolean,        // Billable rates visibility
+  "only_admins_see_team_dashboard": boolean,        // Team dashboard visibility
+  "projects_billable_by_default": boolean,          // Default billable setting
+  "projects_enforce_billable": boolean,             // Enforce billable setting
+  "projects_private_by_default": boolean,           // Default privacy setting
+  "rate_last_updated": string,                      // Last rate update
+  "reports_collapse": boolean,                      // Collapse reports in UI
+  "rounding": integer,                              // Rounding mode (0, 1, -1)
+  "rounding_minutes": integer,                      // Rounding in minutes
+  "csv_upload": object,                             // CSV upload configuration
+  "ical_enabled": boolean,                          // iCal integration enabled
+  "ical_url": string,                              // iCal feed URL
+  "logo_url": string,                              // Workspace logo URL
+  "permissions": string,                            // User permissions
+  "subscription": object,                           // Subscription details
+  "working_hours_in_minutes": integer,              // Daily working hours
+  "at": string                                      // Last workspace change timestamp
+}
+```
+
+#### Create workspace
+```
+POST /workspaces
+```
+Request body:
+```json
+{
+  "name": string,                    // Required: Workspace name
+  "initial_pricing_plan": integer    // Optional: Initial pricing plan ID
+}
+```
+
+#### Update workspace
+```
+PUT /workspaces/{workspace_id}
+```
+Request body (all fields optional):
+```json
+{
+  "name": string,
+  "default_currency": string,
+  "default_hourly_rate": number,
+  "only_admins_may_create_projects": boolean,
+  "only_admins_may_create_tags": boolean,
+  "only_admins_see_billable_rates": boolean,
+  "only_admins_see_team_dashboard": boolean,
+  "projects_billable_by_default": boolean,
+  "projects_enforce_billable": boolean,
+  "projects_private_by_default": boolean,
+  "rate_change_mode": string,                      // "override-all", "override-current", "start-today"
+  "reports_collapse": boolean,
+  "rounding": integer,
+  "rounding_minutes": integer
+}
+
+#### Get workspace users
+```
+GET /workspaces/{workspace_id}/users
+```
+
+#### Invite users to workspace
+```
+POST /workspaces/{workspace_id}/invite
+```
+Request body:
+```json
+{
+  "emails": ["user1@example.com", "user2@example.com"]
+}
+```
+
+#### Update workspace user
+```
+PUT /workspaces/{workspace_id}/users/{user_id}
+```
+Request body:
+```json
+{
+  "admin": true,
+  "inactive": false,
+  "labor_cost": 50,
+  "labor_cost_change_mode": "start-today",
+  "rate": 100,
+  "rate_change_mode": "start-today"
+}
+```
+
+#### Delete workspace user
+```
+DELETE /workspaces/{workspace_id}/users/{user_id}
+```
+
+#### Get workspace statistics
+```
+GET /workspaces/{workspace_id}/statistics
+```
+
+### Workspace Alerts
+
+#### Get workspace alerts
+```
+GET /workspaces/{workspace_id}/alerts
+```
+Returns alerts configured for the workspace
+
+#### Create alert
+```
+POST /workspaces/{workspace_id}/alerts
+```
+Request body:
+```json
+{
+  "threshold": number,           // Alert threshold value
+  "type": string,               // Alert type: "daily_limit", "weekly_limit", etc.
+  "recipients": [string],       // Email addresses to notify
+  "enabled": boolean            // Alert enabled status
+}
+```
+
+#### Update alert
+```
+PUT /workspaces/{workspace_id}/alerts/{alert_id}
+```
+
+#### Delete alert
+```
+DELETE /workspaces/{workspace_id}/alerts/{alert_id}
+```
+
+### Audit Logs
+
+#### Get audit logs
+```
+GET /workspaces/{workspace_id}/audit_logs
+```
+Query parameters:
+- `start_date`: string (YYYY-MM-DD) - Filter logs from date
+- `end_date`: string (YYYY-MM-DD) - Filter logs to date
+- `event_type`: string - Filter by event type
+- `actor_id`: integer - Filter by user who performed action
+- `page`: integer - Page number for pagination
+- `per_page`: integer - Results per page (max 100)
+
+Response schema:
+```json
+{
+  "audit_logs": [
+    {
+      "id": integer,
+      "workspace_id": integer,
+      "actor_id": integer,
+      "actor_name": string,
+      "event_type": string,
+      "entity_type": string,
+      "entity_id": integer,
+      "changes": object,
+      "created_at": string
+    }
+  ],
+  "total_count": integer,
+  "page": integer,
+  "per_page": integer
+}
+```
+
+### Clients
+
+#### Get workspace clients
+```
+GET /workspaces/{workspace_id}/clients
+```
+Query parameters:
+- status: active/archived/both
+- name: filter by name
+
+#### Create client
+```
+POST /workspaces/{workspace_id}/clients
+```
+Request body:
+```json
+{
+  "name": "Client Name",
+  "currency": "USD",
+  "note": "Client notes"
+}
+```
+
+#### Get client
+```
+GET /workspaces/{workspace_id}/clients/{client_id}
+```
+
+#### Update client
+```
+PUT /workspaces/{workspace_id}/clients/{client_id}
+```
+
+#### Delete client
+```
+DELETE /workspaces/{workspace_id}/clients/{client_id}
+```
+
+#### Archive/Restore clients
+```
+POST /workspaces/{workspace_id}/clients/{client_ids}/archive
+POST /workspaces/{workspace_id}/clients/{client_ids}/restore
+```
+
+### Projects
+
+#### Get workspace projects
+```
+GET /workspaces/{workspace_id}/projects
+```
+Query parameters:
+- `active`: true/false/both - Filter by active status
+- `since`: integer (timestamp) - Projects modified after this time
+- `billable`: true/false - Filter by billable status
+- `user_ids`: string (comma-separated) - Filter by user IDs
+- `client_ids`: string (comma-separated) - Filter by client IDs
+- `group_ids`: string (comma-separated) - Filter by group IDs
+- `statuses`: string (comma-separated) - Filter by project statuses
+- `name`: string - Filter by project name
+- `page`: integer - Page number
+- `per_page`: integer - Results per page (max 200)
+- `sort_field`: string - Sort by: name/client/billable/updated_at
+- `sort_order`: string - asc/desc
+- `only_templates`: boolean - Return only template projects
+- `only_me`: boolean - Return only projects assigned to current user
+- `is_active`: boolean - Filter by active status (v8 compatibility)
+- `include_archived`: boolean - Include archived projects
+
+Response: array of Project objects
+
+#### Project Schema
+```json
+{
+  "id": integer,                          // Project ID
+  "workspace_id": integer,                // Workspace ID
+  "client_id": integer,                   // Client ID (nullable)
+  "name": string,                         // Project name
+  "is_private": boolean,                  // Private project
+  "active": boolean,                      // Active status
+  "at": string,                          // Last update timestamp
+  "created_at": string,                   // Creation timestamp
+  "server_deleted_at": string,            // Deletion timestamp (nullable)
+  "color": string,                        // Hex color code
+  "billable": boolean,                    // Billable by default
+  "template": boolean,                    // Is template project
+  "auto_estimates": boolean,              // Auto estimates enabled
+  "estimated_hours": integer,             // Estimated hours (nullable)
+  "estimated_seconds": integer,           // Estimated seconds
+  "tracked_seconds": integer,             // Total tracked seconds
+  "rate": number,                         // Hourly rate (nullable)
+  "rate_last_updated": string,            // Rate update timestamp
+  "currency": string,                     // Currency code (nullable)
+  "recurring": boolean,                   // Recurring project
+  "recurring_parameters": array,          // Recurring parameters
+  "current_period": object,               // Current period info
+  "fixed_fee": number,                    // Fixed fee amount
+  "actual_hours": integer,                // Actual hours tracked
+  "actual_seconds": integer,              // Actual seconds tracked
+  "wid": integer,                         // Workspace ID (deprecated)
+  "cid": integer,                         // Client ID (deprecated)
+  "can_track_time": boolean,              // User can track time
+  "permissions": string,                  // User permissions
+  "status": string                        // Project status: upcoming/active/ended/archived/deleted
+}
+```
+
+#### Create project
+```
+POST /workspaces/{workspace_id}/projects
+```
+Request body:
+```json
+{
+  "name": string,                         // Required: Project name
+  "client_id": integer,                   // Optional: Client ID
+  "client_name": string,                  // Optional: Create new client with this name
+  "active": boolean,                      // Default: true
+  "is_private": boolean,                  // Default: true
+  "billable": boolean,                    // Optional
+  "auto_estimates": boolean,              // Default: false
+  "estimated_hours": integer,             // Optional
+  "rate": number,                         // Optional: Hourly rate
+  "currency": string,                     // Optional: Currency code
+  "color": string,                        // Optional: Hex color
+  "recurring": boolean,                   // Default: false
+  "recurring_parameters": array,          // Optional: For recurring projects
+  "template": boolean,                    // Default: false
+  "fixed_fee": number,                    // Optional: Fixed fee amount
+  "end_date": string,                     // Optional: Project end date
+  "start_date": string                    // Optional: Project start date
+}
+
+#### Get project
+```
+GET /workspaces/{workspace_id}/projects/{project_id}
+```
+
+#### Update project
+```
+PUT /workspaces/{workspace_id}/projects/{project_id}
+```
+
+#### Delete project
+```
+DELETE /workspaces/{workspace_id}/projects/{project_id}
+```
+
+#### Bulk update projects
+```
+PATCH /workspaces/{workspace_id}/projects/{project_ids}
+```
+Request body:
+```json
+{
+  "op": "replace",
+  "path": "/billable",
+  "value": true
+}
+```
+
+### Tasks
+
+#### Get project tasks
+```
+GET /workspaces/{workspace_id}/projects/{project_id}/tasks
+```
+
+#### Create task
+```
+POST /workspaces/{workspace_id}/projects/{project_id}/tasks
+```
+Request body:
+```json
+{
+  "name": "Task Name",
+  "active": true,
+  "estimated_seconds": 3600,
+  "tracked_seconds": 0
+}
+```
+
+#### Get task
+```
+GET /workspaces/{workspace_id}/projects/{project_id}/tasks/{task_id}
+```
+
+#### Update task
+```
+PUT /workspaces/{workspace_id}/projects/{project_id}/tasks/{task_id}
+```
+
+#### Delete task
+```
+DELETE /workspaces/{workspace_id}/projects/{project_id}/tasks/{task_id}
+```
+
+### Time Entries
+
+#### TimeEntry Schema
+```json
+{
+  "id": integer,                          // Time entry ID
+  "workspace_id": integer,                // Workspace ID
+  "user_id": integer,                     // User ID who created the entry
+  "project_id": integer,                  // Project ID (nullable)
+  "task_id": integer,                     // Task ID (nullable)
+  "billable": boolean,                    // Billable status
+  "start": string,                        // Start time in UTC (ISO 8601)
+  "stop": string,                         // Stop time in UTC (nullable for running)
+  "duration": integer,                    // Duration in seconds (negative for running, preferably -1)
+  "description": string,                  // Description (nullable)
+  "tag_ids": [integer],                   // Array of tag IDs
+  "tags": [string],                       // Array of tag names (deprecated)
+  "duronly": boolean,                     // Duration only (deprecated for GET, always true)
+  "at": string,                          // Last update timestamp (ISO 8601)
+  "server_deleted_at": string,            // Deletion timestamp (nullable)
+  "uid": integer,                         // User ID (deprecated, use user_id)
+  "wid": integer,                         // Workspace ID (deprecated, use workspace_id)
+  "pid": integer,                         // Project ID (deprecated, use project_id)
+  "tid": integer,                         // Task ID (deprecated, use task_id)
+  "created_with": string,                 // Client used to create entry (required for POST)
+  "permissions": [string],                // Array of user permissions for this entry
+  "shared_with": array,                   // Users this entry is shared with
+  "client_name": string,                  // Client name (only if requested with meta=true)
+  "project_name": string,                 // Project name (only if requested with meta=true)
+  "project_color": string,                // Project color (only if requested with meta=true)
+  "user_name": string,                    // User name (only if requested with meta=true)
+  "user_avatar_url": string,              // User avatar URL (only if requested with meta=true)
+  "expense_ids": [integer]                // Array of work expense IDs
+}
+```
+
+#### Get time entries
+```
+GET /me/time_entries
+```
+Query parameters:
+- `start_date`: string - Start date (YYYY-MM-DD or ISO 8601)
+- `end_date`: string - End date (YYYY-MM-DD or ISO 8601)
+- `before`: string - Entries before this date
+- `since`: integer - Entries modified after this timestamp
+- `meta`: boolean - Include meta information
+- `include_sharing`: boolean - Include sharing details
+
+Response includes array of TimeEntry objects
+
+#### Get current time entry
+```
+GET /me/time_entries/current
+```
+Returns currently running time entry or null
+
+#### Create time entry
+```
+POST /workspaces/{workspace_id}/time_entries
+```
+Request body:
+```json
+{
+  "created_with": string,                 // Required: Client name
+  "description": string,                  // Optional: Description
+  "start": string,                        // Required: Start time (ISO 8601)
+  "stop": string,                         // Optional: Stop time (ISO 8601)
+  "duration": integer,                    // Optional: Duration in seconds (-1 for running)
+  "project_id": integer,                  // Optional: Project ID
+  "task_id": integer,                     // Optional: Task ID
+  "tag_ids": [integer],                   // Optional: Tag IDs
+  "tags": [string],                       // Optional: Tag names (creates if needed)
+  "billable": boolean,                    // Optional: Billable status
+  "workspace_id": integer,                // Required: Must match URL parameter
+  "duronly": boolean,                     // Optional: Duration only entry
+  "shared_with_user_ids": [integer]       // Optional: Share with users
+}
+```
+Note: duration of -1 indicates a running timer
+
+#### Get time entry
+```
+GET /me/time_entries/{time_entry_id}
+```
+
+#### Update time entry
+```
+PUT /workspaces/{workspace_id}/time_entries/{time_entry_id}
+```
+
+#### Delete time entry
+```
+DELETE /workspaces/{workspace_id}/time_entries/{time_entry_id}
+```
+
+#### Stop time entry
+```
+PATCH /workspaces/{workspace_id}/time_entries/{time_entry_id}/stop
+```
+
+#### Bulk update time entries
+```
+PATCH /workspaces/{workspace_id}/time_entries/{time_entry_ids}
+```
+Request body uses JSON Patch format:
+```json
+{
+  "op": "add/remove/replace",
+  "path": "/tag_ids",
+  "value": [1, 2, 3]
+}
+```
+
+### Tags
+
+#### Get workspace tags
+```
+GET /workspaces/{workspace_id}/tags
+```
+
+#### Create tag
+```
+POST /workspaces/{workspace_id}/tags
+```
+Request body:
+```json
+{
+  "name": "Tag Name"
+}
+```
+
+#### Update tag
+```
+PUT /workspaces/{workspace_id}/tags/{tag_id}
+```
+
+#### Delete tag
+```
+DELETE /workspaces/{workspace_id}/tags/{tag_id}
+```
+
+### Preferences
+
+#### Get user preferences
+```
+GET /me/preferences
+```
+
+#### Get workspace preferences
+```
+GET /me/preferences/{workspace_id}
+```
+
+#### Update workspace preferences
+```
+POST /me/preferences/{workspace_id}
+```
+
+#### Get specific preference
+```
+GET /me/preferences/clients/{client_id}
+GET /me/preferences/projects/{project_id}
+GET /me/preferences/tags/{tag_id}
+```
+
+### Timesheets
+
+#### Get timesheets
+```
+GET /workspaces/{workspace_id}/timesheets
+```
+Query parameters:
+- start_date: ISO 8601 date
+- end_date: ISO 8601 date
+- member_ids: comma-separated user IDs
+- approver_ids: comma-separated approver IDs
+- statuses: comma-separated statuses
+
+#### Create timesheet
+```
+POST /workspaces/{workspace_id}/timesheets
+```
+
+#### Update timesheet
+```
+PUT /workspaces/{workspace_id}/timesheets/{timesheet_id}
+```
+
+#### Delete timesheet
+```
+DELETE /workspaces/{workspace_id}/timesheets/{timesheet_id}
+```
+
+### API Keys
+
+#### Get API keys
+```
+GET /me/api_keys
+```
+
+#### Create API key
+```
+POST /me/api_keys
+```
+Request body:
+```json
+{
+  "description": "My API Key",
+  "expires_at": "2024-12-31",
+  "workspace_id": 123
+}
+```
+
+#### Update API key
+```
+PUT /me/api_keys/{key_id}
+```
+
+#### Delete API key
+```
+DELETE /me/api_keys/{key_id}
+```
+
+### Rates
+
+#### Get workspace rates
+```
+GET /workspaces/{workspace_id}/rates
+```
+
+#### Create rate
+```
+POST /workspaces/{workspace_id}/rates
+```
+Request body:
+```json
+{
+  "amount": 100,
+  "currency": "USD",
+  "start": "2024-01-01"
+}
+```
+
+#### Update rate
+```
+PUT /workspaces/{workspace_id}/rates/{rate_id}
+```
+
+#### Delete rate
+```
+DELETE /workspaces/{workspace_id}/rates/{rate_id}
+```
+
+### Countries and Currencies
+
+#### Get countries
+```
+GET /countries
+```
+
+#### Get currencies
+```
+GET /currencies
+```
+
+#### Get timezones
+```
+GET /timezones
+```
+
+### Feedback and Support
+
+#### Create feedback
+```
+POST /feedback
+```
+Request body:
+```json
+{
+  "toggl_version": "toggl-rs v1.0",
+  "type": "bug",
+  "details": "Description of issue",
+  "device_model": "Device info",
+  "operating_system": "OS info"
+}
+```
+
+### Desktop Features
+
+#### Desktop login token
+```
+GET /me/desktop_login_token
+```
+Returns a temporary token for desktop app authentication
+
+#### Session duration
+```
+GET /me/sessions
+```
+Returns user session information
+
+### Additional Endpoints
+
+#### Get features
+```
+GET /me/features
+```
+Returns enabled features for the user:
+- `features`: array of Feature objects containing workspace_id and feature names
+
+#### Get me tracking
+```
+GET /me/tracking
+```
+Returns simplified current tracking state with running time entry
+
+#### Get locations
+```
+GET /me/locations
+```
+Returns saved locations for the user
+
+#### Lost password
+```
+POST /me/lost_password
+```
+Initiates password reset process
+
+#### Get status
+```
+GET /status
+```
+Returns API service status
+
+#### Get viewer token
+```
+POST /timeline/get_viewer_token
+```
+Returns viewer token for timeline access
+
+#### Sync endpoints
+```
+POST /synch/push/{table_name}
+POST /synch/pull/{table_name}
+GET /synch/pull/meta
+```
+Mobile app synchronization endpoints
+
+### Work Expenses
+
+#### Get workspace expenses
+```
+GET /workspaces/{workspace_id}/expenses
+```
+
+#### Create expense
+```
+POST /workspaces/{workspace_id}/expenses
+```
+Request body:
+```json
+{
+  "category_id": integer,
+  "description": string,
+  "amount": number,
+  "currency": string,
+  "date": string,
+  "time_entry_ids": [integer]
+}
+```
+
+#### Update expense
+```
+PUT /workspaces/{workspace_id}/expenses/{expense_id}
+```
+
+#### Delete expense
+```
+DELETE /workspaces/{workspace_id}/expenses/{expense_id}
+```
+
+### Export Features
+
+#### Export workspace data
+```
+POST /workspaces/{workspace_id}/exports
+```
+Request body:
+```json
+{
+  "export_type": string,      // Type of export
+  "exporter_id": string       // Exporter identifier
+}
+```
+
+#### Get export status
+```
+GET /workspaces/{workspace_id}/exports/{export_id}
+```
+
+#### Download export
+```
+GET /workspaces/{workspace_id}/exports/{export_id}/download
+```
+
+### Calendar Integration
+
+#### Get calendar settings
+```
+GET /calendars/{calendar_id}/settings
+```
+
+#### Update calendar settings
+```
+PUT /calendars/{calendar_id}/settings
+```
+
+### Goals and Insights
+
+#### Get goals
+```
+GET /workspaces/{workspace_id}/goals
+```
+
+#### Create goal
+```
+POST /workspaces/{workspace_id}/goals
+```
+Request body:
+```json
+{
+  "name": string,
+  "type": string,              // "project_time", "team_time", etc.
+  "workspace_id": integer,
+  "target": object,
+  "period": string             // "daily", "weekly", "monthly"
+}
+```
+
+### Audit Logs
+
+#### Get audit logs
+```
+GET /workspaces/{workspace_id}/audit_logs
+```
+Query parameters:
+- `start_date`: string
+- `end_date`: string
+- `event_type`: string
+- `actor_id`: integer
+
+### Favorites
+
+#### Get favorites
+```
+GET /me/favorites
+```
+Returns user's favorite time entries for quick access
+
+#### Add favorite
+```
+POST /me/favorites
+```
+Request body:
+```json
+{
+  "description": string,
+  "project_id": integer,
+  "task_id": integer,
+  "tag_ids": [integer],
+  "billable": boolean
+}
+```
+
+#### Update favorite
+```
+PUT /me/favorites/{favorite_id}
+```
+
+#### Delete favorite
+```
+DELETE /me/favorites/{favorite_id}
+```
+
+### Integrations
+
+#### List integrations
+```
+GET /workspaces/{workspace_id}/integrations
+```
+
+#### Get integration
+```
+GET /workspaces/{workspace_id}/integrations/{integration_id}
+```
+
+#### Update integration
+```
+PUT /workspaces/{workspace_id}/integrations/{integration_id}
+```
+
+#### Calendar Integration Endpoints
+```
+GET /integrations/calendar
+GET /integrations/calendar/calendars
+GET /integrations/calendar/events
+POST /integrations/calendar/setup
+```
+
+#### iCal Integration
+```
+GET /ical/workspace_user/{token}
+```
+Returns iCal feed for workspace user (requires valid token)
+
+#### Calendar Settings
+```
+GET /calendars/{calendar_id}/settings
+PUT /calendars/{calendar_id}/settings
+```
+Manage calendar integration configuration and sync preferences
+
+## Reports API (v3)
+
+### Overview
+
+The Reports API provides advanced reporting capabilities with support for various report types, exports, and saved reports. The Reports API uses POST requests for most endpoints to support complex filtering.
+
+### Base Configuration
+
+All report endpoints support common parameters:
+- `workspace_id`: integer (required) - Workspace ID
+- `user_ids`: array of integers - Filter by user IDs
+- `project_ids`: array of integers - Filter by project IDs
+- `client_ids`: array of integers - Filter by client IDs
+- `tag_ids`: array of integers - Filter by tag IDs
+- `start_date`: string - Report start date (YYYY-MM-DD)
+- `end_date`: string - Report end date (YYYY-MM-DD)
+
+### Common Report Parameters
+
+```json
+{
+  "billable": string,              // "yes", "no", "both"
+  "client_ids": [integer],         // Filter by clients
+  "description": string,           // Filter by description
+  "duration_format": string,       // "classic", "decimal", "improved"
+  "group_ids": [integer],          // Filter by groups
+  "grouped": boolean,              // Enable grouping
+  "hide_amounts": boolean,         // Hide monetary amounts
+  "include_time_entry_ids": boolean, // Include time entry IDs
+  "max_duration_seconds": integer, // Maximum duration filter
+  "min_duration_seconds": integer, // Minimum duration filter
+  "order_by": string,             // Sort field
+  "order_dir": string,            // "asc" or "desc"
+  "page_size": integer,           // Results per page (default 50)
+  "project_ids": [integer],       // Filter by projects
+  "rounding": boolean,            // Apply rounding
+  "rounding_minutes": integer,    // Rounding interval (0, 1, 5, 6, 10, 12, 15, 30, 60, 240)
+  "tag_ids": [integer],           // Filter by tags
+  "task_ids": [integer],          // Filter by tasks
+  "time_entry_ids": [integer],    // Specific time entries
+  "user_ids": [integer],          // Filter by users
+  "start_date": string,           // Report start date (YYYY-MM-DD)
+  "end_date": string,             // Report end date (YYYY-MM-DD)
+  "date_format": string,          // Date format for exports
+  "with_inline_rates": boolean,   // Include rates in response
+  "include_inactive": boolean     // Include inactive entities
+}
+
+### Summary Reports
+
+#### Get summary report
+```
+POST /reports/api/v3/workspace/{workspace_id}/summary/time_entries
+```
+Request body:
+```json
+{
+  "start_date": "2024-01-01",
+  "end_date": "2024-01-31",
+  "grouping": string,                     // "projects", "clients", "users"
+  "sub_grouping": string,                 // "time_entries", "users", "projects"
+  "subgrouping_ids": [integer],          // Filter sub-groups
+  "grouped_time_entry_ids": [integer],   // Specific time entries
+  "include_time_entry_ids": boolean       // Include time entry IDs
+}
+```
+
+Response schema:
+```json
+{
+  "groups": [
+    {
+      "id": integer,
+      "title": string,
+      "seconds": integer,
+      "sub_groups": [
+        {
+          "id": integer,
+          "title": string,
+          "seconds": integer
+        }
+      ]
+    }
+  ],
+  "resolution": string,
+  "total_seconds": integer,
+  "total_billable_seconds": integer,
+  "total_currencies": [
+    {
+      "currency": string,
+      "amount": number
+    }
+  ]
+}
+```
+
+### Detailed Reports
+
+#### Search time entries
+```
+POST /reports/api/v3/workspace/{workspace_id}/search/time_entries
+```
+Request body includes common parameters plus:
+```json
+{
+  "first_row_number": integer,            // Starting row for pagination
+  "page_size": integer,                   // Results per page
+  "order_by": string,                     // Sort field: "date", "user", "duration", "description"
+  "order_dir": string,                    // Sort direction: "asc" or "desc"
+  "distinct_rates": boolean,              // Group by distinct rates
+  "hide_amounts": boolean,                // Hide monetary values
+  "enriched_time_entries": boolean        // Include enriched data
+}
+```
+
+Response schema:
+```json
+{
+  "total_count": integer,
+  "per_page": integer,
+  "total_billable_seconds": integer,
+  "total_seconds": integer,
+  "total_currencies": array,
+  "time_entries": [
+    {
+      "id": integer,
+      "seconds": integer,
+      "start": string,
+      "stop": string,
+      "at": string,
+      "description": string,
+      "project_id": integer,
+      "project_name": string,
+      "project_color": string,
+      "client_id": integer,
+      "client_name": string,
+      "task_id": integer,
+      "task_name": string,
+      "user_id": integer,
+      "user_name": string,
+      "tag_ids": [integer],
+      "billable": boolean,
+      "billable_amount_in_cents": integer,
+      "hourly_rate_in_cents": integer,
+      "currency": string
+    }
+  ]
+}
+```
+
+### Weekly Reports
+
+#### Get weekly report
+```
+POST /reports/api/v3/workspace/{workspace_id}/weekly/time_entries
+```
+Request body includes common parameters plus:
+```json
+{
+  "group_ids": [integer],
+  "user_ids": [integer],
+  "project_ids": [integer]
+}
+```
+
+Response includes weekly breakdown of time entries grouped by week.
+
+### Data Trends
+
+#### Projects data trends
+```
+POST /reports/api/v3/workspace/{workspace_id}/data_trends/projects
+```
+
+#### Clients data trends
+```
+POST /reports/api/v3/workspace/{workspace_id}/data_trends/clients
+```
+
+#### Users data trends
+```
+POST /reports/api/v3/workspace/{workspace_id}/data_trends/users
+```
+
+All data trends endpoints support:
+- Date range filtering
+- Grouping by various time periods
+- Filtering by IDs
+
+### Profitability Reports
+
+#### Project profitability
+```
+POST /reports/api/v3/workspace/{workspace_id}/profitability/projects
+```
+Returns profitability metrics for projects including:
+- Total time tracked
+- Billable vs non-billable time
+- Revenue and costs
+- Profit margins
+
+#### Employee profitability
+```
+POST /reports/api/v3/workspace/{workspace_id}/profitability/employees
+```
+Returns profitability metrics per employee
+
+### Insights Reports
+
+#### Projects insights
+```
+POST /insights/api/v1/workspace/{workspace_id}/trends/projects
+```
+Available formats:
+- `/trends/projects.csv`
+- `/trends/projects.pdf`
+- `/trends/projects.xlsx`
+
+#### Data trends
+```
+POST /insights/api/v1/workspace/{workspace_id}/data_trends/projects
+```
+
+#### Profitability insights
+```
+POST /insights/api/v1/workspace/{workspace_id}/profitability/projects.{format}
+POST /insights/api/v1/workspace/{workspace_id}/profitability/employees.{format}
+```
+Formats: csv, pdf, xlsx
+
+### Exports
+
+#### Export summary report (PDF)
+```
+POST /workspace/{workspace_id}/reports/summary.pdf
+```
+
+#### Export detailed report (CSV)
+```
+POST /workspace/{workspace_id}/reports/detailed.csv
+```
+
+#### Export detailed report (XLSX)
+```
+POST /workspace/{workspace_id}/reports/detailed.xlsx
+```
+
+All export endpoints accept the same parameters as their corresponding report endpoints.
+
+### Saved Reports
+
+#### Get saved reports
+```
+GET /workspace/{workspace_id}/reports/saved
+```
+
+#### Create saved report
+```
+POST /workspace/{workspace_id}/reports/saved
+```
+Request body:
+```json
+{
+  "name": "Monthly Team Report",
+  "report_type": "summary",
+  "public": true,
+  "parameters": {
+    "grouping": "projects",
+    "user_ids": [1, 2, 3]
+  }
+}
+```
+
+#### Get saved report
+```
+GET /workspace/{workspace_id}/reports/saved/{report_id}
+```
+
+#### Update saved report
+```
+PUT /workspace/{workspace_id}/reports/saved/{report_id}
+```
+
+#### Delete saved report
+```
+DELETE /workspace/{workspace_id}/reports/saved/{report_id}
+```
+
+### Report Sharing
+
+#### Get shared report
+```
+GET /reports/api/v3/shared/{report_token}
+```
+Returns shared report data using a public token
+
+#### Export shared report (CSV)
+```
+GET /reports/api/v3/shared/{report_token}/csv
+```
+
+#### Export shared report (PDF)
+```
+GET /reports/api/v3/shared/{report_token}/pdf
+```
+
+#### Export shared report (XLSX)
+```
+GET /reports/api/v3/shared/{report_token}/xlsx
+```
+
+#### Create/update shared report
+```
+POST /reports/api/v3/workspace/{workspace_id}/reports/shared
+```
+Request body:
+```json
+{
+  "name": "Shared Report Name",
+  "type": "summary",
+  "public": true,
+  "password": "optional_password"
+}
+```
+
+#### Delete shared reports (bulk)
+```
+POST /reports/api/v3/workspace/{workspace_id}/reports/shared/bulk_delete
+```
+Request body:
+```json
+{
+  "report_ids": [1, 2, 3]
+}
+```
+
+### Time Entry Filters
+
+#### Get time entry filters
+```
+POST /workspace/{workspace_id}/reports/filters/time_entries
+```
+Returns available filter options based on workspace data
+
+#### Get project filters
+```
+POST /workspace/{workspace_id}/reports/filters/projects
+```
+
+#### Get client filters
+```
+POST /workspace/{workspace_id}/reports/filters/clients
+```
+
+## Webhooks API (v1)
+
+### Overview
+
+The Webhooks API allows you to receive real-time notifications when events occur in Toggl Track. Note: The Webhooks API uses the main API base URL with `/api/v9` prefix, not a separate webhooks URL.
+
+### Key Characteristics
+- A user may define one or more webhook subscriptions per workspace
+- Each subscription may have different filters to receive notifications about a subset of events
+- The visibility access of the subscription's creator will be taken into account to filter out events that the creator has no access to
+- The URL endpoint configured for a subscription must be both reachable and return a 2xx HTTP status code
+- A subscription must be both enabled and validated before events are sent to its corresponding URL endpoint
+
+### Webhook Limits
+
+#### Get webhook limits
+```
+GET /api/v9/limits
+```
+Returns plan-based limits:
+```json
+{
+  "max_event_filters": {
+    "free": 5,
+    "starter": 10,
+    "premium": 20,
+    "enterprise": 50
+  },
+  "max_webhooks": {
+    "free": 1,
+    "starter": 3,
+    "premium": 5,
+    "enterprise": 10
+  }
+}
+```
+
+Note: Webhook limits are enforced per workspace and based on the workspace's subscription plan.
+
+### Event Types
+
+Available event types by entity:
+
+#### Time Entry Events
+- `time_entry.created` - New time entry created
+- `time_entry.updated` - Time entry modified
+- `time_entry.deleted` - Time entry deleted  
+- `time_entry.started` - Timer started
+- `time_entry.stopped` - Timer stopped
+
+#### Project Events
+- `project.created` - New project created
+- `project.updated` - Project modified
+- `project.deleted` - Project deleted
+
+#### Client Events
+- `client.created` - New client created
+- `client.updated` - Client modified
+- `client.deleted` - Client deleted
+
+#### Workspace Events
+- `workspace.user_added` - User added to workspace
+- `workspace.user_removed` - User removed from workspace
+- `workspace.user_updated` - User role/permissions changed
+
+#### Task Events
+- `task.created` - New task created
+- `task.updated` - Task modified
+- `task.deleted` - Task deleted
+
+#### Tag Events
+- `tag.created` - New tag created
+- `tag.updated` - Tag modified
+- `tag.deleted` - Tag deleted
+
+### Subscriptions
+
+#### Subscription Schema
+```json
+{
+  "subscription_id": string,              // Subscription ID (UUID format)
+  "workspace_id": integer,                // Workspace ID
+  "user_id": integer,                     // Creator user ID
+  "enabled": boolean,                     // Active status
+  "description": string,                  // Description
+  "event_filters": [                      // Event filter configuration
+    {
+      "entity": string,                   // Entity type
+      "action": string                    // Action type or "*" for all
+    }
+  ],
+  "secret": string,                       // Secret for HMAC-SHA256 signature
+  "url_callback": string,                 // Webhook endpoint URL (HTTPS required)
+  "user_agent": string,                   // Custom User-Agent header value
+  "validated_at": string,                 // Last validation timestamp (ISO 8601)
+  "created_at": string,                   // Creation timestamp (ISO 8601)
+  "updated_at": string,                   // Last update timestamp (ISO 8601)
+  "has_pending_events": boolean           // Pending events exist
+}
+```
+
+#### Get subscriptions
+```
+GET /api/v9/subscriptions
+```
+Query parameters:
+- `workspace_id`: integer (required) - Workspace ID to get subscriptions for
+
+Returns array of Subscription objects
+
+#### Create subscription
+```
+POST /api/v9/subscriptions
+```
+Request body:
+```json
+{
+  "workspace_id": integer,                // Required: Workspace ID
+  "url_callback": string,                 // Required: HTTPS endpoint URL
+  "event_filters": [                      // Required: Event filters
+    {
+      "entity": string,                   // Entity: time_entry, project, etc.
+      "action": string                    // Action: created, updated, deleted, or *
+    }
+  ],
+  "enabled": boolean,                     // Optional: Default true
+  "description": string,                  // Optional: Description  
+  "secret": string,                       // Optional: Secret for signature validation (auto-generated if omitted)
+  "user_agent": string,                   // Optional: Custom User-Agent header value
+  "has_pending_events": boolean           // Optional: Whether subscription has pending events
+}
+```
+
+Validation rules:
+- `url_callback` must be HTTPS
+- `url_callback` must be reachable and return 2xx status
+- Maximum subscriptions per workspace based on plan (see limits endpoint)
+- `secret` is used for HMAC-SHA256 signature generation
+- Validation payload sent to webhook includes:
+  ```json
+  {
+    "event_type": "ping",
+    "validation_code": "unique_code_string"
+  }
+  ```
+- Webhook must return 2xx status code to pass validation
+
+#### Get subscription
+```
+GET /api/v9/subscriptions/{subscription_id}
+```
+
+#### Update subscription
+```
+PUT /api/v9/subscriptions/{subscription_id}
+```
+Request body uses same structure as create, all fields optional
+
+#### Delete subscription
+```
+DELETE /api/v9/subscriptions/{subscription_id}
+```
+
+### Testing Webhooks
+
+#### Send test event (ping)
+```
+POST /api/v9/ping/{subscription_id}
+```
+Sends a test event to verify webhook configuration. The ping event payload:
+```json
+{
+  "event_id": 0,
+  "created_at": "2022-06-25T03:58:10.207820267Z",
+  "creator_id": 6,
+  "metadata": {
+    "request_type": "POST",
+    "event_user_id": 6
+  },
+  "payload": "ping",
+  "subscription_id": 6,
+  "timestamp": "2022-06-25T03:58:10.207820267Z",
+  "url_callback": "https://callback-url.com"
+}
+```
+
+### Event Filters
+
+#### Get available event filters
+```
+GET /api/v9/event_filters
+```
+Returns available entities and actions:
+```json
+{
+  "event_filters": [
+    {
+      "name": "time_entry",
+      "actions": ["created", "updated", "deleted", "started", "stopped"]
+    },
+    {
+      "name": "project", 
+      "actions": ["created", "updated", "deleted"]
+    },
+    {
+      "name": "client",
+      "actions": ["created", "updated", "deleted"]
+    },
+    {
+      "name": "task",
+      "actions": ["created", "updated", "deleted"]
+    },
+    {
+      "name": "tag",
+      "actions": ["created", "updated", "deleted"]
+    },
+    {
+      "name": "workspace",
+      "actions": ["user_added", "user_removed", "user_updated"]
+    }
+  ]
+}
+```
+
+### URL Endpoint Validation
+
+#### Subscription URL Validation Process
+When creating or updating a subscription, Toggl validates the URL endpoint:
+
+1. **Initial Validation Request**: Toggl sends a POST request to the URL with:
+```json
+{
+  "event_type": "subscription_validation", 
+  "validation_code": "unique_validation_code"
+}
+```
+
+2. **Expected Response**: Your endpoint must return:
+   - HTTP status code: 2xx (200-299)
+   - Response body:
+   ```json
+   {
+     "validation_code": "unique_validation_code"
+   }
+   ```
+
+3. **Validation Status**: Only after successful validation will the subscription be marked as `validated` and start receiving events.
+
+### Health Status
+
+#### Get webhook service health
+```
+GET /api/v9/health
+```
+Returns webhook service health status:
+```json
+{
+  "description": "Webhooks Service",
+  "status": "pass",
+  "msg": "Service is healthy",
+  "error": null
+}
+```
+
+### Webhook Payload
+
+Webhook events are sent as POST requests with JSON payloads:
+
+#### Payload Schema
+```json
+{
+  "event_id": string,                     // Unique event ID (UUID)
+  "created_at": string,                   // Event timestamp (ISO 8601)
+  "creator_id": integer,                  // User ID who triggered the event
+  "metadata": {
+    "request_type": string,               // HTTP method used
+    "request_path": string,               // API path that triggered event
+    "event_type": string,                 // Full event type (e.g., "time_entry.created")
+    "event_user_id": integer,             // User associated with the event
+    "workspace_id": integer,              // Workspace ID
+    "project_id": integer,                // Project ID (if applicable)
+    "client_id": integer,                 // Client ID (if applicable)
+    "task_id": integer,                   // Task ID (if applicable)
+    "tag_id": integer                     // Tag ID (if applicable)
+  },
+  "payload": object                       // Entity data (varies by event type)
+}
+```
+
+#### Example Payloads
+
+##### Time Entry Created
+```json
+{
+  "event_id": "c996224a-11cb-4b4f-9555-7a1b064dd0be",
+  "created_at": "2024-01-20T10:30:00.000Z",
+  "creator_id": 123456,
+  "metadata": {
+    "request_type": "POST",
+    "request_path": "/api/v9/workspaces/987654/time_entries",
+    "event_type": "time_entry.created",
+    "event_user_id": 123456,
+    "workspace_id": 987654
+  },
+  "payload": {
+    "id": 1234567890,
+    "workspace_id": 987654,
+    "user_id": 123456,
+    "project_id": 555555,
+    "task_id": null,
+    "billable": true,
+    "start": "2024-01-20T09:00:00+00:00",
+    "stop": null,
+    "duration": -1,
+    "description": "Working on webhook integration",
+    "tag_ids": [111, 222],
+    "created_with": "toggl-api"
+  }
+}
+```
+
+##### Project Updated
+```json
+{
+  "event_id": "d887335b-22dc-5c5e-0666-8b2c175ee1cf",
+  "created_at": "2024-01-20T11:45:00.000Z",
+  "creator_id": 123456,
+  "metadata": {
+    "request_type": "PUT",
+    "request_path": "/api/v9/workspaces/987654/projects/555555",
+    "event_type": "project.updated",
+    "event_user_id": 123456,
+    "workspace_id": 987654,
+    "project_id": 555555
+  },
+  "payload": {
+    "id": 555555,
+    "workspace_id": 987654,
+    "client_id": 333333,
+    "name": "Updated Project Name",
+    "is_private": false,
+    "active": true,
+    "billable": true,
+    "color": "#06aaf5",
+    "rate": 150.00,
+    "currency": "USD"
+  }
+}
+```
+
+##### Ping Event
+```json
+{
+  "event_id": "00000000-0000-0000-0000-000000000000",
+  "created_at": "2024-01-20T10:00:00.000Z",
+  "creator_id": 0,
+  "metadata": {
+    "event_type": "ping",
+    "workspace_id": 987654
+  },
+  "payload": {
+    "message": "Webhook is active"
+  }
+}
+```
+
+### Security
+
+#### Signature Validation
+
+Webhooks include an `X-Webhook-Signature-256` header containing HMAC-SHA256 signature for request validation.
+
+##### Signature Format
+```
+X-Webhook-Signature-256: sha256={signature_hex}
+```
+
+##### Validation Process
+1. Extract the signature from the header (remove "sha256=" prefix)
+2. Compute HMAC-SHA256 of the raw request body using the subscription's secret
+3. Compare the computed hash with the received signature
+4. Use constant-time comparison to prevent timing attacks
+
+##### Example Validation (pseudo-code)
+```
+received_signature = request.headers['X-Webhook-Signature-256'].replace('sha256=', '')
+expected_signature = hmac_sha256(subscription_secret, request.raw_body)
+is_valid = constant_time_compare(received_signature, expected_signature)
+```
+
+**Critical Security Notes:**
+- Always validate signatures to ensure webhook authenticity and prevent replay attacks
+- Use the raw, unparsed request body for signature calculation
+- Implement replay attack protection using timestamps or nonce values
+- Store webhook secrets securely and rotate them periodically
+- Log failed signature validations for security monitoring
+
+## Accounts API
+
+### Sessions
+
+#### Create session (login)
+```
+POST https://accounts.toggl.com/api/sessions
+```
+Request body:
+```json
+{
+  "email": "user@example.com",
+  "password": "password",
+  "remember_me": true
+}
+```
+
+Returns `__Secure-accounts-session` cookie for authentication
+
+#### Get cookie domain
+```
+GET /get_cookie_domain
+```
+
+### Account Management
+
+#### Account signup
+```
+POST https://accounts.toggl.com/api/signup
+```
+Request body:
+```json
+{
+  "email": "user@example.com",
+  "password": "password",
+  "display_name": "John Doe",
+  "tos_accepted_for": "track",
+  "remember_me": true,
+  "timezone": "Europe/London",
+  "country_id": 826
+}
+```
+
+#### Close account
+```
+POST https://accounts.toggl.com/api/me/close_account/track
+```
+
+### Password Reset
+
+#### Request password reset
+```
+POST https://accounts.toggl.com/api/me/password_reset/request
+```
+Request body:
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+#### Reset password with code
+```
+POST https://accounts.toggl.com/api/me/password_reset/confirm/{code}
+```
+Request body:
+```json
+{
+  "password": "new_password"
+}
+```
+
+## Error Handling
+
+### HTTP Status Codes
+
+- 200: Success
+- 201: Created
+- 204: No Content
+- 400: Bad Request
+- 401: Unauthorized
+- 402: Payment Required (workspace needs upgrade for feature access)
+- 403: Forbidden
+- 404: Not Found
+- 409: Conflict
+- 410: Gone (don't retry this endpoint again)
+- 429: Too Many Requests
+- 500: Internal Server Error
+
+### Error Response Format
+
+```json
+{
+  "error": "error_code",
+  "message": "Human-readable error message",
+  "errors": [
+    {
+      "field": "field_name",
+      "message": "Field-specific error"
+    }
+  ]
+}
+```
+
+### Common Error Codes
+
+- `invalid_auth_credentials`: Invalid authentication
+- `resource_not_found`: Requested resource doesn't exist
+- `validation_error`: Request validation failed
+- `rate_limit_exceeded`: Too many requests
+- `insufficient_permissions`: User lacks required permissions
+- `conflict`: Resource conflict (e.g., duplicate name)
+
+## Best Practices
+
+### Rate Limiting
+
+- Main API: 1000 requests per minute per user
+- Reports API: 100 requests per minute per workspace
+- Webhooks API: 100 requests per minute per subscription
+
+Implement exponential backoff when receiving 429 responses.
+
+**Important Response Headers:**
+- `X-Request-Id`: Unique request identifier for debugging
+- `X-RateLimit-Limit`: Rate limit ceiling for current window
+- `X-RateLimit-Remaining`: Requests remaining in current window
+- `X-RateLimit-Reset`: Unix timestamp when rate limit resets
+
+### Eventual Consistency
+
+**Critical Architecture Detail**: The Toggl API operates within an event-based service architecture with eventual consistency. Operations may take 2-5 seconds to propagate across services. This particularly affects:
+
+- Newly created organizations, workspaces, projects, and groups
+- User assignments and permission changes
+- Subscription and billing operations
+
+**Implementation Strategy:**
+- Implement artificial delays (2-5 seconds) after create operations
+- Use retry logic with exponential backoff for dependent operations
+- Poll for entity existence before proceeding with related operations
+
+### Pagination
+
+For endpoints supporting pagination:
+- Use `page` and `per_page` parameters
+- Default per_page is usually 50
+- Maximum per_page varies by endpoint (typically 200)
+
+### Filtering and Sorting
+
+Many endpoints support:
+- `filter`: Text search
+- `sort_field`: Field to sort by
+- `sort_order`: asc/desc
+- Date ranges with `start_date` and `end_date`
+
+### Time Zones
+
+- All timestamps are in UTC
+- Use ISO 8601 format: `2024-01-20T10:30:00Z`
+- User's timezone preference affects UI display only
+
+### Bulk Operations
+
+For better performance:
+- Use bulk endpoints when available
+- Batch create/update operations
+- Use comma-separated IDs for bulk fetches
+
+### Caching
+
+Implement caching for:
+- User preferences
+- Workspace settings
+- Project/client lists
+- Currency and country data
+
+### Webhooks Best Practices
+
+1. Always validate webhook signatures
+2. Implement idempotent webhook handlers
+3. Return 2xx status quickly
+4. Process webhooks asynchronously
+5. Implement retry logic for failures
+6. Monitor webhook health
+
+### Security
+
+1. Store API tokens securely
+2. Use HTTPS for all requests
+3. Validate webhook signatures
+4. Implement proper access controls
+5. Log security events
+6. Rotate API tokens periodically
+
+## Migration from v8
+
+### Key differences from API v8:
+- New endpoint structure with workspace context
+- Improved consistency across all endpoints
+- Better error messages with field-level validation
+- Enhanced filtering options and query parameters
+- Webhook support for real-time events
+- More granular permissions system
+
+### Major endpoint changes:
+- Many endpoints moved under workspace context:
+  - `/clients` → `/workspaces/{workspace_id}/clients`
+  - `/projects` → `/workspaces/{workspace_id}/projects`
+  - `/tags` → `/workspaces/{workspace_id}/tags`
+- Time entry creation changed from GET to POST
+- Organization concept not fully migrated from v8
+- Timeline settings moved to preferences endpoint
+- Several v8 endpoints deprecated without direct replacements
+
+### Breaking changes:
+- Required workspace_id in most endpoints
+- Changed authentication endpoints to different domain
+- Modified time entry start behavior (POST with negative duration)
+- Different response formats for some entities
+- Removed some legacy fields from responses
+
+## Support
+
+For API support:
+- Documentation: https://developers.track.toggl.com
+- API Status: https://status.toggl.com
+- Support: support@toggl.com
+
+## Changelog
+
+### v9 (Current)
+- Complete API redesign
+- Webhook support
+- Enhanced reporting
+- Better error handling
+- Improved performance
+
+### v3 (Reports)
+- New report types
+- Export formats
+- Saved reports
+- Sharing capabilities
+
+### v1 (Webhooks)
+- Initial webhook implementation
+- Event filtering
+- Signature validation
+
+## OpenAPI Specification Notes
+
+This documentation incorporates detailed schema information from the official OpenAPI specifications:
+
+### Enhanced Documentation Includes:
+1. **Complete Field-Level Documentation**: Every request/response field is documented with types and descriptions
+2. **Required vs Optional Fields**: Clear indication of which fields are mandatory
+3. **Enum Values**: All possible values for constrained fields
+4. **Schema Relationships**: How different models relate to each other
+5. **Additional Endpoints**: Many endpoints not covered in the HTML documentation
+6. **Validation Rules**: Field constraints and validation requirements
+7. **Deprecation Notices**: Fields marked as deprecated with alternatives
+
+### Key Additions from OpenAPI Specs:
+- Detailed TimeEntry schema with all fields and types
+- Complete Workspace configuration options
+- Project status enum and lifecycle fields
+- User permissions and role information
+- Webhook payload structures with examples
+- Reports API query parameters and response formats
+- Integration endpoints and features
+- Export, goals, audit logs, and favorites endpoints
+- Mobile sync endpoints
+- Calendar integration endpoints
+
+This comprehensive documentation should provide all necessary information for implementing a complete Toggl Track API client.
+
+## Implementation-Specific Details
+
+### Request Headers
+All API requests should include:
+- `Content-Type: application/json` (for POST/PUT requests)
+- `Accept: application/json` (recommended)
+- `Authorization: Basic {base64_encoded_credentials}`
+- `User-Agent: {your_app_name}` (recommended)
+- `X-Request-Id: {unique_request_id}` (optional, for request tracing)
+
+### Query Parameter Encoding
+- Arrays in query parameters use comma-separated values: `?user_ids=1,2,3`
+- Some endpoints accept repeated array parameters: `?tag_ids=1&tag_ids=2&tag_ids=3`
+- Boolean values should be `true` or `false` (lowercase)
+- Date parameters accept both YYYY-MM-DD and ISO 8601 formats
+- Special characters must be URL encoded
+- Empty values may be interpreted differently across endpoints
+
+### Response Headers
+Important response headers:
+- `X-Request-Id`: Unique request identifier for debugging
+- `X-RateLimit-Limit`: Rate limit ceiling
+- `X-RateLimit-Remaining`: Requests remaining in current window
+- `X-RateLimit-Reset`: Unix timestamp when limit resets
+
+### Nullable Fields
+Many fields can be null, especially:
+- `description` in time entries
+- `stop` in running time entries
+- `project_id`, `task_id`, `client_id` when not assigned
+- `server_deleted_at` for active records
+
+### Field Constraints
+- **Workspace names**: 3-100 characters (required, not empty)
+- **Project names**: Max 100 characters  
+- **Time entry descriptions**: Max 3000 characters
+- **Tag names**: Max 50 characters (no leading/trailing whitespace)
+- **Client names**: Max 100 characters
+- **Color codes**: Must be valid hex format (#RRGGBB)
+- **Email fields**: Valid email format required
+- **URL fields**: Must be valid URLs (webhooks require HTTPS)
+- **Currency codes**: ISO 4217 format (USD, EUR, etc.)
+- **Timezone fields**: IANA timezone identifiers (Europe/London)
+
+### Special Behaviors
+1. **Time Entry Duration**: 
+   - Running entries have negative duration (preferably -1)
+   - Stopped entries have positive duration in seconds
+   - Duration is automatically calculated from start/stop if both provided
+
+2. **Cascading Deletes**:
+   - Deleting a project soft-deletes associated time entries
+   - Deleting a client doesn't affect projects (they become client-less)
+   - Deleting a workspace is not allowed via API
+
+3. **Permission Inheritance**:
+   - Project privacy settings affect time entry visibility
+   - Workspace admin permissions override project-level restrictions
+   - Organization admins have full access to all workspaces
+
+4. **Validation Edge Cases**:
+   - Cannot create time entries in the future
+   - Cannot have overlapping running time entries
+   - Cannot modify time entries older than workspace's lock date (if set)
+
+### Mobile/Desktop Specific
+- Desktop apps use `desktop_login_token` for authentication
+- Mobile apps use sync endpoints for batch operations
+- Both support offline mode with conflict resolution
+
+### Legacy Support
+Deprecated fields still returned for compatibility:
+- `wid`, `pid`, `tid`, `uid` (use full names instead)
+- `tags` array in time entries (use `tag_ids`)
+- `data` field in some responses (contents moved to root)
+
+## Advanced Features & Implementation Details
+
+### Subscription Management (Organization-level)
+
+#### Payment Methods
+```
+GET /organizations/{organization_id}/payment_methods
+POST /organizations/{organization_id}/payment_methods
+PUT /organizations/{organization_id}/payment_methods/{payment_method_id}
+DELETE /organizations/{organization_id}/payment_methods/{payment_method_id}
+```
+
+#### Invoices & Billing
+```
+GET /organizations/{organization_id}/invoices
+GET /organizations/{organization_id}/invoices/{invoice_id}/pdf
+POST /organizations/{organization_id}/purchase_orders
+PUT /organizations/{organization_id}/purchase_orders/{po_id}
+```
+
+#### Subscription Plans
+```
+GET /organizations/{organization_id}/plans
+PUT /organizations/{organization_id}/subscription
+POST /organizations/{organization_id}/subscription/preview
+```
+
+### Mobile Synchronization
+
+#### Batch Sync Endpoints
+```
+POST /synch/push/{table_name}
+POST /synch/pull/{table_name}
+GET /synch/pull/meta
+```
+
+Table names include: `time_entries`, `projects`, `clients`, `tags`, `tasks`, `workspaces`
+
+#### Conflict Resolution
+- Last-write-wins for most entities
+- Special handling for time entries to prevent overlaps
+- Tombstone records for deleted entities
+- Server-side validation for business rules
+
+### Desktop Integration
+
+#### Desktop Login
+```
+GET /me/desktop_login_token
+```
+Returns temporary token for desktop app authentication with short expiration (5 minutes)
+
+#### Update Management
+```
+GET /desktop/updates/check
+GET /desktop/updates/{version}/download
+```
+
+### Third-Party Integrations
+
+#### GitHub Integration
+```
+GET /integrations/github
+POST /integrations/github/setup
+PUT /integrations/github/sync
+DELETE /integrations/github/disconnect
+```
+
+#### Jira Integration
+```
+GET /integrations/jira
+POST /integrations/jira/setup
+GET /integrations/jira/projects
+POST /integrations/jira/sync
+```
+
+#### Salesforce Integration
+```
+GET /integrations/salesforce
+POST /integrations/salesforce/setup
+GET /integrations/salesforce/objects
+POST /integrations/salesforce/sync
+```
+
+## Additional Models and Namespacing
+
+### Model Namespacing
+Due to conflicting type names across different API contexts, models are organized into namespaces:
+
+#### Organization Models
+- `organization.Group` - Organization-level group
+- `organization.OrganizationOwner` - Organization owner details
+- `organization.OrganizationUserSimple` - Simplified user model
+- `organization.Workspace` - Workspace within organization
+
+#### Workspace Models
+- `workspace.Group` - Workspace-level group
+- `workspace.Tag` - Workspace tag
+- `workspace.Client` - Workspace client
+
+#### Billing Models
+- `billing.FancyPlan` - Subscription plan details
+- `billing.PricingStruct` - Pricing configuration
+- `billing.Feature` - Available features per plan
+- `billing.WorkspaceFeature` - Enabled features for workspace
+
+#### Customer Models
+- `customer.PaymentMethod` - Payment method base
+- `customer.CardDetails` - Credit card payment method
+- `customer.SepaDetails` - SEPA bank payment method
+- `customer.USBankAccount` - US bank account payment method
+- `customer.Subscription` - Subscription details
+
+#### Goals Models
+- `goals.BaseGoal` - Common goal properties
+- `goals.ProjectTimeGoal` - Project-based time goals
+- `goals.TeamTimeGoal` - Team-based time goals
+
+#### Dashboard Models
+- `dashboard.Activity` - User activity data
+- `dashboard.MostActiveUser` - Most active user metrics
+- `dashboard.ProjectActivity` - Project activity data
+
+#### Integration Models
+- `calendar.CalendarIntegration` - Calendar integration config
+- `calendar.CalendarEvent` - Calendar event data
+- `github.Integration` - GitHub integration
+- `jira.Integration` - Jira integration
+- `salesforce.Integration` - Salesforce integration
+
+### Desktop-Specific Models
+- `desktop.LoginToken` - Temporary login token for desktop apps
+- `desktop.Feature` - Desktop app features
+- `desktop.UpdateCheck` - Update availability
+
+### Mobile-Specific Models
+- `mobile.SyncResponse` - Sync operation response
+- `mobile.PushData` - Data to push to server
+- `mobile.PullData` - Data pulled from server
+
+### Common Type Aliases
+Many models use type aliases for clarity:
+- `WorkspaceId` - int64 workspace identifier
+- `ProjectId` - int64 project identifier
+- `ClientId` - int64 client identifier
+- `UserId` - int64 user identifier
+- `TaskId` - int64 task identifier
+- `TagId` - int64 tag identifier
+- `TimeEntryId` - int64 time entry identifier
+
+### Field Naming Conventions
+- Snake_case for JSON fields: `workspace_id`, `created_at`
+- Some legacy fields use different naming: `wid` (workspace_id), `pid` (project_id)
+- Deprecated fields are marked but still returned for compatibility
+- Meta fields (like `client_name` in time entries) only included when requested
+
+### Validation Rules
+Common validation patterns across the API:
+- Email fields: Valid email format required
+- URL fields: Must be valid URLs (webhooks require HTTPS)
+- Date fields: ISO 8601 format in UTC
+- Duration fields: Seconds as integers (negative for running)
+- Color fields: Hex color codes (e.g., "#06aaf5")
+- Currency fields: ISO 4217 currency codes
+- Timezone fields: IANA timezone identifiers
+
+### Workspace Alerts
+
+#### Get workspace alerts
+```
+GET /workspaces/{workspace_id}/alerts
+```
+
+#### Create workspace alert
+```
+POST /workspaces/{workspace_id}/alerts
+```
+Request body:
+```json
+{
+  "alert_type": string,      // Alert type identifier
+  "threshold": number,       // Threshold value
+  "enabled": boolean         // Alert enabled status
+}
+```
+
+#### Update workspace alert
+```
+PUT /workspaces/{workspace_id}/alerts/{alert_id}
+```
+
+#### Delete workspace alert
+```
+DELETE /workspaces/{workspace_id}/alerts/{alert_id}
+```
+
+## Implementation-Specific Details
+
+### Request Headers
+- `Content-Type: application/json` for all POST/PUT requests
+- `Accept: application/json` recommended
+- `User-Agent` should identify your application
+- `X-Request-Id` for request tracing (optional)
+
+### Query Parameter Encoding
+- Array parameters use repeated keys: `?tag_ids=1&tag_ids=2&tag_ids=3`
+- Boolean parameters: use `true`/`false` strings
+- Date parameters accept both ISO 8601 and YYYY-MM-DD formats
+- Special characters in parameters must be URL encoded
+
+### Response Headers
+- `X-Request-Id`: Request tracking ID
+- `X-RateLimit-Limit`: Rate limit ceiling
+- `X-RateLimit-Remaining`: Requests remaining
+- `X-RateLimit-Reset`: Rate limit reset timestamp
+
+### Nullable Fields
+Many fields can be null even if not marked optional:
+- `stop` in time entries (null = running)
+- `project_id`, `task_id`, `client_id` (null = unassigned)
+- `description` fields (null = no description)
+- Deleted entities return `server_deleted_at` timestamp
+
+### Field Constraints
+- Description fields: typically max 3000 characters
+- Name fields: typically max 255 characters
+- Tag names: max 50 characters
+- Workspace names: 3-100 characters
+- Color fields: must be valid hex colors
+
+### Special Behaviors
+- Running time entries have `duration` < 0 (preferably -1)
+- Bulk operations have limits (typically 100-200 items)
+- Some endpoints support partial updates (PATCH)
+- Cascading deletes: deleting projects deletes tasks and time entries
+- Permissions affect visible fields in responses
+
+### Mobile and Desktop Features
+- Desktop apps use special authentication flows
+- Mobile sync has conflict resolution rules
+- Offline support requires special handling
+- Push notifications available for mobile apps
+
+### Legacy Support
+- v8 compatibility fields maintained but deprecated
+- Some endpoints accept both old and new field names
+- Legacy IDs (wid, pid, tid) map to modern names
+- Migration endpoints available for v8 → v9
+
+This comprehensive documentation should provide all necessary information for implementing a complete Toggl Track API client.

@@ -78,15 +78,19 @@
 //! - `Error::RateLimited` - API rate limit exceeded
 //! - `Error::Network` - Network connectivity issues
 
+#[cfg(feature = "client")]
 pub mod client;
 pub mod models;
 pub mod prelude;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "client"))]
 mod tests;
 
+#[cfg(feature = "client")]
 pub use client::TogglClient;
-pub use toggl_core::{Auth, Error, Result};
+#[cfg(feature = "client")]
+pub use toggl_core::Auth;
+pub use toggl_core::{Error, Result};
 
 // Re-export commonly used types
 pub use models::*;

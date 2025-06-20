@@ -36,6 +36,6 @@ tokio = { version = "1", features = ["rt", "macros", "rt-multi-thread"] }
 
 # Internal dependencies
 toggl-core = { path = "toggl-core", version = "0.0.3" }
-toggl-api = { path = "toggl-api", version = "0.0.3" }
-toggl-reports = { path = "toggl-reports", version = "0.0.3" }
-toggl-webhooks = { path = "toggl-webhooks", version = "0.0.3" }
+toggl-api = { path = "toggl-api", version = "0.0.3", default-features = false }
+toggl-reports = { path = "toggl-reports", version = "0.0.3", default-features = false }
+toggl-webhooks = { path = "toggl-webhooks", version = "0.0.3", default-features = false }
