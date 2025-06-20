@@ -3,6 +3,7 @@ use crate::models::api::workspace::*;
 use pretty_assertions::assert_eq;
 use reqwest::Method;
 use serde_json::json;
+use toggl_core::test_utils::{test_organization_id, test_workspace_id, TestWorkspaceBuilder};
 use toggl_core::Result;
 use toggl_core::{ClientId, TagId, UserId, WorkspaceId};
 
@@ -10,47 +11,20 @@ use super::with_mockito;
 
 #[test]
 fn test_get_workspace() -> Result<()> {
-    let response = json!({
-        "id": 1234567,
-        "organization_id": 7654321,
-        "name": "My Workspace",
-        "profile": 0,
-        "premium": false,
-        "business_ws": false,
-        "admin": true,
-        "default_hourly_rate": null,
-        "rate_last_updated": null,
-        "default_currency": "USD",
-        "only_admins_may_create_projects": false,
-        "only_admins_may_create_tags": false,
-        "only_admins_see_billable_rates": false,
-        "only_admins_see_team_dashboard": false,
-        "projects_billable_by_default": true,
-        "projects_enforce_billable": false,
-        "projects_private_by_default": false,
-        "reports_collapse": true,
-        "rounding": 1,
-        "rounding_minutes": 0,
-        "api_token": null,
-        "at": "2022-10-03T15:44:00.289146Z",
-        "ical_enabled": false,
-        "ical_url": null,
-        "csv_upload": null,
-        "subscription": null,
-        "working_hours_in_minutes": null,
-        "logo_url": null,
-        "permissions": null,
-        "max_data_retention_days": null
-    });
+    let workspace_id = test_workspace_id();
+    let response = TestWorkspaceBuilder::new()
+        .name("My Workspace")
+        .organization_id(test_organization_id().value())
+        .build();
 
     with_mockito(
         Method::GET,
-        "/workspaces/1234567",
+        &format!("/workspaces/{}", workspace_id),
         200,
         Some(response),
         |client| {
-            let workspace = client.workspaces().get(WorkspaceId(1234567))?;
-            assert_eq!(WorkspaceId(1234567), workspace.id);
+            let workspace = client.workspaces().get(workspace_id)?;
+            assert_eq!(workspace_id, workspace.id);
             assert_eq!("My Workspace", workspace.name);
             assert_eq!(true, workspace.admin);
             Ok(())

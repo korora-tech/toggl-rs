@@ -1,7 +1,7 @@
 use crate::client::TogglClient;
-use mockito::{Matcher, Server};
 use reqwest::Method;
 use std::collections::BTreeMap;
+use toggl_core::test_utils::{with_mock_server, with_mock_server_params, TEST_API_TOKEN};
 use toggl_core::Result;
 
 pub mod audit_logs;
@@ -60,8 +60,6 @@ pub mod workspace_time_entry_constraints;
 pub mod workspaces;
 pub mod workspaces_goals;
 
-const API_TOKEN: &str = "test_api_token";
-
 pub fn with_mockito<F, T>(
     method: Method,
     url: &str,
@@ -72,7 +70,14 @@ pub fn with_mockito<F, T>(
 where
     F: FnOnce(TogglClient) -> Result<T>,
 {
-    with_mockito_params(method, url, None, status, response, test)
+    with_mock_server(
+        |base_url| TogglClient::new_with_base_url(TEST_API_TOKEN.to_string(), base_url),
+        method.as_ref(),
+        url,
+        status,
+        response,
+        test,
+    )
 }
 
 pub fn with_mockito_params<F, T>(
@@ -86,44 +91,24 @@ pub fn with_mockito_params<F, T>(
 where
     F: FnOnce(TogglClient) -> Result<T>,
 {
-    let mut server = Server::new();
-
-    // Build the full URL with query parameters if provided
-    let url = if let Some(params) = params {
-        if params.is_empty() {
-            path.to_string()
-        } else {
-            let query_string = params
-                .iter()
-                .map(|(k, v)| format!("{}={}", k, v))
-                .collect::<Vec<_>>()
-                .join("&");
-            format!("{}?{}", path, query_string)
-        }
+    if let Some(params) = params {
+        with_mock_server_params(
+            |base_url| TogglClient::new_with_base_url(TEST_API_TOKEN.to_string(), base_url),
+            method.as_ref(),
+            path,
+            params,
+            status,
+            response,
+            test,
+        )
     } else {
-        path.to_string()
-    };
-
-    let mock = server
-        .mock(method.as_ref(), url.as_str())
-        .match_header("authorization", Matcher::Any)
-        .with_status(status);
-
-    let mock = if let Some(response) = response {
-        mock.with_body(response.to_string())
-    } else {
-        mock
-    };
-
-    let mock = mock.create();
-
-    // Create a custom client that points to the mock server
-    let mock_url = server.url();
-    let toggl_client = TogglClient::new_with_base_url(API_TOKEN.to_string(), &mock_url)?;
-
-    let result = test(toggl_client);
-
-    mock.assert();
-
-    result
+        with_mock_server(
+            |base_url| TogglClient::new_with_base_url(TEST_API_TOKEN.to_string(), base_url),
+            method.as_ref(),
+            path,
+            status,
+            response,
+            test,
+        )
+    }
 }

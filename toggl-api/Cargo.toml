@@ -20,3 +20,4 @@ base64 = { workspace = true }
 mockito = { workspace = true }
 tokio = { workspace = true }
 pretty_assertions = { workspace = true }
+toggl-core = { workspace = true, features = ["test-utils"] }

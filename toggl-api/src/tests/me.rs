@@ -9,13 +9,14 @@ use toggl_core::{
     WorkspaceId,
 };
 
-use super::{with_mockito, with_mockito_params, API_TOKEN};
+use super::{with_mockito, with_mockito_params};
+use toggl_core::test_utils::TEST_API_TOKEN;
 
 #[test]
 fn test_get_me() -> Result<()> {
     let response = json!({
         "id": 1234567,
-        "api_token": API_TOKEN,
+        "api_token": TEST_API_TOKEN,
         "email": "test@example.com",
         "fullname": "Test User",
         "timezone": "Europe/Berlin",
@@ -59,7 +60,7 @@ fn test_update_me() -> Result<()> {
 
     let response = json!({
         "id": 1234567,
-        "api_token": API_TOKEN,
+        "api_token": TEST_API_TOKEN,
         "email": "test@example.com",
         "fullname": "Updated Name",
         "timezone": "Europe/Berlin",

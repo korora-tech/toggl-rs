@@ -14,7 +14,7 @@ mod tests {
         });
 
         let mut params = BTreeMap::new();
-        params.insert("email", "user%40example.com");
+        params.insert("email", "user@example.com");
 
         with_mockito_params(
             Method::GET,

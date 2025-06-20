@@ -1,8 +1,10 @@
 #[cfg(test)]
 use crate::client::ReportsClient;
-use mockito::{Matcher, Server};
 use reqwest::Method;
 use std::collections::BTreeMap;
+use toggl_core::test_utils::{
+    with_mock_server, with_mock_server_bytes, with_mock_server_params, TEST_API_TOKEN,
+};
 use toggl_core::Result;
 
 pub mod comparative;
@@ -17,8 +19,6 @@ pub mod shared;
 pub mod summary;
 pub mod weekly;
 
-const API_TOKEN: &str = "test_api_token";
-
 pub fn with_mockito<F, T>(
     method: Method,
     url: &str,
@@ -29,7 +29,16 @@ pub fn with_mockito<F, T>(
 where
     F: FnOnce(ReportsClient) -> Result<T>,
 {
-    with_mockito_params(method, url, None, status, response, test)
+    with_mock_server(
+        |base_url| {
+            ReportsClient::new_with_base_urls(TEST_API_TOKEN.to_string(), base_url, base_url)
+        },
+        method.as_str(),
+        url,
+        status,
+        response,
+        test,
+    )
 }
 
 pub fn with_mockito_params<F, T>(
@@ -43,42 +52,30 @@ pub fn with_mockito_params<F, T>(
 where
     F: FnOnce(ReportsClient) -> Result<T>,
 {
-    let mut server = Server::new();
-
-    // Build the full URL with query parameters if provided
-    let url = if let Some(params) = params {
-        if params.is_empty() {
-            path.to_string()
-        } else {
-            let query_string = params
-                .iter()
-                .map(|(k, v)| format!("{}={}", k, v))
-                .collect::<Vec<_>>()
-                .join("&");
-            format!("{}?{}", path, query_string)
-        }
+    if let Some(params) = params {
+        with_mock_server_params(
+            |base_url| {
+                ReportsClient::new_with_base_urls(TEST_API_TOKEN.to_string(), base_url, base_url)
+            },
+            method.as_str(),
+            path,
+            params,
+            status,
+            response,
+            test,
+        )
     } else {
-        path.to_string()
-    };
-
-    let mock = server
-        .mock(method.as_str(), url.as_str())
-        .match_header("authorization", Matcher::Any)
-        .with_status(status);
-
-    let mock = if let Some(response) = response {
-        mock.with_header("content-type", "application/json")
-            .with_body(response.to_string())
-    } else {
-        mock
-    };
-
-    let _m = mock.create();
-
-    let client =
-        ReportsClient::new_with_base_urls(API_TOKEN.to_string(), &server.url(), &server.url())?;
-
-    test(client)
+        with_mock_server(
+            |base_url| {
+                ReportsClient::new_with_base_urls(TEST_API_TOKEN.to_string(), base_url, base_url)
+            },
+            method.as_str(),
+            path,
+            status,
+            response,
+            test,
+        )
+    }
 }
 
 pub fn with_mockito_bytes<F, T>(
@@ -91,17 +88,14 @@ pub fn with_mockito_bytes<F, T>(
 where
     F: FnOnce(ReportsClient) -> Result<T>,
 {
-    let mut server = Server::new();
-
-    let _m = server
-        .mock(method.as_str(), url)
-        .match_header("authorization", Matcher::Any)
-        .with_status(status)
-        .with_body(response_bytes)
-        .create();
-
-    let client =
-        ReportsClient::new_with_base_urls(API_TOKEN.to_string(), &server.url(), &server.url())?;
-
-    test(client)
+    with_mock_server_bytes(
+        |base_url| {
+            ReportsClient::new_with_base_urls(TEST_API_TOKEN.to_string(), base_url, base_url)
+        },
+        method.as_str(),
+        url,
+        status,
+        response_bytes,
+        test,
+    )
 }

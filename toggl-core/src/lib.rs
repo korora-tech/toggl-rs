@@ -46,6 +46,9 @@ pub mod error;
 pub mod ids;
 pub mod types;
 
+#[cfg(any(test, feature = "test-utils"))]
+pub mod test_utils;
+
 pub use auth::*;
 pub use client::BaseClient;
 pub use error::*;

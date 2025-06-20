@@ -1,0 +1,632 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/v9/subscriptions": {
+            "get": {
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "Get workspace subscriptions",
+                "description": "Get workspace subscriptions.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Numeric ID of the workspace.",
+                        "name": "workspace_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/SubscriptionOutDto"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "403": {
+                        "description": "User does not have permission to access subscription data."
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "Create a subscription",
+                "description": "Create a subscription.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/SubscriptionInDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/SubscriptionOutDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "403": {
+                        "description": "User does not have permission to create subscription.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v9/subscriptions/{subscription_id}": {
+            "get": {
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "Get a subscription",
+                "description": "Get a subscription.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subscription ID.",
+                        "name": "subscription_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SubscriptionOutDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "403": {
+                        "description": "User does not have permission to access subscription.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "Update a subscription",
+                "description": "Update a subscription.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subscription ID.",
+                        "name": "subscription_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/SubscriptionUpdateDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SubscriptionOutDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "403": {
+                        "description": "User does not have permission to update subscription.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "Delete a subscription",
+                "description": "Delete a subscription.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subscription ID.",
+                        "name": "subscription_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "403": {
+                        "description": "User does not have permission to delete subscription.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v9/event_filters": {
+            "get": {
+                "tags": [
+                    "Event filters"
+                ],
+                "summary": "Get event filters",
+                "description": "Get event filters.",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/EventFiltersOutDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v9/ping/{subscription_id}": {
+            "post": {
+                "tags": [
+                    "Ping"
+                ],
+                "summary": "Send a test event",
+                "description": "Send a test event.",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subscription ID.",
+                        "name": "subscription_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "403": {
+                        "description": "User does not have permission to ping subscription.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v9/health": {
+            "get": {
+                "tags": [
+                    "Status"
+                ],
+                "summary": "Get application health status",
+                "description": "Get application health status.",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/AppHealthOutDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscription_validation_events": {
+            "post": {
+                "tags": [
+                    "Subscription validation"
+                ],
+                "summary": "Validate subscription urls",
+                "description": "Receive subscription validation events.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/SubscriptionValidationDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SubscriptionValidationResponseDto"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "AppHealthOutDto": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "ErrorDto": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "tip": {
+                    "type": "string"
+                }
+            }
+        },
+        "EventFiltersGroupDto": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "EventFiltersOutDto": {
+            "type": "object",
+            "properties": {
+                "event_filters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/EventFiltersGroupDto"
+                    }
+                }
+            }
+        },
+        "SubscriptionInDto": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "event_filters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SubscriptionInEventFiltersDto"
+                    }
+                },
+                "has_pending_events": {
+                    "type": "boolean"
+                },
+                "secret": {
+                    "type": "string"
+                },
+                "url_callback": {
+                    "type": "string"
+                },
+                "user_agent": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "SubscriptionInEventFiltersDto": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "entity": {
+                    "type": "string"
+                }
+            }
+        },
+        "SubscriptionOutDto": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "event_filters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SubscriptionOutEventFilterDto"
+                    }
+                },
+                "has_pending_events": {
+                    "type": "boolean"
+                },
+                "secret": {
+                    "type": "string"
+                },
+                "subscription_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "url_callback": {
+                    "type": "string"
+                },
+                "user_agent": {
+                    "type": "string"
+                },
+                "validated_at": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "SubscriptionOutEventFilterDto": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "entity": {
+                    "type": "string"
+                }
+            }
+        },
+        "SubscriptionUpdateDto": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "event_filters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SubscriptionUpdateEventFilterDto"
+                    }
+                },
+                "has_pending_events": {
+                    "type": "boolean"
+                },
+                "secret": {
+                    "type": "string"
+                },
+                "url_callback": {
+                    "type": "string"
+                },
+                "user_agent": {
+                    "type": "string"
+                }
+            }
+        },
+        "SubscriptionUpdateEventFilterDto": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "entity": {
+                    "type": "string"
+                }
+            }
+        },
+        "SubscriptionValidationDto": {
+            "type": "object",
+            "properties": {
+                "event_type": {
+                    "type": "string"
+                },
+                "validation_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "SubscriptionValidationResponseDto": {
+            "type": "object",
+            "properties": {
+                "validation_code": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
