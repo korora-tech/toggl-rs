@@ -1,6 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use crate::{models::api::favorite::*, tests::with_mockito};
+    use crate::{
+        models::api::favorite::*,
+        models::api::ids::{FavoriteId, ProjectId, TagId, WorkspaceId},
+        tests::with_mockito,
+    };
     use reqwest::Method;
     use serde_json::json;
     use toggl_core::Result;
@@ -32,7 +36,7 @@ mod tests {
             |client| {
                 let favorites = client.me().get_favorites(None)?;
                 assert_eq!(favorites.len(), 1);
-                assert_eq!(favorites[0].id, 1);
+                assert_eq!(favorites[0].id, FavoriteId(1));
                 assert_eq!(favorites[0].description.as_ref().unwrap(), "Favorite task");
                 Ok(())
             },
@@ -42,11 +46,11 @@ mod tests {
     #[test]
     fn test_create_favorite() -> Result<()> {
         let create_data = CreateFavorite {
-            workspace_id: 123,
+            workspace_id: WorkspaceId(123),
             description: Some("New favorite".to_string()),
-            project_id: Some(789),
+            project_id: Some(ProjectId(789)),
             task_id: None,
-            tag_ids: Some(vec![1, 2]),
+            tag_ids: Some(vec![TagId(1), TagId(2)]),
             billable: Some(true),
         };
 
@@ -72,7 +76,7 @@ mod tests {
             Some(response),
             |client| {
                 let favorite = client.me().create_favorite(&create_data)?;
-                assert_eq!(favorite.id, 1);
+                assert_eq!(favorite.id, FavoriteId(1));
                 assert_eq!(favorite.description.as_ref().unwrap(), "New favorite");
                 Ok(())
             },
@@ -83,7 +87,7 @@ mod tests {
     fn test_update_favorite() -> Result<()> {
         let update_data = UpdateFavorite {
             description: Some("Updated favorite".to_string()),
-            project_id: Some(999),
+            project_id: Some(ProjectId(999)),
             task_id: None,
             tag_ids: None,
             billable: Some(false),
@@ -110,8 +114,8 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let favorite = client.me().update_favorite(1, &update_data)?;
-                assert_eq!(favorite.id, 1);
+                let favorite = client.me().update_favorite(FavoriteId(1), &update_data)?;
+                assert_eq!(favorite.id, FavoriteId(1));
                 assert_eq!(favorite.description.as_ref().unwrap(), "Updated favorite");
                 assert!(!favorite.billable);
                 Ok(())
@@ -127,7 +131,7 @@ mod tests {
             200,
             None::<serde_json::Value>,
             |client| {
-                client.me().delete_favorite(1)?;
+                client.me().delete_favorite(FavoriteId(1))?;
                 Ok(())
             },
         )
@@ -160,7 +164,7 @@ mod tests {
             |client| {
                 let suggestions = client.me().get_favorite_suggestions()?;
                 assert_eq!(suggestions.len(), 1);
-                assert_eq!(suggestions[0].id, 2);
+                assert_eq!(suggestions[0].id, FavoriteId(2));
                 assert!(suggestions[0].suggestion);
                 Ok(())
             },

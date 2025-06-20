@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::models::api::calendar::*;
+    use crate::models::api::ids::{IntegrationId, ProjectId};
     use crate::tests::*;
     use chrono::DateTime;
     use reqwest::Method;
@@ -27,8 +28,10 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let integration = client.calendar().update_integration(123, &update)?;
-                assert_eq!(integration.id, 123);
+                let integration = client
+                    .calendar()
+                    .update_integration(IntegrationId::new(123), &update)?;
+                assert_eq!(integration.id, IntegrationId::new(123));
                 assert_eq!(integration.provider, "google");
                 Ok(())
             },
@@ -64,7 +67,9 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let result = client.calendar().get_integration_calendars(123)?;
+                let result = client
+                    .calendar()
+                    .get_integration_calendars(IntegrationId::new(123))?;
                 assert_eq!(result.calendars.len(), 2);
                 assert_eq!(result.calendars[0].name, "My Calendar");
                 assert!(result.calendars[0].selected);
@@ -78,11 +83,11 @@ mod tests {
         let update = CalendarUpdateRequest {
             calendars: vec![
                 CalendarUpdate {
-                    id: "primary".to_string(),
+                    id: "primary".into(),
                     selected: true,
                 },
                 CalendarUpdate {
-                    id: "work".to_string(),
+                    id: "work".into(),
                     selected: false,
                 },
             ],
@@ -96,7 +101,7 @@ mod tests {
             |client| {
                 client
                     .calendar()
-                    .update_integration_calendars(123, &update)?;
+                    .update_integration_calendars(IntegrationId::new(123), &update)?;
                 Ok(())
             },
         )
@@ -105,7 +110,7 @@ mod tests {
     #[test]
     fn test_update_calendar() -> Result<()> {
         let update = CalendarUpdate {
-            id: "primary".to_string(),
+            id: "primary".into(),
             selected: true,
         };
 
@@ -123,8 +128,12 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let calendar = client.calendar().update_calendar(123, "primary", &update)?;
-                assert_eq!(calendar.id, "primary");
+                let calendar = client.calendar().update_calendar(
+                    IntegrationId::new(123),
+                    "primary",
+                    &update,
+                )?;
+                assert_eq!(calendar.id, "primary".into());
                 assert!(calendar.selected);
                 Ok(())
             },
@@ -163,7 +172,7 @@ mod tests {
             Some(response),
             |client| {
                 let result = client.calendar().get_calendar_events(
-                    123,
+                    IntegrationId::new(123),
                     "primary",
                     "2024-01-16",
                     "2024-01-17",
@@ -194,7 +203,7 @@ mod tests {
             Some(response),
             |client| {
                 let suggestion = client.calendar().get_event_details_suggestion("evt1")?;
-                assert_eq!(suggestion.project_id, Some(456));
+                assert_eq!(suggestion.project_id, Some(ProjectId::new(456)));
                 assert_eq!(suggestion.billable, Some(true));
                 Ok(())
             },
@@ -231,7 +240,7 @@ mod tests {
                     .calendar()
                     .get_events_details_suggestions(&event_ids)?;
                 assert_eq!(suggestions.len(), 2);
-                assert_eq!(suggestions[0].project_id, Some(456));
+                assert_eq!(suggestions[0].project_id, Some(ProjectId::new(456)));
                 assert_eq!(suggestions[1].billable, Some(false));
                 Ok(())
             },
@@ -265,7 +274,7 @@ mod tests {
                     Some("state_123"),
                 )?;
 
-                assert_eq!(integration.id, 124);
+                assert_eq!(integration.id, IntegrationId::new(124));
                 assert_eq!(integration.provider, "google");
                 Ok(())
             },
@@ -431,9 +440,9 @@ mod tests {
     #[test]
     fn test_update_event() -> Result<()> {
         let event = CalendarEvent {
-            id: "evt1".to_string(),
-            calendar_id: "primary".to_string(),
-            integration_id: 123,
+            id: "evt1".into(),
+            calendar_id: "primary".into(),
+            integration_id: IntegrationId::new(123),
             title: "Updated Meeting".to_string(),
             description: Some("Updated description".to_string()),
             start: DateTime::parse_from_rfc3339("2024-01-16T14:00:00Z")
@@ -496,7 +505,7 @@ mod tests {
             Some(response),
             |client| {
                 let integration = client.calendar().setup("google")?;
-                assert_eq!(integration.id, 125);
+                assert_eq!(integration.id, IntegrationId::new(125));
                 assert_eq!(integration.provider, "google");
                 Ok(())
             },
@@ -511,7 +520,9 @@ mod tests {
             204,
             None,
             |client| {
-                client.calendar().delete_integration(123)?;
+                client
+                    .calendar()
+                    .delete_integration(IntegrationId::new(123))?;
                 Ok(())
             },
         )

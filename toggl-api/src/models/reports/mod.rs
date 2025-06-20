@@ -14,6 +14,7 @@ pub use summary::*;
 pub use trends::*;
 pub use weekly::*;
 
+use crate::models::api::ids::{ClientId, ProjectId, TagId, TaskId, UserId};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
@@ -25,11 +26,11 @@ pub struct ReportTimeRange {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ReportFilters {
-    pub client_ids: Option<Vec<u64>>,
-    pub project_ids: Option<Vec<u64>>,
-    pub user_ids: Option<Vec<u64>>,
-    pub tag_ids: Option<Vec<u64>>,
-    pub task_ids: Option<Vec<u64>>,
+    pub client_ids: Option<Vec<ClientId>>,
+    pub project_ids: Option<Vec<ProjectId>>,
+    pub user_ids: Option<Vec<UserId>>,
+    pub tag_ids: Option<Vec<TagId>>,
+    pub task_ids: Option<Vec<TaskId>>,
     pub billable: Option<bool>,
     pub description: Option<String>,
 }

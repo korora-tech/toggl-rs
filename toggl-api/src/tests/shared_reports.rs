@@ -1,3 +1,4 @@
+use crate::models::api::ids::{ReportId, WorkspaceId};
 use crate::models::api::shared_reports::{
     BulkDeleteRequest, CreateSavedReportPayload, SharedReportsQuery, UpdateSavedReportPayload,
 };
@@ -29,7 +30,9 @@ fn test_get_shared_reports() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let reports = client.shared_reports().get_shared_reports(111, None)?;
+            let reports = client
+                .shared_reports()
+                .get_shared_reports(WorkspaceId(111), None)?;
             assert_eq!(reports.len(), 1);
             assert_eq!(reports[0].name, Some("Weekly Report".to_string()));
             assert_eq!(reports[0].public, Some(true));
@@ -61,7 +64,7 @@ fn test_get_shared_reports_with_query() -> Result<()> {
             };
             let reports = client
                 .shared_reports()
-                .get_shared_reports(111, Some(query))?;
+                .get_shared_reports(WorkspaceId(111), Some(query))?;
             assert_eq!(reports.len(), 0);
             Ok(())
         },
@@ -94,7 +97,9 @@ fn test_create_shared_report() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let report = client.shared_reports().create_shared_report(111, request)?;
+            let report = client
+                .shared_reports()
+                .create_shared_report(WorkspaceId(111), request)?;
             assert_eq!(report.id, Some(124));
             assert_eq!(report.name, Some("New Report".to_string()));
             assert_eq!(report.public, Some(false));
@@ -120,7 +125,9 @@ fn test_get_shared_report() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let report = client.shared_reports().get_shared_report(111, 123)?;
+            let report = client
+                .shared_reports()
+                .get_shared_report(WorkspaceId(111), ReportId(123))?;
             assert_eq!(report.id, Some(123));
             assert_eq!(report.name, Some("Specific Report".to_string()));
             Ok(())
@@ -154,9 +161,11 @@ fn test_update_shared_report() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let report = client
-                .shared_reports()
-                .update_shared_report(111, 123, request)?;
+            let report = client.shared_reports().update_shared_report(
+                WorkspaceId(111),
+                ReportId(123),
+                request,
+            )?;
             assert_eq!(report.name, Some("Updated Report".to_string()));
             assert_eq!(report.public, Some(true));
             Ok(())
@@ -178,7 +187,9 @@ fn test_delete_shared_report() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let report = client.shared_reports().delete_shared_report(111, 123)?;
+            let report = client
+                .shared_reports()
+                .delete_shared_report(WorkspaceId(111), ReportId(123))?;
             assert_eq!(report.id, Some(123));
             assert!(report.deleted_at.is_some());
             Ok(())
@@ -218,7 +229,7 @@ fn test_bulk_delete_shared_reports() -> Result<()> {
         |client| {
             let reports = client
                 .shared_reports()
-                .bulk_delete_shared_reports(111, request)?;
+                .bulk_delete_shared_reports(WorkspaceId(111), request)?;
             assert_eq!(reports.len(), 3);
             assert!(reports.iter().all(|r| r.deleted_at.is_some()));
             Ok(())

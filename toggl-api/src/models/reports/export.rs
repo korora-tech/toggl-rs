@@ -1,9 +1,12 @@
 use super::{ReportFilters, ReportTimeRange};
+use crate::models::api::ids::WorkspaceId;
 use serde::{Deserialize, Serialize};
+
+use crate::models::api::ids::ExportId;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ExportRequest {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     #[serde(flatten)]
     pub time_range: ReportTimeRange,
     #[serde(flatten)]
@@ -24,7 +27,7 @@ pub enum ExportFormat {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ExportResponse {
     pub download_url: String,
-    pub export_id: String,
+    pub export_id: ExportId,
     pub status: ExportStatus,
 }
 
@@ -39,7 +42,7 @@ pub enum ExportStatus {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ExportStatusResponse {
-    pub export_id: String,
+    pub export_id: ExportId,
     pub status: ExportStatus,
     pub download_url: Option<String>,
     pub error_message: Option<String>,

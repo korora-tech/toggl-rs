@@ -1,6 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use crate::{models::api::time_entry::*, tests::with_mockito};
+    use crate::{
+        models::api::ids::{ProjectId, TimeEntryId, WorkspaceId},
+        models::api::time_entry::*,
+        tests::with_mockito,
+    };
     use chrono::Utc;
     use reqwest::Method;
     use serde_json::json;
@@ -34,7 +38,7 @@ mod tests {
             |client| {
                 let entries = client.me().get_time_entries(None, None, None, None, None)?;
                 assert_eq!(entries.len(), 1);
-                assert_eq!(entries[0].id, 1);
+                assert_eq!(entries[0].id, TimeEntryId(1));
                 assert_eq!(
                     entries[0].description.as_ref().unwrap(),
                     "Working on project"
@@ -47,11 +51,11 @@ mod tests {
     #[test]
     fn test_create_time_entry() -> Result<()> {
         let create_data = CreateTimeEntry {
-            workspace_id: 123,
+            workspace_id: WorkspaceId(123),
             start: Utc::now(),
             duration: 3600,
             description: Some("New task".to_string()),
-            project_id: Some(789),
+            project_id: Some(ProjectId(789)),
             task_id: None,
             tag_ids: None,
             billable: Some(false),
@@ -81,7 +85,7 @@ mod tests {
             Some(response),
             |client| {
                 let entry = client.me().create_time_entry(&create_data)?;
-                assert_eq!(entry.id, 1);
+                assert_eq!(entry.id, TimeEntryId(1));
                 assert_eq!(entry.description.as_ref().unwrap(), "New task");
                 Ok(())
             },
@@ -112,8 +116,8 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let entry = client.me().get_time_entry(1)?;
-                assert_eq!(entry.id, 1);
+                let entry = client.me().get_time_entry(TimeEntryId(1))?;
+                assert_eq!(entry.id, TimeEntryId(1));
                 assert_eq!(entry.description.as_ref().unwrap(), "Working on project");
                 Ok(())
             },
@@ -124,7 +128,7 @@ mod tests {
     fn test_update_time_entry() -> Result<()> {
         let update_data = UpdateTimeEntry {
             description: Some("Updated task".to_string()),
-            project_id: Some(999),
+            project_id: Some(ProjectId(999)),
             task_id: None,
             tag_ids: None,
             billable: Some(true),
@@ -155,8 +159,10 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let entry = client.me().update_time_entry(1, &update_data)?;
-                assert_eq!(entry.id, 1);
+                let entry = client
+                    .me()
+                    .update_time_entry(TimeEntryId(1), &update_data)?;
+                assert_eq!(entry.id, TimeEntryId(1));
                 assert_eq!(entry.description.as_ref().unwrap(), "Updated task");
                 assert!(entry.billable);
                 Ok(())
@@ -172,7 +178,7 @@ mod tests {
             200,
             None::<serde_json::Value>,
             |client| {
-                client.me().delete_time_entry(1)?;
+                client.me().delete_time_entry(TimeEntryId(1))?;
                 Ok(())
             },
         )
@@ -239,7 +245,7 @@ mod tests {
                 let entry = client.me().get_current_time_entry()?;
                 assert!(entry.is_some());
                 let entry = entry.unwrap();
-                assert_eq!(entry.id, 1);
+                assert_eq!(entry.id, TimeEntryId(1));
                 assert_eq!(entry.description.as_ref().unwrap(), "Currently tracking");
                 assert!(entry.stop.is_none());
                 Ok(())
@@ -298,7 +304,7 @@ mod tests {
             Some(response),
             |client| {
                 let entry = client.me().update_current_time_entry(&update_data)?;
-                assert_eq!(entry.id, 1);
+                assert_eq!(entry.id, TimeEntryId(1));
                 assert_eq!(entry.description.as_ref().unwrap(), "Updated current");
                 Ok(())
             },
@@ -330,7 +336,7 @@ mod tests {
             Some(response),
             |client| {
                 let entry = client.me().stop_current_time_entry()?;
-                assert_eq!(entry.id, 1);
+                assert_eq!(entry.id, TimeEntryId(1));
                 assert!(entry.stop.is_some());
                 Ok(())
             },

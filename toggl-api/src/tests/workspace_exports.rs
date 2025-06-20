@@ -1,3 +1,4 @@
+use crate::models::api::ids::WorkspaceId;
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
@@ -24,7 +25,7 @@ fn test_get_workspace_exports() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let exports = client.workspaces().get_exports(12345)?;
+            let exports = client.workspaces().get_exports(WorkspaceId(12345))?;
             assert_eq!(exports.len(), 2);
             assert_eq!(exports[0].token, Some("abc123".to_string()));
             assert_eq!(exports[0].state, Some("completed".to_string()));
@@ -46,7 +47,9 @@ fn test_create_workspace_export() -> Result<()> {
         Some(response),
         |client| {
             let tokens = vec!["projects".to_string(), "time_entries".to_string()];
-            let export_id = client.workspaces().create_export(12345, tokens)?;
+            let export_id = client
+                .workspaces()
+                .create_export(WorkspaceId(12345), tokens)?;
             assert_eq!(export_id, "export-uuid-12345");
             Ok(())
         },
@@ -67,7 +70,7 @@ fn test_download_workspace_export() -> Result<()> {
             // In real usage, this would return the zip file contents
             let result = client
                 .workspaces()
-                .download_export(12345, "export-uuid-12345");
+                .download_export(WorkspaceId(12345), "export-uuid-12345");
             // Just verify the request is made successfully
             assert!(result.is_ok());
             Ok(())

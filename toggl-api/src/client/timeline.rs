@@ -1,4 +1,5 @@
 use super::TogglClient;
+use crate::models::api::ids::TimelineId;
 use crate::models::api::timeline::{CreateTimelineEvent, TimelineEvent};
 use reqwest::Method;
 use std::collections::BTreeMap;
@@ -30,7 +31,7 @@ impl TimelineClient {
     }
 
     /// Delete timeline event
-    pub fn delete(&self, event_id: u64) -> Result<()> {
+    pub fn delete(&self, event_id: TimelineId) -> Result<()> {
         self.client
             .request_empty(Method::DELETE, &format!("timeline/{}", event_id))
     }

@@ -1,3 +1,4 @@
+use crate::models::api::ids::{ReportId, WorkspaceId};
 use crate::models::api::shared_reports::*;
 use crate::tests::with_mockito;
 use reqwest::Method;
@@ -28,7 +29,7 @@ fn test_get_shared_reports() -> Result<()> {
         |client| {
             let reports = client
                 .workspace_reports()
-                .get_shared_reports(987654, None)?;
+                .get_shared_reports(WorkspaceId(987654), None)?;
             assert_eq!(reports.len(), 1);
             assert_eq!(reports[0].name.as_ref().unwrap(), "Weekly Team Report");
             Ok(())
@@ -63,7 +64,7 @@ fn test_get_shared_reports_with_query() -> Result<()> {
             };
             let reports = client
                 .workspace_reports()
-                .get_shared_reports(987654, Some(&query))?;
+                .get_shared_reports(WorkspaceId(987654), Some(&query))?;
             assert_eq!(reports.len(), 1);
             assert_eq!(reports[0].public, Some(true));
             Ok(())
@@ -103,7 +104,7 @@ fn test_create_shared_report() -> Result<()> {
 
             let created = client
                 .workspace_reports()
-                .create_shared_report(987654, &report)?;
+                .create_shared_report(WorkspaceId(987654), &report)?;
             assert_eq!(created.name.as_ref().unwrap(), "Monthly Revenue Report");
             assert_eq!(created.id, Some(3));
             Ok(())
@@ -139,7 +140,7 @@ fn test_update_shared_reports() -> Result<()> {
 
             let updated = client
                 .workspace_reports()
-                .update_shared_reports(987654, &reports)?;
+                .update_shared_reports(WorkspaceId(987654), &reports)?;
             assert_eq!(updated.name.as_ref().unwrap(), "Updated Report Name");
             Ok(())
         },
@@ -165,7 +166,9 @@ fn test_get_shared_report() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let report = client.workspace_reports().get_shared_report(987654, 5)?;
+            let report = client
+                .workspace_reports()
+                .get_shared_report(WorkspaceId(987654), ReportId(5))?;
             assert_eq!(report.id, Some(5));
             assert_eq!(report.name.as_ref().unwrap(), "Specific Report");
             assert_eq!(report.is_commenting_enabled, Some(true));
@@ -200,9 +203,11 @@ fn test_update_shared_report() -> Result<()> {
                 regenerate_token: None,
             };
 
-            let updated = client
-                .workspace_reports()
-                .update_shared_report(987654, 6, &update)?;
+            let updated = client.workspace_reports().update_shared_report(
+                WorkspaceId(987654),
+                ReportId(6),
+                &update,
+            )?;
             assert_eq!(updated.name.as_ref().unwrap(), "Updated Single Report");
             Ok(())
         },
@@ -217,7 +222,9 @@ fn test_delete_shared_report() -> Result<()> {
         204,
         None,
         |client| {
-            client.workspace_reports().delete_shared_report(987654, 7)?;
+            client
+                .workspace_reports()
+                .delete_shared_report(WorkspaceId(987654), ReportId(7))?;
             Ok(())
         },
     )
@@ -231,9 +238,10 @@ fn test_bulk_delete_shared_reports() -> Result<()> {
         204,
         None,
         |client| {
-            client
-                .workspace_reports()
-                .bulk_delete_shared_reports(987654, vec![8, 9, 10])?;
+            client.workspace_reports().bulk_delete_shared_reports(
+                WorkspaceId(987654),
+                vec![ReportId(8), ReportId(9), ReportId(10)],
+            )?;
             Ok(())
         },
     )

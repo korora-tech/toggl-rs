@@ -1,9 +1,11 @@
 use serde::{Deserialize, Serialize};
 
+use super::ids::{AlertId, WorkspaceId};
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Alert {
-    pub id: u64,
-    pub workspace_id: u64,
+    pub id: AlertId,
+    pub workspace_id: WorkspaceId,
     pub alert_type: String,
     pub threshold: f64,
     pub enabled: bool,

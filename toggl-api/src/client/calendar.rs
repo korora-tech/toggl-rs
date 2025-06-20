@@ -1,5 +1,6 @@
 use super::TogglClient;
 use crate::models::api::calendar::*;
+use crate::models::api::ids::IntegrationId;
 use reqwest::Method;
 use std::collections::BTreeMap;
 use toggl_core::Result;
@@ -56,7 +57,7 @@ impl CalendarClient {
     }
 
     /// Delete calendar integration
-    pub fn delete_integration(&self, integration_id: u64) -> Result<()> {
+    pub fn delete_integration(&self, integration_id: IntegrationId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("integrations/calendar/{}", integration_id),
@@ -66,7 +67,7 @@ impl CalendarClient {
     /// Update calendar integration
     pub fn update_integration(
         &self,
-        integration_id: u64,
+        integration_id: IntegrationId,
         update: &UpdateIntegration,
     ) -> Result<Integration> {
         self.client.request_with_body(
@@ -77,7 +78,10 @@ impl CalendarClient {
     }
 
     /// Get calendars for specific integration
-    pub fn get_integration_calendars(&self, integration_id: u64) -> Result<CalendarsResponse> {
+    pub fn get_integration_calendars(
+        &self,
+        integration_id: IntegrationId,
+    ) -> Result<CalendarsResponse> {
         self.client.request(
             Method::GET,
             &format!("integrations/calendar/{}/calendars", integration_id),
@@ -87,7 +91,7 @@ impl CalendarClient {
     /// Update calendars for specific integration
     pub fn update_integration_calendars(
         &self,
-        integration_id: u64,
+        integration_id: IntegrationId,
         update: &CalendarUpdateRequest,
     ) -> Result<()> {
         self.client.request_with_body_empty(
@@ -100,7 +104,7 @@ impl CalendarClient {
     /// Update specific calendar
     pub fn update_calendar(
         &self,
-        integration_id: u64,
+        integration_id: IntegrationId,
         calendar_id: &str,
         update: &CalendarUpdate,
     ) -> Result<Calendar> {
@@ -117,7 +121,7 @@ impl CalendarClient {
     /// Get events for specific calendar
     pub fn get_calendar_events(
         &self,
-        integration_id: u64,
+        integration_id: IntegrationId,
         calendar_id: &str,
         start_date: &str,
         end_date: &str,

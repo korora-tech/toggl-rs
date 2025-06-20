@@ -1,3 +1,4 @@
+use crate::models::api::ids::{TimeEntryId, WorkspaceId};
 use crate::models::api::time_entry::*;
 use chrono::{DateTime, Utc};
 use pretty_assertions::assert_eq;
@@ -39,7 +40,7 @@ fn test_get_current_time_entry() -> Result<()> {
             let entry = client.time_entries().current()?;
             assert!(entry.is_some());
             let entry = entry.unwrap();
-            assert_eq!(1234567890, entry.id);
+            assert_eq!(TimeEntryId(1234567890), entry.id);
             assert_eq!(
                 Some("Working on important task".to_string()),
                 entry.description
@@ -55,7 +56,7 @@ fn test_create_time_entry() -> Result<()> {
     let create_data = CreateTimeEntry {
         created_with: "toggl-rs".to_string(),
         description: Some("New time entry".to_string()),
-        workspace_id: 1234567,
+        workspace_id: WorkspaceId(1234567),
         project_id: None,
         task_id: None,
         billable: Some(false),
@@ -93,8 +94,10 @@ fn test_create_time_entry() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let entry = client.time_entries().create(1234567, &create_data)?;
-            assert_eq!(987654321, entry.id);
+            let entry = client
+                .time_entries()
+                .create(WorkspaceId(1234567), &create_data)?;
+            assert_eq!(TimeEntryId(987654321), entry.id);
             assert_eq!(Some("New time entry".to_string()), entry.description);
             assert_eq!(3600, entry.duration);
             Ok(())
@@ -107,7 +110,7 @@ fn test_start_time_entry() -> Result<()> {
     let start_data = CreateTimeEntry {
         created_with: "toggl-rs".to_string(),
         description: Some("Starting work".to_string()),
-        workspace_id: 1234567,
+        workspace_id: WorkspaceId(1234567),
         project_id: None,
         task_id: None,
         billable: Some(false),
@@ -145,8 +148,10 @@ fn test_start_time_entry() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let entry = client.time_entries().start(1234567, &start_data)?;
-            assert_eq!(1111111111, entry.id);
+            let entry = client
+                .time_entries()
+                .start(WorkspaceId(1234567), &start_data)?;
+            assert_eq!(TimeEntryId(1111111111), entry.id);
             assert_eq!(Some("Starting work".to_string()), entry.description);
             assert_eq!(-1672588800, entry.duration);
             Ok(())
@@ -183,8 +188,10 @@ fn test_stop_time_entry() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let entry = client.time_entries().stop(1234567, 1111111111)?;
-            assert_eq!(1111111111, entry.id);
+            let entry = client
+                .time_entries()
+                .stop(WorkspaceId(1234567), TimeEntryId(1111111111))?;
+            assert_eq!(TimeEntryId(1111111111), entry.id);
             assert_eq!(5400, entry.duration);
             assert!(entry.stop.is_some());
             Ok(())
@@ -232,9 +239,11 @@ fn test_update_time_entry() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let entry = client
-                .time_entries()
-                .update(1234567, 1234567890, &update_data)?;
+            let entry = client.time_entries().update(
+                WorkspaceId(1234567),
+                TimeEntryId(1234567890),
+                &update_data,
+            )?;
             assert_eq!(Some("Updated description".to_string()), entry.description);
             assert_eq!(true, entry.billable);
             assert_eq!(2, entry.tags.as_ref().unwrap().len());
@@ -251,7 +260,9 @@ fn test_delete_time_entry() -> Result<()> {
         200,
         None,
         |client| {
-            client.time_entries().delete(1234567, 1234567890)?;
+            client
+                .time_entries()
+                .delete(WorkspaceId(1234567), TimeEntryId(1234567890))?;
             Ok(())
         },
     )
@@ -319,7 +330,11 @@ fn test_list_time_entries() -> Result<()> {
 
 #[test]
 fn test_bulk_delete_time_entries() -> Result<()> {
-    let time_entry_ids = vec![123456, 789012, 345678];
+    let time_entry_ids = vec![
+        TimeEntryId(123456),
+        TimeEntryId(789012),
+        TimeEntryId(345678),
+    ];
 
     with_mockito(
         Method::DELETE,
@@ -327,7 +342,9 @@ fn test_bulk_delete_time_entries() -> Result<()> {
         200,
         None,
         |client| {
-            client.time_entries().bulk_delete(1234567, time_entry_ids)?;
+            client
+                .time_entries()
+                .bulk_delete(WorkspaceId(1234567), time_entry_ids)?;
             Ok(())
         },
     )

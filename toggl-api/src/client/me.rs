@@ -2,6 +2,7 @@ use super::TogglClient;
 use crate::models::api::client::Client;
 use crate::models::api::favorite::{CreateFavorite, Favorite, UpdateFavorite};
 use crate::models::api::features::{Features, Location, TrackReminder};
+use crate::models::api::ids::{FavoriteId, TimeEntryId, WorkspaceId};
 use crate::models::api::organization::Organization;
 use crate::models::api::preferences::*;
 use crate::models::api::project::Project;
@@ -272,7 +273,10 @@ impl MeClient {
 
     /// Get time entry constraints
     /// This endpoint is not documented but exists in the API spec
-    pub fn get_time_entry_constraints(&self, workspace_id: u64) -> Result<TimeEntryConstraints> {
+    pub fn get_time_entry_constraints(
+        &self,
+        workspace_id: WorkspaceId,
+    ) -> Result<TimeEntryConstraints> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/time_entry_constraints", workspace_id),
@@ -315,7 +319,7 @@ impl MeClient {
     }
 
     /// Get time entry by ID
-    pub fn get_time_entry(&self, time_entry_id: u64) -> Result<TimeEntry> {
+    pub fn get_time_entry(&self, time_entry_id: TimeEntryId) -> Result<TimeEntry> {
         self.client
             .request(Method::GET, &format!("me/time_entries/{}", time_entry_id))
     }
@@ -323,7 +327,7 @@ impl MeClient {
     /// Update time entry
     pub fn update_time_entry(
         &self,
-        time_entry_id: u64,
+        time_entry_id: TimeEntryId,
         time_entry: &UpdateTimeEntry,
     ) -> Result<TimeEntry> {
         self.client.request_with_body(
@@ -334,7 +338,7 @@ impl MeClient {
     }
 
     /// Delete time entry
-    pub fn delete_time_entry(&self, time_entry_id: u64) -> Result<()> {
+    pub fn delete_time_entry(&self, time_entry_id: TimeEntryId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("me/time_entries/{}", time_entry_id),
@@ -447,7 +451,11 @@ impl MeClient {
     }
 
     /// Update favorite
-    pub fn update_favorite(&self, favorite_id: u64, favorite: &UpdateFavorite) -> Result<Favorite> {
+    pub fn update_favorite(
+        &self,
+        favorite_id: FavoriteId,
+        favorite: &UpdateFavorite,
+    ) -> Result<Favorite> {
         self.client.request_with_body(
             Method::PUT,
             &format!("me/favorites/{}", favorite_id),
@@ -456,7 +464,7 @@ impl MeClient {
     }
 
     /// Delete favorite
-    pub fn delete_favorite(&self, favorite_id: u64) -> Result<()> {
+    pub fn delete_favorite(&self, favorite_id: FavoriteId) -> Result<()> {
         self.client
             .request_empty(Method::DELETE, &format!("me/favorites/{}", favorite_id))
     }

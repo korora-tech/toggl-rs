@@ -1,9 +1,10 @@
 use super::{ReportFilters, ReportTimeRange};
+use crate::models::api::ids::{ClientId, ProjectId, UserId, WorkspaceId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProfitabilityReportRequest {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     #[serde(flatten)]
     pub time_range: ReportTimeRange,
     #[serde(flatten)]
@@ -18,9 +19,9 @@ pub struct ProjectProfitabilityResponse {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProjectProfitability {
-    pub project_id: u64,
+    pub project_id: ProjectId,
     pub project_name: String,
-    pub client_id: Option<u64>,
+    pub client_id: Option<ClientId>,
     pub client_name: Option<String>,
     pub billable_seconds: u64,
     pub non_billable_seconds: u64,
@@ -41,7 +42,7 @@ pub struct EmployeeProfitabilityResponse {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmployeeProfitability {
-    pub user_id: u64,
+    pub user_id: UserId,
     pub user_name: String,
     pub billable_seconds: u64,
     pub non_billable_seconds: u64,

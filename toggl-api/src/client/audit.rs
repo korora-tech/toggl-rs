@@ -1,5 +1,6 @@
 use super::TogglClient;
 use crate::models::api::audit::AuditLog;
+use crate::models::api::ids::{OrganizationId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use std::collections::BTreeMap;
@@ -7,11 +8,11 @@ use toggl_core::Result;
 
 #[derive(Debug, Default)]
 pub struct AuditLogFilters {
-    pub workspace_id: Option<u64>,
+    pub workspace_id: Option<WorkspaceId>,
     pub entity_type: Option<String>,
     pub entity_id: Option<u64>,
     pub action: Option<String>,
-    pub user_id: Option<u64>,
+    pub user_id: Option<UserId>,
     pub page_size: Option<u64>,
     pub offset: Option<u64>,
 }
@@ -28,7 +29,7 @@ impl AuditClient {
     /// Get audit logs for an organization
     pub fn get_logs(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         from: DateTime<Utc>,
         to: DateTime<Utc>,
     ) -> Result<Vec<AuditLog>> {
@@ -44,7 +45,7 @@ impl AuditClient {
     /// Get audit logs with filters
     pub fn get_logs_with_filters(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         from: DateTime<Utc>,
         to: DateTime<Utc>,
         filters: &AuditLogFilters,
@@ -85,7 +86,7 @@ impl AuditClient {
     /// Export all audit logs without pagination
     pub fn export_logs(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         from: DateTime<Utc>,
         to: DateTime<Utc>,
     ) -> Result<Vec<AuditLog>> {
@@ -105,7 +106,7 @@ impl AuditClient {
     /// Get audit logs with pagination
     pub fn get_logs_paginated(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         from: DateTime<Utc>,
         to: DateTime<Utc>,
         page_size: u64,

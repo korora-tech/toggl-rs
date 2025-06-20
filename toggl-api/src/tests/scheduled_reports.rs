@@ -1,3 +1,4 @@
+use crate::models::api::ids::{BookmarkId, GroupId, ReportId, UserId, WorkspaceId};
 use crate::models::api::scheduled_reports::CreateScheduledReportPayload;
 use serde_json::json;
 use toggl_core::Result;
@@ -26,11 +27,13 @@ fn test_list_scheduled_reports() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let reports = client.scheduled_reports().list_scheduled_reports(111)?;
+            let reports = client
+                .scheduled_reports()
+                .list_scheduled_reports(WorkspaceId(111))?;
             assert_eq!(reports.len(), 1);
-            assert_eq!(reports[0].bookmark_id, Some(123));
+            assert_eq!(reports[0].bookmark_id, Some(BookmarkId(123)));
             assert_eq!(reports[0].frequency, Some(7));
-            assert_eq!(reports[0].workspace_id, Some(111));
+            assert_eq!(reports[0].workspace_id, Some(WorkspaceId(111)));
             Ok(())
         },
     )
@@ -39,10 +42,10 @@ fn test_list_scheduled_reports() -> Result<()> {
 #[test]
 fn test_create_scheduled_report() -> Result<()> {
     let request = CreateScheduledReportPayload {
-        bookmark_id: 123,
+        bookmark_id: BookmarkId(123),
         frequency: 7,
-        group_ids: Some(vec![789]),
-        user_ids: Some(vec![456, 457]),
+        group_ids: Some(vec![GroupId(789)]),
+        user_ids: Some(vec![UserId(456), UserId(457)]),
     };
 
     let response = json!({
@@ -64,10 +67,10 @@ fn test_create_scheduled_report() -> Result<()> {
         |client| {
             let report = client
                 .scheduled_reports()
-                .create_scheduled_report(111, request)?;
-            assert_eq!(report.bookmark_id, Some(123));
+                .create_scheduled_report(WorkspaceId(111), request)?;
+            assert_eq!(report.bookmark_id, Some(BookmarkId(123)));
             assert_eq!(report.frequency, Some(7));
-            assert_eq!(report.report_id, Some(999));
+            assert_eq!(report.report_id, Some(ReportId(999)));
             Ok(())
         },
     )
@@ -85,7 +88,7 @@ fn test_delete_scheduled_report() -> Result<()> {
         |client| {
             let result = client
                 .scheduled_reports()
-                .delete_scheduled_report(111, 999)?;
+                .delete_scheduled_report(WorkspaceId(111), 999)?;
             assert_eq!(result, "OK");
             Ok(())
         },

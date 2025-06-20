@@ -1,3 +1,4 @@
+use crate::models::api::ids::CountryId;
 use pretty_assertions::assert_eq;
 use reqwest::Method;
 use serde_json::json;
@@ -58,7 +59,7 @@ fn test_get_subdivisions() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let subdivisions = client.countries().get_subdivisions(1)?;
+            let subdivisions = client.countries().get_subdivisions(CountryId(1))?;
             assert_eq!(2, subdivisions.len());
             assert_eq!("California", subdivisions[0].name);
             assert_eq!("NY", subdivisions[1].code);

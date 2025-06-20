@@ -1,14 +1,15 @@
+use super::ids::{CreatorId, GoalId, ProjectId, TagId, TaskId, UserId, WorkspaceId};
 use serde::{Deserialize, Serialize};
 
 /// Workspace goal response from API
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkspaceGoal {
     #[serde(rename = "goal_id")]
-    pub id: i64,
+    pub id: GoalId,
     pub active: bool,
     pub billable: bool,
     pub comparison: String,
-    pub creator_user_id: i64,
+    pub creator_user_id: CreatorId,
     pub creator_user_name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_recurrence_end_date: Option<String>,
@@ -24,30 +25,30 @@ pub struct WorkspaceGoal {
     pub last_notified_at: Option<String>,
     pub name: String,
     pub permissions: Vec<String>,
-    pub project_ids: Vec<i64>,
+    pub project_ids: Vec<ProjectId>,
     pub recurrence: String,
     pub start_date: String,
     pub status: String,
     pub streak: i32,
-    pub tag_ids: Vec<i64>,
+    pub tag_ids: Vec<TagId>,
     pub tags: Vec<String>,
     pub target_seconds: i64,
-    pub task_ids: Vec<i64>,
+    pub task_ids: Vec<TaskId>,
     pub team_goal: bool,
-    pub user_id: i64,
+    pub user_id: UserId,
     pub user_name: String,
-    pub workspace_id: i64,
+    pub workspace_id: WorkspaceId,
 }
 
 /// Goal model for create/update responses
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Goal {
-    pub id: i64,
+    pub id: GoalId,
     pub active: bool,
     pub billable: bool,
     pub comparison: String,
     #[serde(rename = "creatorUserID")]
-    pub creator_user_id: i64,
+    pub creator_user_id: CreatorId,
     #[serde(rename = "creatorUserName")]
     pub creator_user_name: String,
     #[serde(
@@ -78,27 +79,27 @@ pub struct Goal {
     pub name: String,
     pub permissions: Vec<String>,
     #[serde(rename = "projectIDs")]
-    pub project_ids: Vec<i64>,
+    pub project_ids: Vec<ProjectId>,
     pub recurrence: String,
     #[serde(rename = "startDate")]
     pub start_date: String,
     pub status: String,
     pub streak: i32,
     #[serde(rename = "tagIDs")]
-    pub tag_ids: Vec<i64>,
+    pub tag_ids: Vec<TagId>,
     pub tags: Vec<String>,
     #[serde(rename = "targetSeconds")]
     pub target_seconds: i64,
     #[serde(rename = "taskIDs")]
-    pub task_ids: Vec<i64>,
+    pub task_ids: Vec<TaskId>,
     #[serde(rename = "teamGoal")]
     pub team_goal: bool,
     #[serde(rename = "userID")]
-    pub user_id: i64,
+    pub user_id: UserId,
     #[serde(rename = "userName")]
     pub user_name: String,
     #[serde(rename = "workspaceID")]
-    pub workspace_id: i64,
+    pub workspace_id: WorkspaceId,
 }
 
 /// Create goal request
@@ -109,13 +110,13 @@ pub struct CreateGoalRequest {
     pub end_date: String,
     pub icon: String,
     pub name: String,
-    pub project_ids: Vec<i64>,
+    pub project_ids: Vec<ProjectId>,
     pub recurrence: String,
     pub start_date: String,
-    pub tag_ids: Vec<i64>,
+    pub tag_ids: Vec<TagId>,
     pub target_seconds: i64,
-    pub task_ids: Vec<i64>,
-    pub user_id: i64,
+    pub task_ids: Vec<TaskId>,
+    pub user_id: UserId,
 }
 
 /// Update goal request

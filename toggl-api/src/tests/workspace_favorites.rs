@@ -1,4 +1,5 @@
 use crate::models::api::favorite::{CreateFavorite, UpdateFavorite};
+use crate::models::api::ids::{FavoriteId, ProjectId, WorkspaceId};
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
@@ -29,14 +30,16 @@ fn test_get_workspace_favorites() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let favorites = client.workspaces().get_favorites(12345, None)?;
+            let favorites = client
+                .workspaces()
+                .get_favorites(WorkspaceId(12345), None)?;
             assert_eq!(favorites.len(), 1);
-            assert_eq!(favorites[0].id, 1);
+            assert_eq!(favorites[0].id, FavoriteId(1));
             assert_eq!(
                 favorites[0].description,
                 Some("Writing reports".to_string())
             );
-            assert_eq!(favorites[0].project_id, Some(111));
+            assert_eq!(favorites[0].project_id, Some(ProjectId(111)));
             Ok(())
         },
     )
@@ -52,7 +55,9 @@ fn test_get_workspace_favorites_with_since() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let favorites = client.workspaces().get_favorites(12345, Some(1704067200))?;
+            let favorites = client
+                .workspaces()
+                .get_favorites(WorkspaceId(12345), Some(1704067200))?;
             assert_eq!(favorites.len(), 0);
             Ok(())
         },
@@ -83,15 +88,17 @@ fn test_create_workspace_favorite() -> Result<()> {
         Some(response),
         |client| {
             let new_favorite = CreateFavorite {
-                workspace_id: 12345,
+                workspace_id: WorkspaceId(12345),
                 description: Some("New favorite".to_string()),
-                project_id: Some(111),
+                project_id: Some(ProjectId(111)),
                 task_id: None,
                 tag_ids: None,
                 billable: Some(false),
             };
-            let favorite = client.workspaces().create_favorite(12345, &new_favorite)?;
-            assert_eq!(favorite.id, 1);
+            let favorite = client
+                .workspaces()
+                .create_favorite(WorkspaceId(12345), &new_favorite)?;
+            assert_eq!(favorite.id, FavoriteId(1));
             assert_eq!(favorite.description, Some("New favorite".to_string()));
             Ok(())
         },
@@ -125,12 +132,14 @@ fn test_update_workspace_favorites() -> Result<()> {
         |client| {
             let updates = vec![UpdateFavorite {
                 description: Some("Updated favorite".to_string()),
-                project_id: Some(111),
+                project_id: Some(ProjectId(111)),
                 task_id: None,
                 tag_ids: None,
                 billable: Some(true),
             }];
-            let favorites = client.workspaces().update_favorites(12345, &updates)?;
+            let favorites = client
+                .workspaces()
+                .update_favorites(WorkspaceId(12345), &updates)?;
             assert_eq!(favorites.len(), 1);
             assert_eq!(
                 favorites[0].description,
@@ -150,7 +159,9 @@ fn test_delete_workspace_favorite() -> Result<()> {
         200,
         None,
         |client| {
-            client.workspaces().delete_favorite(12345, 1)?;
+            client
+                .workspaces()
+                .delete_favorite(WorkspaceId(12345), FavoriteId(1))?;
             Ok(())
         },
     )
@@ -181,7 +192,9 @@ fn test_get_workspace_favorite_suggestions() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let suggestions = client.workspaces().get_favorite_suggestions(12345)?;
+            let suggestions = client
+                .workspaces()
+                .get_favorite_suggestions(WorkspaceId(12345))?;
             assert_eq!(suggestions.len(), 1);
             assert!(suggestions[0].suggestion);
             assert_eq!(

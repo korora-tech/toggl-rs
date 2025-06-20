@@ -1,10 +1,11 @@
 use super::{Pagination, ReportFilters, ReportTimeRange, ReportTotals};
+use crate::models::api::ids::{ClientId, ProjectId, TaskId, TimeEntryId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DetailedReportRequest {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     #[serde(flatten)]
     pub time_range: ReportTimeRange,
     #[serde(flatten)]
@@ -26,15 +27,15 @@ pub struct DetailedReportResponse {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DetailedReportItem {
-    pub id: u64,
-    pub user_id: u64,
+    pub id: TimeEntryId,
+    pub user_id: UserId,
     pub user_name: String,
-    pub project_id: Option<u64>,
+    pub project_id: Option<ProjectId>,
     pub project_name: Option<String>,
     pub project_color: Option<String>,
-    pub client_id: Option<u64>,
+    pub client_id: Option<ClientId>,
     pub client_name: Option<String>,
-    pub task_id: Option<u64>,
+    pub task_id: Option<TaskId>,
     pub task_name: Option<String>,
     pub description: Option<String>,
     pub tags: Option<Vec<String>>,

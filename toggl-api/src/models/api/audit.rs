@@ -1,11 +1,13 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use super::ids::{AuditId, UserId};
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuditLog {
-    pub id: String,
+    pub id: AuditId,
     pub timestamp: DateTime<Utc>,
-    pub user_id: u64,
+    pub user_id: UserId,
     pub event_type: String,
     pub details: serde_json::Value,
 }

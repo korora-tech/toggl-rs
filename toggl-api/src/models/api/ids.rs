@@ -123,3 +123,53 @@ define_string_id!(ApiKeyId, "API key identifier");
 define_string_id!(ExportId, "Export identifier");
 define_string_id!(InvoiceId, "Invoice identifier");
 define_string_id!(SamlConfigurationId, "SAML configuration identifier");
+
+// Additional ID types for complete type safety
+define_id!(
+    TimeEntryInvitationId,
+    u64,
+    "Time entry invitation identifier"
+);
+define_id!(CompanyId, u64, "Company identifier");
+define_id!(CustomerId, u64, "Customer identifier");
+define_id!(ContactDetailId, u64, "Contact detail identifier");
+define_id!(CountrySubdivisionId, u32, "Country subdivision identifier");
+define_id!(SubscriptionPeriodId, u64, "Subscription period identifier");
+define_id!(BookmarkId, u64, "Bookmark identifier");
+define_id!(ReportId, u64, "Report identifier");
+define_id!(FavoriteId, u64, "Favorite identifier");
+define_id!(IntegrationId, u64, "Integration identifier");
+define_id!(ExpenseId, u64, "Expense identifier");
+define_id!(ReminderId, u64, "Reminder identifier");
+define_id!(SetupId, u64, "Timesheet setup identifier");
+define_id!(LevelId, u64, "Level identifier");
+define_id!(CategoryId, u64, "Category identifier");
+define_id!(ProjectUserId, u64, "Project user association identifier");
+define_id!(
+    WorkspaceUserId,
+    u64,
+    "Workspace user association identifier"
+);
+define_id!(TransferId, u64, "Ownership transfer identifier");
+define_id!(InvoiceLineItemId, u64, "Invoice line item identifier");
+define_id!(ScheduledReportId, u64, "Scheduled report identifier");
+define_id!(WebhookId, u64, "Webhook identifier");
+define_id!(RateId, u64, "Rate identifier");
+define_id!(SsoProfileId, u64, "SSO profile identifier");
+define_id!(FeatureId, u32, "Feature identifier");
+define_id!(ProductId, u32, "Product identifier");
+define_id!(PaymentMethodId, u64, "Payment method identifier");
+define_id!(RoleId, u64, "Role identifier");
+
+// Define string-based audit ID
+define_string_id!(AuditId, "Audit log entry identifier");
+
+// Additional association IDs
+define_id!(ProjectGroupId, u64, "Project-group association identifier");
+define_id!(InvoiceItemId, u64, "Invoice item identifier");
+define_id!(InvitationItemId, u64, "Invitation item identifier");
+define_id!(PaymentRecordId, u64, "Payment record identifier");
+define_id!(InvoiceInfoId, u64, "Invoice info identifier");
+
+// Define string-based currency code type
+define_string_id!(CurrencyCode, "Currency code identifier (e.g., USD, EUR)");

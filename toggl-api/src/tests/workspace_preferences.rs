@@ -1,3 +1,4 @@
+use crate::models::api::ids::WorkspaceId;
 use crate::models::api::preferences::WorkspacePreferences;
 use serde_json::json;
 use toggl_core::Result;
@@ -17,7 +18,7 @@ fn test_get_workspace_preferences() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let logo = client.workspaces().get_preferences(123)?;
+            let logo = client.workspaces().get_preferences(WorkspaceId(123))?;
             assert_eq!(logo.logo, "https://example.com/workspace-logo.png");
             Ok(())
         },
@@ -49,7 +50,9 @@ fn test_update_workspace_preferences() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let logo = client.workspaces().update_preferences(123, &preferences)?;
+            let logo = client
+                .workspaces()
+                .update_preferences(WorkspaceId(123), &preferences)?;
             assert_eq!(logo.logo, "https://example.com/updated-logo.png");
             Ok(())
         },

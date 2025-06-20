@@ -1,11 +1,12 @@
+use super::ids::{GroupId, OrganizationId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Group {
-    pub id: u64,
-    pub workspace_id: u64,
-    pub organization_id: Option<u64>,
+    pub id: GroupId,
+    pub workspace_id: WorkspaceId,
+    pub organization_id: Option<OrganizationId>,
     pub name: String,
     pub at: DateTime<Utc>,
     pub permissions: Option<Vec<String>>,
@@ -13,7 +14,7 @@ pub struct Group {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateGroup {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     pub name: String,
 }
 
@@ -25,25 +26,25 @@ pub struct UpdateGroup {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GroupUser {
     pub id: u64,
-    pub group_id: u64,
-    pub user_id: u64,
-    pub workspace_id: u64,
+    pub group_id: GroupId,
+    pub user_id: UserId,
+    pub workspace_id: WorkspaceId,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PatchGroupUsersInput {
-    pub add: Option<Vec<u64>>,
-    pub remove: Option<Vec<u64>>,
+    pub add: Option<Vec<UserId>>,
+    pub remove: Option<Vec<UserId>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PatchGroupUsersOutput {
-    pub success: Vec<u64>,
+    pub success: Vec<UserId>,
     pub failure: Vec<PatchFailure>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PatchFailure {
-    pub id: u64,
+    pub id: UserId,
     pub message: String,
 }

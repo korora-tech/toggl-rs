@@ -1,11 +1,14 @@
+use super::ids::{
+    ClientId, GroupId, ProjectGroupId, ProjectId, ProjectUserId, UserId, WorkspaceId,
+};
 use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Project {
-    pub id: u64,
-    pub workspace_id: u64,
-    pub client_id: Option<u64>,
+    pub id: ProjectId,
+    pub workspace_id: WorkspaceId,
+    pub client_id: Option<ClientId>,
     pub name: String,
     pub is_private: bool,
     pub active: bool,
@@ -33,10 +36,10 @@ pub struct Project {
     pub permissions: Option<Vec<String>>,
 
     #[deprecated(note = "Use workspace_id instead")]
-    pub wid: Option<u64>,
+    pub wid: Option<WorkspaceId>,
 
     #[deprecated(note = "Use client_id instead")]
-    pub cid: Option<u64>,
+    pub cid: Option<ClientId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -57,9 +60,9 @@ pub struct CurrentPeriod {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateProject {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     pub name: String,
-    pub client_id: Option<u64>,
+    pub client_id: Option<ClientId>,
     pub is_private: Option<bool>,
     pub active: Option<bool>,
     pub color: Option<String>,
@@ -79,7 +82,7 @@ pub struct CreateProject {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UpdateProject {
     pub name: Option<String>,
-    pub client_id: Option<u64>,
+    pub client_id: Option<ClientId>,
     pub is_private: Option<bool>,
     pub active: Option<bool>,
     pub color: Option<String>,
@@ -98,24 +101,24 @@ pub struct UpdateProject {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProjectUser {
-    pub id: u64,
-    pub project_id: u64,
-    pub user_id: u64,
-    pub workspace_id: u64,
+    pub id: ProjectUserId,
+    pub project_id: ProjectId,
+    pub user_id: UserId,
+    pub workspace_id: WorkspaceId,
     pub manager: bool,
     pub rate: Option<f64>,
     pub rate_last_updated: Option<DateTime<Utc>>,
     pub labour_cost: Option<f64>,
     pub at: DateTime<Utc>,
-    pub group_ids: Option<Vec<u64>>,
+    pub group_ids: Option<Vec<GroupId>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProjectGroup {
-    pub id: u64,
-    pub group_id: u64,
-    pub project_id: u64,
-    pub workspace_id: u64,
+    pub id: ProjectGroupId,
+    pub group_id: GroupId,
+    pub project_id: ProjectId,
+    pub workspace_id: WorkspaceId,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -140,13 +143,13 @@ pub struct PatchOperation {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProjectIds {
-    pub project_ids: Vec<u64>,
+    pub project_ids: Vec<ProjectId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateProjectUser {
-    pub project_id: u64,
-    pub user_id: u64,
+    pub project_id: ProjectId,
+    pub user_id: UserId,
     pub manager: Option<bool>,
     pub rate: Option<f64>,
     pub labour_cost: Option<f64>,
@@ -161,13 +164,13 @@ pub struct UpdateProjectUser {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProjectGroupPayload {
-    pub project_id: u64,
-    pub group_id: u64,
+    pub project_id: ProjectId,
+    pub group_id: GroupId,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProjectTemplate {
-    pub id: u64,
+    pub id: ProjectId,
     pub name: String,
     pub active: bool,
     pub billable: Option<bool>,

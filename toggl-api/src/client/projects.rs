@@ -1,4 +1,5 @@
 use super::TogglClient;
+use crate::models::api::ids::{GroupId, ProjectId, ProjectUserId, TaskId, WorkspaceId};
 use crate::models::api::project::*;
 use crate::models::api::task::Task;
 use reqwest::Method;
@@ -15,7 +16,7 @@ impl ProjectsClient {
     }
 
     /// Get project
-    pub fn get(&self, workspace_id: u64, project_id: u64) -> Result<Project> {
+    pub fn get(&self, workspace_id: WorkspaceId, project_id: ProjectId) -> Result<Project> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/projects/{}", workspace_id, project_id),
@@ -23,7 +24,7 @@ impl ProjectsClient {
     }
 
     /// Create project
-    pub fn create(&self, workspace_id: u64, project: &CreateProject) -> Result<Project> {
+    pub fn create(&self, workspace_id: WorkspaceId, project: &CreateProject) -> Result<Project> {
         self.client.request_with_body(
             Method::POST,
             &format!("workspaces/{}/projects", workspace_id),
@@ -34,8 +35,8 @@ impl ProjectsClient {
     /// Update project
     pub fn update(
         &self,
-        workspace_id: u64,
-        project_id: u64,
+        workspace_id: WorkspaceId,
+        project_id: ProjectId,
         project: &UpdateProject,
     ) -> Result<Project> {
         self.client.request_with_body(
@@ -46,7 +47,7 @@ impl ProjectsClient {
     }
 
     /// Delete project
-    pub fn delete(&self, workspace_id: u64, project_id: u64) -> Result<()> {
+    pub fn delete(&self, workspace_id: WorkspaceId, project_id: ProjectId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/projects/{}", workspace_id, project_id),
@@ -54,7 +55,11 @@ impl ProjectsClient {
     }
 
     /// Get project users
-    pub fn get_users(&self, workspace_id: u64, project_id: u64) -> Result<Vec<ProjectUser>> {
+    pub fn get_users(
+        &self,
+        workspace_id: WorkspaceId,
+        project_id: ProjectId,
+    ) -> Result<Vec<ProjectUser>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/projects/{}/users", workspace_id, project_id),
@@ -62,7 +67,11 @@ impl ProjectsClient {
     }
 
     /// Get project statistics
-    pub fn get_statistics(&self, workspace_id: u64, project_id: u64) -> Result<ProjectStatistics> {
+    pub fn get_statistics(
+        &self,
+        workspace_id: WorkspaceId,
+        project_id: ProjectId,
+    ) -> Result<ProjectStatistics> {
         self.client.request(
             Method::GET,
             &format!(
@@ -73,7 +82,7 @@ impl ProjectsClient {
     }
 
     /// Get project tasks
-    pub fn get_tasks(&self, workspace_id: u64, project_id: u64) -> Result<Vec<Task>> {
+    pub fn get_tasks(&self, workspace_id: WorkspaceId, project_id: ProjectId) -> Result<Vec<Task>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/projects/{}/tasks", workspace_id, project_id),
@@ -83,8 +92,8 @@ impl ProjectsClient {
     /// Create project task
     pub fn create_task(
         &self,
-        workspace_id: u64,
-        project_id: u64,
+        workspace_id: WorkspaceId,
+        project_id: ProjectId,
         name: &str,
         active: bool,
     ) -> Result<Task> {
@@ -103,9 +112,9 @@ impl ProjectsClient {
     /// Update project task
     pub fn update_task(
         &self,
-        workspace_id: u64,
-        project_id: u64,
-        task_id: u64,
+        workspace_id: WorkspaceId,
+        project_id: ProjectId,
+        task_id: TaskId,
         name: &str,
         active: bool,
     ) -> Result<Task> {
@@ -124,7 +133,12 @@ impl ProjectsClient {
     }
 
     /// Delete project task
-    pub fn delete_task(&self, workspace_id: u64, project_id: u64, task_id: u64) -> Result<()> {
+    pub fn delete_task(
+        &self,
+        workspace_id: WorkspaceId,
+        project_id: ProjectId,
+        task_id: TaskId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!(
@@ -139,8 +153,8 @@ impl ProjectsClient {
     /// Bulk edit projects
     pub fn bulk_edit(
         &self,
-        workspace_id: u64,
-        project_ids: &[u64],
+        workspace_id: WorkspaceId,
+        project_ids: &[ProjectId],
         operations: &[PatchOperation],
     ) -> Result<Vec<Project>> {
         let ids = project_ids
@@ -159,8 +173,8 @@ impl ProjectsClient {
     /// Get project periods
     pub fn get_periods(
         &self,
-        workspace_id: u64,
-        project_id: u64,
+        workspace_id: WorkspaceId,
+        project_id: ProjectId,
         start_date: Option<&str>,
         end_date: Option<&str>,
     ) -> Result<Vec<ProjectPeriod>> {
@@ -183,7 +197,7 @@ impl ProjectsClient {
     }
 
     /// Pin project
-    pub fn pin(&self, workspace_id: u64, project_id: u64) -> Result<()> {
+    pub fn pin(&self, workspace_id: WorkspaceId, project_id: ProjectId) -> Result<()> {
         self.client.request_empty(
             Method::POST,
             &format!("workspaces/{}/projects/{}/pin", workspace_id, project_id),
@@ -191,7 +205,7 @@ impl ProjectsClient {
     }
 
     /// Unpin project
-    pub fn unpin(&self, workspace_id: u64, project_id: u64) -> Result<()> {
+    pub fn unpin(&self, workspace_id: WorkspaceId, project_id: ProjectId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/projects/{}/pin", workspace_id, project_id),
@@ -201,9 +215,9 @@ impl ProjectsClient {
     /// Bulk edit tasks
     pub fn bulk_edit_tasks(
         &self,
-        workspace_id: u64,
-        project_id: u64,
-        task_ids: &[u64],
+        workspace_id: WorkspaceId,
+        project_id: ProjectId,
+        task_ids: &[TaskId],
         operations: &[PatchOperation],
     ) -> Result<Vec<Task>> {
         let ids = task_ids
@@ -225,8 +239,8 @@ impl ProjectsClient {
     /// Get billable amounts for projects
     pub fn get_billable_amounts(
         &self,
-        workspace_id: u64,
-        project_ids: &[u64],
+        workspace_id: WorkspaceId,
+        project_ids: &[ProjectId],
     ) -> Result<Vec<Project>> {
         let payload = ProjectIds {
             project_ids: project_ids.to_vec(),
@@ -240,7 +254,7 @@ impl ProjectsClient {
     }
 
     /// Get project task count
-    pub fn get_task_count(&self, workspace_id: u64) -> Result<serde_json::Value> {
+    pub fn get_task_count(&self, workspace_id: WorkspaceId) -> Result<serde_json::Value> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/projects/task_count", workspace_id),
@@ -248,7 +262,7 @@ impl ProjectsClient {
     }
 
     /// Get project templates
-    pub fn get_templates(&self, workspace_id: u64) -> Result<Vec<ProjectTemplate>> {
+    pub fn get_templates(&self, workspace_id: WorkspaceId) -> Result<Vec<ProjectTemplate>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/projects/templates", workspace_id),
@@ -256,7 +270,7 @@ impl ProjectsClient {
     }
 
     /// Get project user count
-    pub fn get_user_count(&self, workspace_id: u64) -> Result<serde_json::Value> {
+    pub fn get_user_count(&self, workspace_id: WorkspaceId) -> Result<serde_json::Value> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/projects/user_count", workspace_id),
@@ -266,7 +280,7 @@ impl ProjectsClient {
     // Project Groups
 
     /// Get project groups
-    pub fn get_groups(&self, workspace_id: u64) -> Result<Vec<ProjectGroup>> {
+    pub fn get_groups(&self, workspace_id: WorkspaceId) -> Result<Vec<ProjectGroup>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/project_groups", workspace_id),
@@ -276,7 +290,7 @@ impl ProjectsClient {
     /// Create project group
     pub fn create_group(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         payload: &ProjectGroupPayload,
     ) -> Result<ProjectGroup> {
         self.client.request_with_body(
@@ -287,7 +301,7 @@ impl ProjectsClient {
     }
 
     /// Delete project group
-    pub fn delete_group(&self, workspace_id: u64, project_group_id: u64) -> Result<()> {
+    pub fn delete_group(&self, workspace_id: WorkspaceId, project_group_id: GroupId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!(
@@ -300,7 +314,7 @@ impl ProjectsClient {
     // Project Users
 
     /// List project users
-    pub fn list_project_users(&self, workspace_id: u64) -> Result<Vec<ProjectUser>> {
+    pub fn list_project_users(&self, workspace_id: WorkspaceId) -> Result<Vec<ProjectUser>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/project_users", workspace_id),
@@ -310,7 +324,7 @@ impl ProjectsClient {
     /// List project users paginated
     pub fn list_project_users_paginated(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         page: Option<u32>,
         per_page: Option<u32>,
         sort_field: Option<&str>,
@@ -340,7 +354,7 @@ impl ProjectsClient {
     /// Create project user
     pub fn create_project_user(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         project_user: &CreateProjectUser,
     ) -> Result<ProjectUser> {
         self.client.request_with_body(
@@ -353,8 +367,8 @@ impl ProjectsClient {
     /// Bulk edit project users
     pub fn bulk_edit_project_users(
         &self,
-        workspace_id: u64,
-        project_user_ids: &[u64],
+        workspace_id: WorkspaceId,
+        project_user_ids: &[ProjectUserId],
         operations: &[PatchOperation],
     ) -> Result<Vec<ProjectUser>> {
         let ids = project_user_ids
@@ -373,8 +387,8 @@ impl ProjectsClient {
     /// Update project user
     pub fn update_project_user(
         &self,
-        workspace_id: u64,
-        project_user_id: u64,
+        workspace_id: WorkspaceId,
+        project_user_id: ProjectUserId,
         update: &UpdateProjectUser,
     ) -> Result<ProjectUser> {
         self.client.request_with_body(
@@ -388,7 +402,11 @@ impl ProjectsClient {
     }
 
     /// Delete project user
-    pub fn delete_project_user(&self, workspace_id: u64, project_user_id: u64) -> Result<()> {
+    pub fn delete_project_user(
+        &self,
+        workspace_id: WorkspaceId,
+        project_user_id: ProjectUserId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!(

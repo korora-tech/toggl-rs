@@ -1,11 +1,13 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use super::ids::{FeatureId, PaymentMethodId, PricingPlanId, ProductId};
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Plan {
-    pub id: u32,
+    pub id: PricingPlanId,
     pub name: String,
-    pub pricing_plan_id: u32,
+    pub pricing_plan_id: PricingPlanId,
     pub monthly_price_in_cents: u64,
     pub yearly_price_in_cents: u64,
     pub max_workspaces: u32,
@@ -14,15 +16,15 @@ pub struct Plan {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PlanFeature {
-    pub feature_id: u32,
+    pub feature_id: FeatureId,
     pub name: String,
-    pub plan_id: u32,
+    pub plan_id: PricingPlanId,
     pub enabled: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct FancyPlan {
-    pub product_id: u32,
+    pub product_id: ProductId,
     pub name: String,
     pub localized_name: Option<String>,
     pub actual_price: f64,
@@ -55,7 +57,7 @@ pub struct PricingPlans {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PaymentMethod {
-    pub id: u64,
+    pub id: PaymentMethodId,
     pub type_: String,
     pub card: Option<PaymentCard>,
     pub sepa_debit: Option<SEPADebit>,

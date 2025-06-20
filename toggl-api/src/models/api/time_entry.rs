@@ -1,19 +1,20 @@
+use super::ids::{ProjectId, TagId, TaskId, TimeEntryId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TimeEntry {
-    pub id: u64,
-    pub workspace_id: u64,
-    pub user_id: u64,
+    pub id: TimeEntryId,
+    pub workspace_id: WorkspaceId,
+    pub user_id: UserId,
     pub billable: bool,
     pub start: DateTime<Utc>,
     pub stop: Option<DateTime<Utc>>,
     pub duration: i64,
     pub description: Option<String>,
-    pub project_id: Option<u64>,
-    pub task_id: Option<u64>,
-    pub tag_ids: Option<Vec<u64>>,
+    pub project_id: Option<ProjectId>,
+    pub task_id: Option<TaskId>,
+    pub tag_ids: Option<Vec<TagId>>,
     pub tags: Option<Vec<String>>,
     pub at: DateTime<Utc>,
 
@@ -55,37 +56,37 @@ pub struct TimeEntry {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[deprecated(note = "Use workspace_id instead")]
-    pub wid: Option<u64>,
+    pub wid: Option<WorkspaceId>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[deprecated(note = "Use project_id instead")]
-    pub pid: Option<u64>,
+    pub pid: Option<ProjectId>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[deprecated(note = "Use task_id instead")]
-    pub tid: Option<u64>,
+    pub tid: Option<TaskId>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[deprecated(note = "Use user_id instead")]
-    pub uid: Option<u64>,
+    pub uid: Option<UserId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TimeEntrySharedWith {
     pub accepted: bool,
-    pub user_id: u64,
+    pub user_id: UserId,
     pub user_name: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateTimeEntry {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     pub start: DateTime<Utc>,
     pub duration: i64,
     pub description: Option<String>,
-    pub project_id: Option<u64>,
-    pub task_id: Option<u64>,
-    pub tag_ids: Option<Vec<u64>>,
+    pub project_id: Option<ProjectId>,
+    pub task_id: Option<TaskId>,
+    pub tag_ids: Option<Vec<TagId>>,
     pub billable: Option<bool>,
     pub created_with: String,
 }
@@ -93,9 +94,9 @@ pub struct CreateTimeEntry {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UpdateTimeEntry {
     pub description: Option<String>,
-    pub project_id: Option<u64>,
-    pub task_id: Option<u64>,
-    pub tag_ids: Option<Vec<u64>>,
+    pub project_id: Option<ProjectId>,
+    pub task_id: Option<TaskId>,
+    pub tag_ids: Option<Vec<TagId>>,
     pub billable: Option<bool>,
     pub start: Option<DateTime<Utc>>,
     pub stop: Option<DateTime<Utc>>,
@@ -104,7 +105,7 @@ pub struct UpdateTimeEntry {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BulkEditTimeEntries {
-    pub time_entry_ids: Vec<u64>,
+    pub time_entry_ids: Vec<TimeEntryId>,
     pub op: BulkEditOperation,
     pub path: String,
     pub value: Option<serde_json::Value>,
@@ -128,12 +129,12 @@ pub struct TimeEntryChecklist {
 pub struct TimeEntryChecklistError {
     pub code: String,
     pub message: String,
-    pub time_entry_ids: Vec<u64>,
+    pub time_entry_ids: Vec<TimeEntryId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TimeEntryChecklistWarning {
     pub code: String,
     pub message: String,
-    pub time_entry_ids: Vec<u64>,
+    pub time_entry_ids: Vec<TimeEntryId>,
 }

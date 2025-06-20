@@ -1,3 +1,4 @@
+use crate::models::api::ids::WorkspaceId;
 use crate::models::api::preferences::TimeEntryConstraints;
 use crate::tests::*;
 use reqwest::Method;
@@ -6,7 +7,7 @@ use toggl_core::Result;
 
 #[test]
 fn test_get_time_entry_constraints() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!({
         "description_required": true,
@@ -37,7 +38,7 @@ fn test_get_time_entry_constraints() -> Result<()> {
 
 #[test]
 fn test_create_time_entry_constraints() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let constraints = TimeEntryConstraints {
         description_required: true,
@@ -76,7 +77,7 @@ fn test_create_time_entry_constraints() -> Result<()> {
 
 #[test]
 fn test_update_time_entry_constraints() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let constraints = TimeEntryConstraints {
         description_required: false,
@@ -115,7 +116,7 @@ fn test_update_time_entry_constraints() -> Result<()> {
 
 #[test]
 fn test_update_time_entry_constraints_disabled() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let constraints = TimeEntryConstraints {
         description_required: false,

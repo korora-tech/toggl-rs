@@ -1,4 +1,5 @@
 use crate::models::api::goals::{CreateGoalRequest, UpdateGoalRequest, WorkspaceGoalsQuery};
+use crate::models::api::ids::{GoalId, TagId, UserId, WorkspaceId};
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
@@ -40,7 +41,7 @@ fn test_get_workspace_goals() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let goals = client.workspaces().get_goals(987654, None)?;
+            let goals = client.workspaces().get_goals(WorkspaceId(987654), None)?;
             assert_eq!(goals.len(), 1);
             assert_eq!(goals[0].name, "Daily coding goal");
             assert_eq!(goals[0].target_seconds, 28800);
@@ -90,7 +91,9 @@ fn test_get_workspace_goals_with_query() -> Result<()> {
                 active: Some(true),
                 ..Default::default()
             };
-            let goals = client.workspaces().get_goals(987654, Some(&query))?;
+            let goals = client
+                .workspaces()
+                .get_goals(WorkspaceId(987654), Some(&query))?;
             assert_eq!(goals.len(), 1);
             assert_eq!(goals[0].name, "Team billable hours");
             assert!(goals[0].team_goal);
@@ -142,14 +145,16 @@ fn test_create_workspace_goal() -> Result<()> {
                 project_ids: vec![],
                 recurrence: "daily".to_string(),
                 start_date: "2024-01-01".to_string(),
-                tag_ids: vec![123],
+                tag_ids: vec![TagId(123)],
                 target_seconds: 7200,
                 task_ids: vec![],
-                user_id: 123456,
+                user_id: UserId(123456),
             };
 
-            let created = client.workspaces().create_goal(987654, &goal)?;
-            assert_eq!(created.id, 3);
+            let created = client
+                .workspaces()
+                .create_goal(WorkspaceId(987654), &goal)?;
+            assert_eq!(created.id, GoalId(3));
             assert_eq!(created.name, "Study time");
             assert_eq!(created.target_seconds, 7200);
             Ok(())
@@ -191,8 +196,10 @@ fn test_get_workspace_goal() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let goal = client.workspaces().get_goal(987654, 4)?;
-            assert_eq!(goal.id, 4);
+            let goal = client
+                .workspaces()
+                .get_goal(WorkspaceId(987654), GoalId(4))?;
+            assert_eq!(goal.id, GoalId(4));
             assert_eq!(goal.name, "Q2 Revenue Goal");
             assert!(goal.team_goal);
             Ok(())
@@ -244,8 +251,11 @@ fn test_update_workspace_goal() -> Result<()> {
                 target_seconds: 14400,
             };
 
-            let updated = client.workspaces().update_goal(987654, 5, &update)?;
-            assert_eq!(updated.id, 5);
+            let updated =
+                client
+                    .workspaces()
+                    .update_goal(WorkspaceId(987654), GoalId(5), &update)?;
+            assert_eq!(updated.id, GoalId(5));
             assert_eq!(updated.name, "Completed Goal");
             assert!(!updated.active);
             Ok(())
@@ -261,7 +271,9 @@ fn test_delete_workspace_goal() -> Result<()> {
         204,
         None,
         |client| {
-            client.workspaces().delete_goal(987654, 6)?;
+            client
+                .workspaces()
+                .delete_goal(WorkspaceId(987654), GoalId(6))?;
             Ok(())
         },
     )

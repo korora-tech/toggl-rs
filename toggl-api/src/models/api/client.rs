@@ -1,10 +1,11 @@
+use super::ids::{ClientId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Client {
-    pub id: u64,
-    pub workspace_id: u64,
+    pub id: ClientId,
+    pub workspace_id: WorkspaceId,
     pub name: String,
     pub archived: bool,
     pub at: DateTime<Utc>,
@@ -17,7 +18,7 @@ pub struct Client {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateClient {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     pub name: String,
 }
 
@@ -29,11 +30,11 @@ pub struct UpdateClient {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BulkArchiveClients {
-    pub client_ids: Vec<u64>,
+    pub client_ids: Vec<ClientId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ArchiveClientsResponse {
-    pub client_ids: Option<Vec<u64>>,
+    pub client_ids: Option<Vec<ClientId>>,
     pub project_ids: Option<Vec<u64>>,
 }

@@ -2,6 +2,7 @@ use super::TogglClient;
 use crate::models::api::goals::{
     CreateGoalRequest, Goal, UpdateGoalRequest, WorkspaceGoal, WorkspaceGoalsQuery,
 };
+use crate::models::api::ids::{GoalId, WorkspaceId};
 use std::collections::BTreeMap;
 use toggl_core::Result;
 
@@ -16,10 +17,10 @@ impl GoalsClient {
     /// Get workspace goals
     pub fn get_workspace_goals(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         query: Option<WorkspaceGoalsQuery>,
     ) -> Result<Vec<WorkspaceGoal>> {
-        let url = format!("/workspaces/{}/goals", workspace_id);
+        let url = format!("/workspaces/{}/goals", workspace_id.value());
         let mut params = BTreeMap::new();
 
         if let Some(q) = query {
@@ -43,33 +44,49 @@ impl GoalsClient {
     /// Create a workspace goal
     pub fn create_workspace_goal(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         goal: CreateGoalRequest,
     ) -> Result<Goal> {
-        let url = format!("/workspaces/{}/goals", workspace_id);
+        let url = format!("/workspaces/{}/goals", workspace_id.value());
         self.client.post(&url, &goal)
     }
 
     /// Get a specific workspace goal
-    pub fn get_workspace_goal(&self, workspace_id: u64, goal_id: u64) -> Result<WorkspaceGoal> {
-        let url = format!("/workspaces/{}/goals/{}", workspace_id, goal_id);
+    pub fn get_workspace_goal(
+        &self,
+        workspace_id: WorkspaceId,
+        goal_id: GoalId,
+    ) -> Result<WorkspaceGoal> {
+        let url = format!(
+            "/workspaces/{}/goals/{}",
+            workspace_id.value(),
+            goal_id.value()
+        );
         self.client.get(&url, &BTreeMap::new())
     }
 
     /// Update a workspace goal
     pub fn update_workspace_goal(
         &self,
-        workspace_id: u64,
-        goal_id: u64,
+        workspace_id: WorkspaceId,
+        goal_id: GoalId,
         goal: UpdateGoalRequest,
     ) -> Result<Goal> {
-        let url = format!("/workspaces/{}/goals/{}", workspace_id, goal_id);
+        let url = format!(
+            "/workspaces/{}/goals/{}",
+            workspace_id.value(),
+            goal_id.value()
+        );
         self.client.put(&url, &goal)
     }
 
     /// Delete a workspace goal
-    pub fn delete_workspace_goal(&self, workspace_id: u64, goal_id: u64) -> Result<()> {
-        let url = format!("/workspaces/{}/goals/{}", workspace_id, goal_id);
+    pub fn delete_workspace_goal(&self, workspace_id: WorkspaceId, goal_id: GoalId) -> Result<()> {
+        let url = format!(
+            "/workspaces/{}/goals/{}",
+            workspace_id.value(),
+            goal_id.value()
+        );
         self.client.delete_empty(&url)
     }
 }

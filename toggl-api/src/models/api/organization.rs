@@ -1,11 +1,16 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use super::ids::{
+    GroupId, OrganizationId, PricingPlanId, RoleId, TransferId, UserId, WorkspaceId,
+    WorkspaceUserId,
+};
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Organization {
-    pub id: u64,
+    pub id: OrganizationId,
     pub name: String,
-    pub pricing_plan_id: u32,
+    pub pricing_plan_id: PricingPlanId,
     pub created_at: DateTime<Utc>,
     pub at: DateTime<Utc>,
     pub server_deleted_at: Option<DateTime<Utc>>,
@@ -28,7 +33,7 @@ pub struct TrialInfo {
     pub trial_available: bool,
     pub trial_end_date: Option<DateTime<Utc>>,
     pub next_payment_date: Option<DateTime<Utc>>,
-    pub last_pricing_plan_id: Option<u32>,
+    pub last_pricing_plan_id: Option<PricingPlanId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -44,9 +49,9 @@ pub struct UpdateOrganization {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationUser {
-    pub id: u64,
-    pub user_id: u64,
-    pub organization_id: u64,
+    pub id: WorkspaceUserId,
+    pub user_id: UserId,
+    pub organization_id: OrganizationId,
     pub name: String,
     pub email: String,
     pub admin: bool,
@@ -61,15 +66,15 @@ pub struct OrganizationUser {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationGroup {
-    pub id: u64,
+    pub id: GroupId,
     pub name: String,
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateOrganizationGroup {
     pub name: String,
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -79,14 +84,14 @@ pub struct UpdateOrganizationGroup {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationWorkspace {
-    pub id: u64,
+    pub id: WorkspaceId,
     pub name: String,
     pub admin: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationOwner {
-    pub id: u64,
+    pub id: UserId,
     pub email: String,
     pub name: String,
     pub created_at: DateTime<Utc>,
@@ -101,9 +106,9 @@ pub struct UpdateOrganizationUser {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationUserDetailed {
-    pub id: u64,
-    pub user_id: u64,
-    pub organization_id: u64,
+    pub id: WorkspaceUserId,
+    pub user_id: UserId,
+    pub organization_id: OrganizationId,
     pub name: String,
     pub email: String,
     pub admin: bool,
@@ -123,17 +128,17 @@ pub struct OrganizationUserDetailed {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationRole {
-    pub id: u64,
+    pub id: RoleId,
     pub name: String,
     pub permissions: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OwnershipTransferRequest {
-    pub id: u64,
-    pub organization_id: u64,
-    pub current_owner_id: u64,
-    pub new_owner_id: u64,
+    pub id: TransferId,
+    pub organization_id: OrganizationId,
+    pub current_owner_id: UserId,
+    pub new_owner_id: UserId,
     pub status: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: Option<DateTime<Utc>>,
@@ -141,12 +146,12 @@ pub struct OwnershipTransferRequest {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateOwnershipTransfer {
-    pub new_owner_id: u64,
+    pub new_owner_id: UserId,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WorkspaceStatistics {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     pub billable_seconds: i64,
     pub tracked_seconds: i64,
     pub active_member_count: i32,

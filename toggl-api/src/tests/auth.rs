@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+    use crate::models::api::ids::WorkspaceId;
     use crate::tests::*;
     use reqwest::Method;
     use serde_json::json;
@@ -39,7 +40,7 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let result = client.auth().saml2_login(Some(123456))?;
+                let result = client.auth().saml2_login(Some(WorkspaceId(123456)))?;
 
                 assert_eq!(
                     result.sso_url,

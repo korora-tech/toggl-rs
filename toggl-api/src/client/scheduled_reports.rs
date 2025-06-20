@@ -1,4 +1,5 @@
 use super::TogglClient;
+use crate::models::api::ids::WorkspaceId;
 use crate::models::api::scheduled_reports::{CreateScheduledReportPayload, ScheduledReport};
 use reqwest::Method;
 use toggl_core::Result;
@@ -13,7 +14,10 @@ impl ScheduledReportsClient {
     }
 
     /// List scheduled reports
-    pub fn list_scheduled_reports(&self, workspace_id: u64) -> Result<Vec<ScheduledReport>> {
+    pub fn list_scheduled_reports(
+        &self,
+        workspace_id: WorkspaceId,
+    ) -> Result<Vec<ScheduledReport>> {
         let url = format!("/workspaces/{}/scheduled_reports", workspace_id);
         self.client.request(Method::GET, &url)
     }
@@ -21,7 +25,7 @@ impl ScheduledReportsClient {
     /// Create a scheduled report
     pub fn create_scheduled_report(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         report: CreateScheduledReportPayload,
     ) -> Result<ScheduledReport> {
         let url = format!("/workspaces/{}/scheduled_reports", workspace_id);
@@ -29,7 +33,11 @@ impl ScheduledReportsClient {
     }
 
     /// Delete a scheduled report
-    pub fn delete_scheduled_report(&self, workspace_id: u64, report_id: u64) -> Result<String> {
+    pub fn delete_scheduled_report(
+        &self,
+        workspace_id: WorkspaceId,
+        report_id: u64,
+    ) -> Result<String> {
         let url = format!(
             "/workspaces/{}/scheduled_reports/{}",
             workspace_id, report_id

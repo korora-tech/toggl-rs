@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::client::TogglClient;
+    use crate::models::api::ids::{InvoiceId, OrganizationId, WorkspaceId};
     use crate::models::api::invoices::*;
     use crate::tests::*;
     use reqwest::Method;
@@ -22,7 +23,7 @@ mod tests {
         let client = TogglClient::new_with_base_url("test_api_token".to_string(), &server.url())?;
         let pdf_bytes = client
             .invoices()
-            .get_organization_invoice_pdf(123, "INV-2024-001")?;
+            .get_organization_invoice_pdf(OrganizationId(123), InvoiceId::from("INV-2024-001"))?;
 
         assert_eq!(pdf_bytes, b"PDF_CONTENT_HERE");
         mock.assert();
@@ -55,7 +56,9 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let result = client.invoices().get_organization_invoices(123, None)?;
+                let result = client
+                    .invoices()
+                    .get_organization_invoices(OrganizationId(123), None)?;
                 assert_eq!(result.items.as_ref().unwrap().len(), 1);
                 let invoice = &result.items.as_ref().unwrap()[0];
                 assert_eq!(invoice.id, Some("inv_123".to_string()));
@@ -76,7 +79,9 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let summary = client.invoices().get_organization_invoice_summary(123)?;
+                let summary = client
+                    .invoices()
+                    .get_organization_invoice_summary(OrganizationId(123))?;
                 assert_eq!(summary, "Total invoices: 5, Total amount: $495.00");
                 Ok(())
             },
@@ -124,9 +129,13 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let result = client
-                    .invoices()
-                    .get_workspace_invoices(456, None, None, None, None)?;
+                let result = client.invoices().get_workspace_invoices(
+                    WorkspaceId(456),
+                    None,
+                    None,
+                    None,
+                    None,
+                )?;
                 assert_eq!(result.page, Some(1));
                 assert_eq!(result.total_count, Some(1));
                 assert_eq!(result.data.as_ref().unwrap().len(), 1);
@@ -194,7 +203,7 @@ mod tests {
             |client| {
                 let invoice = client
                     .invoices()
-                    .create_workspace_invoice(456, &new_invoice)?;
+                    .create_workspace_invoice(WorkspaceId(456), &new_invoice)?;
                 assert_eq!(invoice.user_invoice_id, Some(1));
                 assert_eq!(invoice.document_id, Some("DOC-001".to_string()));
                 assert_eq!(invoice.billing_address, Some("123 Main St".to_string()));
@@ -211,7 +220,9 @@ mod tests {
             204,
             None,
             |client| {
-                client.invoices().delete_workspace_invoice(456, 1)?;
+                client
+                    .invoices()
+                    .delete_workspace_invoice(WorkspaceId(456), 1)?;
                 Ok(())
             },
         )
@@ -251,7 +262,7 @@ mod tests {
             |client| {
                 let invoice = client
                     .invoices()
-                    .create_workspace_invoice(456, &invoice_with_integration)?;
+                    .create_workspace_invoice(WorkspaceId(456), &invoice_with_integration)?;
                 assert_eq!(invoice.integration_ext_id, Some("JIRA-123".to_string()));
                 assert_eq!(
                     invoice.integration_provider,

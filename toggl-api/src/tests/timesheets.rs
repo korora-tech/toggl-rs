@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+    use crate::models::api::ids::{SetupId, TimeEntryId, WorkspaceId};
     use crate::models::api::timesheets::*;
     use crate::tests::*;
     use reqwest::Method;
@@ -63,9 +64,13 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let result = client
-                    .timesheets()
-                    .get_timesheet_setups(123, None, None, None, None)?;
+                let result = client.timesheets().get_timesheet_setups(
+                    WorkspaceId(123),
+                    None,
+                    None,
+                    None,
+                    None,
+                )?;
                 assert_eq!(result.data.as_ref().unwrap().len(), 1);
                 let setup = &result.data.as_ref().unwrap()[0];
                 assert_eq!(setup.id, Some(1));
@@ -108,7 +113,9 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let setups = client.timesheets().create_timesheet_setup(123, &payload)?;
+                let setups = client
+                    .timesheets()
+                    .create_timesheet_setup(WorkspaceId(123), &payload)?;
                 assert_eq!(setups.len(), 1);
                 assert_eq!(setups[0].id, Some(1));
                 assert_eq!(setups[0].member_id, Some(456));
@@ -144,9 +151,11 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let setup = client
-                    .timesheets()
-                    .update_timesheet_setup(123, 1, &payload)?;
+                let setup = client.timesheets().update_timesheet_setup(
+                    WorkspaceId(123),
+                    SetupId(1),
+                    &payload,
+                )?;
                 assert_eq!(setup.id, Some(1));
                 assert_eq!(setup.approver_id, Some(999));
                 assert_eq!(setup.end_date, Some("2024-12-31".to_string()));
@@ -163,7 +172,9 @@ mod tests {
             204,
             None,
             |client| {
-                client.timesheets().delete_timesheet_setup(123, 1)?;
+                client
+                    .timesheets()
+                    .delete_timesheet_setup(WorkspaceId(123), SetupId(1))?;
                 Ok(())
             },
         )
@@ -206,7 +217,9 @@ mod tests {
                     end_date: Some("2024-01-31"),
                     ..Default::default()
                 };
-                let result = client.timesheets().get_timesheets(123, &filter)?;
+                let result = client
+                    .timesheets()
+                    .get_timesheets(WorkspaceId(123), &filter)?;
                 assert_eq!(result.page, Some(1));
                 assert_eq!(result.total_count, Some(1));
                 assert_eq!(result.data.as_ref().unwrap().len(), 1);
@@ -259,7 +272,7 @@ mod tests {
             |client| {
                 let timesheets = client
                     .timesheets()
-                    .update_batch_timesheets(123, &payloads)?;
+                    .update_batch_timesheets(WorkspaceId(123), &payloads)?;
                 assert_eq!(timesheets.len(), 2);
                 assert_eq!(timesheets[0].status, Some("approved".to_string()));
                 assert_eq!(timesheets[1].status, Some("rejected".to_string()));
@@ -288,7 +301,9 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let hours = client.timesheets().get_timesheet_hours(123, &payload)?;
+                let hours = client
+                    .timesheets()
+                    .get_timesheet_hours(WorkspaceId(123), &payload)?;
                 assert_eq!(hours.timesheet_setup_id, Some(1));
                 assert_eq!(hours.total_seconds, Some(144000));
                 assert_eq!(hours.working_hours_in_minutes, Some(2400));
@@ -319,10 +334,12 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let timesheet =
-                    client
-                        .timesheets()
-                        .update_timesheet(123, 1, "2024-01-01", &payload)?;
+                let timesheet = client.timesheets().update_timesheet(
+                    WorkspaceId(123),
+                    SetupId(1),
+                    "2024-01-01",
+                    &payload,
+                )?;
                 assert_eq!(timesheet.status, Some("submitted".to_string()));
                 assert_eq!(timesheet.timesheet_setup_id, Some(1));
                 Ok(())
@@ -354,12 +371,13 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let entries =
-                    client
-                        .timesheets()
-                        .get_timesheet_time_entries(123, 1, "2024-01-01")?;
+                let entries = client.timesheets().get_timesheet_time_entries(
+                    WorkspaceId(123),
+                    SetupId(1),
+                    "2024-01-01",
+                )?;
                 assert_eq!(entries.len(), 1);
-                assert_eq!(entries[0].id, 1);
+                assert_eq!(entries[0].id, TimeEntryId(1));
                 assert_eq!(entries[0].duration, 28800);
                 Ok(())
             },

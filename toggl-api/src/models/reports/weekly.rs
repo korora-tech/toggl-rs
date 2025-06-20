@@ -1,10 +1,11 @@
 use super::{ReportFilters, ReportTimeRange};
+use crate::models::api::ids::{ClientId, ProjectId, WorkspaceId};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WeeklyReportRequest {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     #[serde(flatten)]
     pub time_range: ReportTimeRange,
     #[serde(flatten)]
@@ -28,9 +29,9 @@ pub struct WeekTotal {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WeeklyProject {
-    pub project_id: Option<u64>,
+    pub project_id: Option<ProjectId>,
     pub project_name: Option<String>,
-    pub client_id: Option<u64>,
+    pub client_id: Option<ClientId>,
     pub client_name: Option<String>,
     pub color: Option<String>,
     pub billable: bool,

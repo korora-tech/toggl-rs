@@ -1,3 +1,4 @@
+use crate::models::api::ids::{OrganizationId, PricingPlanId, TransferId, UserId, WorkspaceId};
 use crate::models::api::organization::*;
 use crate::models::api::workspace::CreateWorkspace;
 use pretty_assertions::assert_eq;
@@ -41,8 +42,8 @@ fn test_get_organization() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let org = client.organizations().get(1234567)?;
-            assert_eq!(1234567, org.id);
+            let org = client.organizations().get(OrganizationId(1234567))?;
+            assert_eq!(OrganizationId(1234567), org.id);
             assert_eq!("Test Organization", org.name);
             assert_eq!(true, org.admin);
             Ok(())
@@ -78,7 +79,9 @@ fn test_get_organization_invitations() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let invitations = client.organizations().get_invitations(1234567)?;
+            let invitations = client
+                .organizations()
+                .get_invitations(OrganizationId(1234567))?;
             assert_eq!(1, invitations.len());
             assert_eq!("invited@example.com", invitations[0].email);
             Ok(())
@@ -122,7 +125,7 @@ fn test_leave_organization() -> Result<()> {
         200,
         None,
         |client| {
-            client.organizations().leave(1234567)?;
+            client.organizations().leave(OrganizationId(1234567))?;
             Ok(())
         },
     )
@@ -154,9 +157,14 @@ fn test_get_detailed_organization_users() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let users = client
-                .organizations()
-                .get_users_detailed(123, None, None, None, None, None)?;
+            let users = client.organizations().get_users_detailed(
+                OrganizationId(123),
+                None,
+                None,
+                None,
+                None,
+                None,
+            )?;
             assert_eq!(users.len(), 1);
             assert_eq!(users[0].labour_cost, Some(50.0));
             assert_eq!(users[0].role, Some("developer".to_string()));
@@ -192,7 +200,10 @@ fn test_update_organization_user() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let user = client.organizations().update_user(123, 456, &update)?;
+            let user =
+                client
+                    .organizations()
+                    .update_user(OrganizationId(123), UserId(456), &update)?;
             assert_eq!(user.admin, true);
             assert_eq!(user.active, true);
             Ok(())
@@ -221,7 +232,7 @@ fn test_get_organization_roles() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let roles = client.organizations().get_roles(123)?;
+            let roles = client.organizations().get_roles(OrganizationId(123))?;
             assert_eq!(roles.len(), 2);
             assert_eq!(roles[0].name, "Admin");
             assert_eq!(roles[0].permissions.len(), 3);
@@ -248,9 +259,11 @@ fn test_get_workspace_statistics() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let stats = client.organizations().get_workspace_statistics(123)?;
+            let stats = client
+                .organizations()
+                .get_workspace_statistics(OrganizationId(123))?;
             assert_eq!(stats.len(), 1);
-            assert_eq!(stats[0].workspace_id, 456);
+            assert_eq!(stats[0].workspace_id, WorkspaceId(456));
             assert_eq!(stats[0].billable_seconds, 28800);
             assert_eq!(stats[0].active_member_count, 10);
             Ok(())
@@ -262,7 +275,7 @@ fn test_get_workspace_statistics() -> Result<()> {
 fn test_create_organization_workspace() -> Result<()> {
     let workspace = CreateWorkspace {
         name: "New Workspace".to_string(),
-        initial_pricing_plan: Some(1),
+        initial_pricing_plan: Some(PricingPlanId(1)),
     };
 
     let response = json!({
@@ -293,8 +306,10 @@ fn test_create_organization_workspace() -> Result<()> {
         201,
         Some(response),
         |client| {
-            let created = client.organizations().create_workspace(123, &workspace)?;
-            assert_eq!(created.id, 789);
+            let created = client
+                .organizations()
+                .create_workspace(OrganizationId(123), &workspace)?;
+            assert_eq!(created.id, WorkspaceId(789));
             assert_eq!(created.name, "New Workspace");
             Ok(())
         },
@@ -321,7 +336,9 @@ fn test_ownership_transfer_flow() -> Result<()> {
         200,
         Some(transfers_response),
         |client| {
-            let transfers = client.organizations().get_ownership_transfers(123)?;
+            let transfers = client
+                .organizations()
+                .get_ownership_transfers(OrganizationId(123))?;
             assert_eq!(transfers.len(), 1);
             assert_eq!(transfers[0].status, "pending");
             Ok(())
@@ -329,7 +346,9 @@ fn test_ownership_transfer_flow() -> Result<()> {
     )?;
 
     // Test creating transfer
-    let create_transfer = CreateOwnershipTransfer { new_owner_id: 789 };
+    let create_transfer = CreateOwnershipTransfer {
+        new_owner_id: UserId(789),
+    };
 
     let create_response = json!({
         "id": 2,
@@ -348,9 +367,9 @@ fn test_ownership_transfer_flow() -> Result<()> {
         |client| {
             let transfer = client
                 .organizations()
-                .create_ownership_transfer(123, &create_transfer)?;
-            assert_eq!(transfer.id, 2);
-            assert_eq!(transfer.new_owner_id, 789);
+                .create_ownership_transfer(OrganizationId(123), &create_transfer)?;
+            assert_eq!(transfer.id, TransferId(2));
+            assert_eq!(transfer.new_owner_id, UserId(789));
             Ok(())
         },
     )?;
@@ -362,9 +381,11 @@ fn test_ownership_transfer_flow() -> Result<()> {
         200,
         None,
         |client| {
-            client
-                .organizations()
-                .handle_ownership_transfer(123, 2, "accept")?;
+            client.organizations().handle_ownership_transfer(
+                OrganizationId(123),
+                TransferId(2),
+                "accept",
+            )?;
             Ok(())
         },
     )
@@ -385,8 +406,8 @@ fn test_get_organization_owner() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let owner = client.organizations().get_owner(12345)?;
-            assert_eq!(owner.id, 98765);
+            let owner = client.organizations().get_owner(OrganizationId(12345))?;
+            assert_eq!(owner.id, UserId(98765));
             assert_eq!(owner.email, "owner@example.com");
             assert_eq!(owner.name, "Owner Name");
             Ok(())
@@ -431,7 +452,9 @@ fn test_get_organization_users() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let users = client.organizations().get_users(12345, None, None)?;
+            let users = client
+                .organizations()
+                .get_users(OrganizationId(12345), None, None)?;
             assert_eq!(users.len(), 2);
             assert_eq!(users[0].name, "John Doe");
             assert!(users[0].admin);
@@ -491,7 +514,9 @@ fn test_get_organization_workspaces() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let workspaces = client.organizations().get_workspaces(12345)?;
+            let workspaces = client
+                .organizations()
+                .get_workspaces(OrganizationId(12345))?;
             assert_eq!(workspaces.len(), 2);
             assert_eq!(workspaces[0].name, "Main Workspace");
             assert!(workspaces[0].admin);
@@ -540,7 +565,9 @@ fn test_update_organization() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let org = client.organizations().update(12345, &update)?;
+            let org = client
+                .organizations()
+                .update(OrganizationId(12345), &update)?;
             assert_eq!(org.name, "Updated Organization Name");
             assert!(org.is_multi_workspace_enabled);
             Ok(())
@@ -556,7 +583,9 @@ fn test_resend_organization_invitation() -> Result<()> {
         200,
         None,
         |client| {
-            client.organizations().resend_invitation(12345, 67890)?;
+            client
+                .organizations()
+                .resend_invitation(OrganizationId(12345), 67890)?;
             Ok(())
         },
     )

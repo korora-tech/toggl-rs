@@ -1,15 +1,18 @@
+use super::ids::{GroupId, ReminderId, UserId, WorkspaceId};
 use serde::{Deserialize, Serialize};
+
+use super::ids::FeatureId;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Feature {
-    pub feature_id: u32,
+    pub feature_id: FeatureId,
     pub name: String,
     pub enabled: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Features {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     pub features: Vec<Feature>,
 }
 
@@ -26,9 +29,9 @@ pub struct Location {
 pub struct TrackReminder {
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub frequency: u32,
-    pub group_ids: Option<Vec<u64>>,
-    pub reminder_id: u64,
+    pub group_ids: Option<Vec<GroupId>>,
+    pub reminder_id: ReminderId,
     pub threshold: u32,
-    pub user_ids: Option<Vec<u64>>,
-    pub workspace_id: u64,
+    pub user_ids: Option<Vec<UserId>>,
+    pub workspace_id: WorkspaceId,
 }

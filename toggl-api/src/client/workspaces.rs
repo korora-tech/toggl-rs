@@ -12,6 +12,10 @@ use crate::models::api::goals::{
     WorkspaceGoalsQuery,
 };
 use crate::models::api::group::{CreateGroup, Group, UpdateGroup};
+use crate::models::api::ids::{
+    AlertId, ClientId, FavoriteId, GoalId, GroupId, ProjectId, ProjectUserId, ReminderId, SetupId,
+    SsoProfileId, TagId, UserId, WorkspaceId, WorkspaceUserId,
+};
 use crate::models::api::preferences::{Logo, TimeEntryConstraints, WorkspacePreferences};
 use crate::models::api::project::{
     CreateProjectUser, PatchOperation, Project, ProjectGroup, ProjectGroupPayload, ProjectUser,
@@ -41,7 +45,7 @@ impl WorkspacesClient {
     }
 
     /// Get workspace
-    pub fn get(&self, workspace_id: u64) -> Result<Workspace> {
+    pub fn get(&self, workspace_id: WorkspaceId) -> Result<Workspace> {
         self.client
             .request(Method::GET, &format!("workspaces/{}", workspace_id))
     }
@@ -49,7 +53,7 @@ impl WorkspacesClient {
     /// Update workspace
     pub fn update(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         workspace_update: &UpdateWorkspace,
     ) -> Result<Workspace> {
         self.client.request_with_body(
@@ -60,13 +64,17 @@ impl WorkspacesClient {
     }
 
     /// Get workspace users
-    pub fn get_users(&self, workspace_id: u64) -> Result<Vec<WorkspaceUser>> {
+    pub fn get_users(&self, workspace_id: WorkspaceId) -> Result<Vec<WorkspaceUser>> {
         self.client
             .request(Method::GET, &format!("workspaces/{}/users", workspace_id))
     }
 
     /// Get workspace clients
-    pub fn get_clients(&self, workspace_id: u64, status: Option<&str>) -> Result<Vec<Client>> {
+    pub fn get_clients(
+        &self,
+        workspace_id: WorkspaceId,
+        status: Option<&str>,
+    ) -> Result<Vec<Client>> {
         let mut params = BTreeMap::new();
         if let Some(status) = status {
             params.insert("status".to_string(), status.to_string());
@@ -80,7 +88,7 @@ impl WorkspacesClient {
     }
 
     /// Create workspace client
-    pub fn create_client(&self, workspace_id: u64, name: &str) -> Result<Client> {
+    pub fn create_client(&self, workspace_id: WorkspaceId, name: &str) -> Result<Client> {
         let body = serde_json::json!({ "name": name });
         self.client.request_with_body(
             Method::POST,
@@ -90,7 +98,12 @@ impl WorkspacesClient {
     }
 
     /// Update workspace client
-    pub fn update_client(&self, workspace_id: u64, client_id: u64, name: &str) -> Result<Client> {
+    pub fn update_client(
+        &self,
+        workspace_id: WorkspaceId,
+        client_id: ClientId,
+        name: &str,
+    ) -> Result<Client> {
         let body = serde_json::json!({ "name": name });
         self.client.request_with_body(
             Method::PUT,
@@ -100,7 +113,7 @@ impl WorkspacesClient {
     }
 
     /// Delete workspace client
-    pub fn delete_client(&self, workspace_id: u64, client_id: u64) -> Result<()> {
+    pub fn delete_client(&self, workspace_id: WorkspaceId, client_id: ClientId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/clients/{}", workspace_id, client_id),
@@ -108,7 +121,7 @@ impl WorkspacesClient {
     }
 
     /// Archive workspace client
-    pub fn archive_client(&self, workspace_id: u64, client_id: u64) -> Result<Client> {
+    pub fn archive_client(&self, workspace_id: WorkspaceId, client_id: ClientId) -> Result<Client> {
         self.client.request(
             Method::POST,
             &format!("workspaces/{}/clients/{}/archive", workspace_id, client_id),
@@ -116,7 +129,7 @@ impl WorkspacesClient {
     }
 
     /// Restore workspace client
-    pub fn restore_client(&self, workspace_id: u64, client_id: u64) -> Result<Client> {
+    pub fn restore_client(&self, workspace_id: WorkspaceId, client_id: ClientId) -> Result<Client> {
         self.client.request(
             Method::POST,
             &format!("workspaces/{}/clients/{}/restore", workspace_id, client_id),
@@ -124,13 +137,13 @@ impl WorkspacesClient {
     }
 
     /// Get workspace groups
-    pub fn get_groups(&self, workspace_id: u64) -> Result<Vec<Group>> {
+    pub fn get_groups(&self, workspace_id: WorkspaceId) -> Result<Vec<Group>> {
         self.client
             .request(Method::GET, &format!("workspaces/{}/groups", workspace_id))
     }
 
     /// Create workspace group
-    pub fn create_group(&self, workspace_id: u64, group: &CreateGroup) -> Result<Group> {
+    pub fn create_group(&self, workspace_id: WorkspaceId, group: &CreateGroup) -> Result<Group> {
         self.client.request_with_body(
             Method::POST,
             &format!("workspaces/{}/groups", workspace_id),
@@ -139,7 +152,7 @@ impl WorkspacesClient {
     }
 
     /// Get workspace group by ID
-    pub fn get_group(&self, workspace_id: u64, group_id: u64) -> Result<Group> {
+    pub fn get_group(&self, workspace_id: WorkspaceId, group_id: GroupId) -> Result<Group> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/groups/{}", workspace_id, group_id),
@@ -149,8 +162,8 @@ impl WorkspacesClient {
     /// Update workspace group
     pub fn update_group(
         &self,
-        workspace_id: u64,
-        group_id: u64,
+        workspace_id: WorkspaceId,
+        group_id: GroupId,
         group: &UpdateGroup,
     ) -> Result<Group> {
         self.client.request_with_body(
@@ -161,7 +174,7 @@ impl WorkspacesClient {
     }
 
     /// Delete workspace group
-    pub fn delete_group(&self, workspace_id: u64, group_id: u64) -> Result<()> {
+    pub fn delete_group(&self, workspace_id: WorkspaceId, group_id: GroupId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/groups/{}", workspace_id, group_id),
@@ -171,7 +184,7 @@ impl WorkspacesClient {
     /// Get workspace projects
     pub fn get_projects(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         active: Option<bool>,
         since: Option<i64>,
     ) -> Result<Vec<Project>> {
@@ -193,7 +206,7 @@ impl WorkspacesClient {
     /// Get workspace tasks
     pub fn get_tasks(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         active: Option<bool>,
         since: Option<i64>,
     ) -> Result<Vec<Task>> {
@@ -213,13 +226,13 @@ impl WorkspacesClient {
     }
 
     /// Get workspace tags
-    pub fn get_tags(&self, workspace_id: u64) -> Result<Vec<Tag>> {
+    pub fn get_tags(&self, workspace_id: WorkspaceId) -> Result<Vec<Tag>> {
         self.client
             .request(Method::GET, &format!("workspaces/{}/tags", workspace_id))
     }
 
     /// Create workspace tag
-    pub fn create_tag(&self, workspace_id: u64, name: &str) -> Result<Tag> {
+    pub fn create_tag(&self, workspace_id: WorkspaceId, name: &str) -> Result<Tag> {
         let body = serde_json::json!({ "name": name });
         self.client.request_with_body(
             Method::POST,
@@ -229,7 +242,7 @@ impl WorkspacesClient {
     }
 
     /// Update workspace tag
-    pub fn update_tag(&self, workspace_id: u64, tag_id: u64, name: &str) -> Result<Tag> {
+    pub fn update_tag(&self, workspace_id: WorkspaceId, tag_id: TagId, name: &str) -> Result<Tag> {
         let body = serde_json::json!({ "name": name });
         self.client.request_with_body(
             Method::PUT,
@@ -239,7 +252,7 @@ impl WorkspacesClient {
     }
 
     /// Delete workspace tag
-    pub fn delete_tag(&self, workspace_id: u64, tag_id: u64) -> Result<()> {
+    pub fn delete_tag(&self, workspace_id: WorkspaceId, tag_id: TagId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/tags/{}", workspace_id, tag_id),
@@ -247,7 +260,7 @@ impl WorkspacesClient {
     }
 
     /// Get workspace statistics
-    pub fn get_statistics(&self, workspace_id: u64) -> Result<WorkspaceStatistics> {
+    pub fn get_statistics(&self, workspace_id: WorkspaceId) -> Result<WorkspaceStatistics> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/statistics", workspace_id),
@@ -261,7 +274,7 @@ impl WorkspacesClient {
     }
 
     /// Get all activity dashboard
-    pub fn get_all_activity(&self, workspace_id: u64) -> Result<AllActivity> {
+    pub fn get_all_activity(&self, workspace_id: WorkspaceId) -> Result<AllActivity> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/dashboard/all_activity", workspace_id),
@@ -269,7 +282,7 @@ impl WorkspacesClient {
     }
 
     /// Get most active users dashboard
-    pub fn get_most_active(&self, workspace_id: u64) -> Result<MostActive> {
+    pub fn get_most_active(&self, workspace_id: WorkspaceId) -> Result<MostActive> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/dashboard/most_active", workspace_id),
@@ -277,7 +290,7 @@ impl WorkspacesClient {
     }
 
     /// Get top activities dashboard
-    pub fn get_top_activity(&self, workspace_id: u64) -> Result<TopActivities> {
+    pub fn get_top_activity(&self, workspace_id: WorkspaceId) -> Result<TopActivities> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/dashboard/top_activity", workspace_id),
@@ -285,7 +298,7 @@ impl WorkspacesClient {
     }
 
     /// Get workspace expenses
-    pub fn get_expenses(&self, workspace_id: u64) -> Result<Vec<Expense>> {
+    pub fn get_expenses(&self, workspace_id: WorkspaceId) -> Result<Vec<Expense>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/expenses", workspace_id),
@@ -293,7 +306,11 @@ impl WorkspacesClient {
     }
 
     /// Create workspace expense
-    pub fn create_expense(&self, workspace_id: u64, expense: &CreateExpense) -> Result<Expense> {
+    pub fn create_expense(
+        &self,
+        workspace_id: WorkspaceId,
+        expense: &CreateExpense,
+    ) -> Result<Expense> {
         self.client.request_with_body(
             Method::POST,
             &format!("workspaces/{}/expenses", workspace_id),
@@ -305,7 +322,7 @@ impl WorkspacesClient {
     /// This endpoint creates an expense with an attached receipt file
     pub fn create_expense_with_receipt(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         expense: &CreateExpense,
         receipt_data: &[u8],
         receipt_filename: &str,
@@ -331,7 +348,7 @@ impl WorkspacesClient {
     }
 
     /// Get workspace currencies
-    pub fn get_currencies(&self, workspace_id: u64) -> Result<Vec<Currency>> {
+    pub fn get_currencies(&self, workspace_id: WorkspaceId) -> Result<Vec<Currency>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/currencies", workspace_id),
@@ -339,7 +356,7 @@ impl WorkspacesClient {
     }
 
     /// Get workspace track reminders
-    pub fn get_track_reminders(&self, workspace_id: u64) -> Result<Vec<TrackReminder>> {
+    pub fn get_track_reminders(&self, workspace_id: WorkspaceId) -> Result<Vec<TrackReminder>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/track_reminders", workspace_id),
@@ -349,7 +366,7 @@ impl WorkspacesClient {
     /// Create workspace track reminder
     pub fn create_track_reminder(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         reminder: &TrackReminder,
     ) -> Result<TrackReminder> {
         self.client.request_with_body(
@@ -362,8 +379,8 @@ impl WorkspacesClient {
     /// Update workspace track reminder
     pub fn update_track_reminder(
         &self,
-        workspace_id: u64,
-        reminder_id: u64,
+        workspace_id: WorkspaceId,
+        reminder_id: ReminderId,
         reminder: &TrackReminder,
     ) -> Result<TrackReminder> {
         self.client.request_with_body(
@@ -377,7 +394,11 @@ impl WorkspacesClient {
     }
 
     /// Delete workspace track reminder
-    pub fn delete_track_reminder(&self, workspace_id: u64, reminder_id: u64) -> Result<()> {
+    pub fn delete_track_reminder(
+        &self,
+        workspace_id: WorkspaceId,
+        reminder_id: ReminderId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!(
@@ -388,13 +409,13 @@ impl WorkspacesClient {
     }
 
     /// Get workspace alerts
-    pub fn get_alerts(&self, workspace_id: u64) -> Result<Vec<AlertWithMeta>> {
+    pub fn get_alerts(&self, workspace_id: WorkspaceId) -> Result<Vec<AlertWithMeta>> {
         self.client
             .request(Method::GET, &format!("workspaces/{}/alerts", workspace_id))
     }
 
     /// Create workspace alert
-    pub fn create_alert(&self, workspace_id: u64, alert: &CreateAlert) -> Result<Alert> {
+    pub fn create_alert(&self, workspace_id: WorkspaceId, alert: &CreateAlert) -> Result<Alert> {
         self.client.request_with_body(
             Method::POST,
             &format!("workspaces/{}/alerts", workspace_id),
@@ -405,8 +426,8 @@ impl WorkspacesClient {
     /// Update workspace alert
     pub fn update_alert(
         &self,
-        workspace_id: u64,
-        alert_id: u64,
+        workspace_id: WorkspaceId,
+        alert_id: AlertId,
         alert: &UpdateAlert,
     ) -> Result<Alert> {
         self.client.request_with_body(
@@ -417,7 +438,7 @@ impl WorkspacesClient {
     }
 
     /// Delete workspace alert
-    pub fn delete_alert(&self, workspace_id: u64, alert_id: u64) -> Result<()> {
+    pub fn delete_alert(&self, workspace_id: WorkspaceId, alert_id: AlertId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/alerts/{}", workspace_id, alert_id),
@@ -425,7 +446,11 @@ impl WorkspacesClient {
     }
 
     /// Add workspace user
-    pub fn add_user(&self, workspace_id: u64, emails: Vec<String>) -> Result<WorkspaceUser> {
+    pub fn add_user(
+        &self,
+        workspace_id: WorkspaceId,
+        emails: Vec<String>,
+    ) -> Result<WorkspaceUser> {
         let body = serde_json::json!({ "emails": emails });
         self.client.request_with_body(
             Method::POST,
@@ -437,8 +462,8 @@ impl WorkspacesClient {
     /// Update workspace user
     pub fn update_workspace_user(
         &self,
-        workspace_id: u64,
-        workspace_user_id: u64,
+        workspace_id: WorkspaceId,
+        workspace_user_id: WorkspaceUserId,
         admin: bool,
     ) -> Result<WorkspaceUser> {
         let body = serde_json::json!({ "admin": admin });
@@ -453,7 +478,11 @@ impl WorkspacesClient {
     }
 
     /// Remove workspace user
-    pub fn remove_user(&self, workspace_id: u64, workspace_user_id: u64) -> Result<()> {
+    pub fn remove_user(
+        &self,
+        workspace_id: WorkspaceId,
+        workspace_user_id: WorkspaceUserId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!(
@@ -464,13 +493,17 @@ impl WorkspacesClient {
     }
 
     /// Get workspace export requests
-    pub fn get_exports(&self, workspace_id: u64) -> Result<Vec<DownloadRequestRecord>> {
+    pub fn get_exports(&self, workspace_id: WorkspaceId) -> Result<Vec<DownloadRequestRecord>> {
         self.client
             .request(Method::GET, &format!("workspaces/{}/exports", workspace_id))
     }
 
     /// Create workspace export request
-    pub fn create_export(&self, workspace_id: u64, tokens_list: Vec<String>) -> Result<String> {
+    pub fn create_export(
+        &self,
+        workspace_id: WorkspaceId,
+        tokens_list: Vec<String>,
+    ) -> Result<String> {
         self.client.request_with_body(
             Method::POST,
             &format!("workspaces/{}/exports", workspace_id),
@@ -479,7 +512,7 @@ impl WorkspacesClient {
     }
 
     /// Download workspace export data
-    pub fn download_export(&self, workspace_id: u64, uuid: &str) -> Result<Vec<u8>> {
+    pub fn download_export(&self, workspace_id: WorkspaceId, uuid: &str) -> Result<Vec<u8>> {
         self.client.request_binary(
             Method::GET,
             &format!("workspaces/{}/exports/data/{}.zip", workspace_id, uuid),
@@ -487,7 +520,11 @@ impl WorkspacesClient {
     }
 
     /// Get workspace favorites
-    pub fn get_favorites(&self, workspace_id: u64, since: Option<u64>) -> Result<Vec<Favorite>> {
+    pub fn get_favorites(
+        &self,
+        workspace_id: WorkspaceId,
+        since: Option<u64>,
+    ) -> Result<Vec<Favorite>> {
         let mut url = format!("workspaces/{}/favorites", workspace_id);
         if let Some(since_ts) = since {
             url.push_str(&format!("?since={}", since_ts));
@@ -498,7 +535,7 @@ impl WorkspacesClient {
     /// Create workspace favorite
     pub fn create_favorite(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         favorite: &CreateFavorite,
     ) -> Result<Favorite> {
         self.client.request_with_body(
@@ -511,7 +548,7 @@ impl WorkspacesClient {
     /// Update workspace favorites
     pub fn update_favorites(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         favorites: &Vec<UpdateFavorite>,
     ) -> Result<Vec<Favorite>> {
         self.client.request_with_body(
@@ -522,7 +559,11 @@ impl WorkspacesClient {
     }
 
     /// Delete workspace favorite
-    pub fn delete_favorite(&self, workspace_id: u64, favorite_id: u64) -> Result<()> {
+    pub fn delete_favorite(
+        &self,
+        workspace_id: WorkspaceId,
+        favorite_id: FavoriteId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/favorites/{}", workspace_id, favorite_id),
@@ -530,7 +571,7 @@ impl WorkspacesClient {
     }
 
     /// Get workspace favorite suggestions
-    pub fn get_favorite_suggestions(&self, workspace_id: u64) -> Result<Vec<Favorite>> {
+    pub fn get_favorite_suggestions(&self, workspace_id: WorkspaceId) -> Result<Vec<Favorite>> {
         self.client.request(
             Method::POST,
             &format!("workspaces/{}/favorites/suggestions", workspace_id),
@@ -538,7 +579,7 @@ impl WorkspacesClient {
     }
 
     /// Create workspace rate
-    pub fn create_rate(&self, workspace_id: u64, rate: &CreateRate) -> Result<()> {
+    pub fn create_rate(&self, workspace_id: WorkspaceId, rate: &CreateRate) -> Result<()> {
         self.client.request_with_body_empty(
             Method::POST,
             &format!("workspaces/{}/rates", workspace_id),
@@ -549,7 +590,7 @@ impl WorkspacesClient {
     /// Get workspace rates by level
     pub fn get_rates(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         level: &RateLevel,
         level_id: u64,
         rate_type: Option<&str>,
@@ -564,8 +605,8 @@ impl WorkspacesClient {
     /// Archive clients in bulk
     pub fn archive_clients_bulk(
         &self,
-        workspace_id: u64,
-        client_ids: Vec<u64>,
+        workspace_id: WorkspaceId,
+        client_ids: Vec<ClientId>,
     ) -> Result<ArchiveClientsResponse> {
         self.client.request_with_body(
             Method::POST,
@@ -575,7 +616,11 @@ impl WorkspacesClient {
     }
 
     /// Get clients data by IDs
-    pub fn get_clients_data(&self, workspace_id: u64, client_ids: Vec<u64>) -> Result<Vec<Client>> {
+    pub fn get_clients_data(
+        &self,
+        workspace_id: WorkspaceId,
+        client_ids: Vec<ClientId>,
+    ) -> Result<Vec<Client>> {
         self.client.request_with_body(
             Method::POST,
             &format!("workspaces/{}/clients/data", workspace_id),
@@ -584,7 +629,11 @@ impl WorkspacesClient {
     }
 
     /// Delete clients in bulk
-    pub fn delete_clients_bulk(&self, workspace_id: u64, client_ids: Vec<u64>) -> Result<()> {
+    pub fn delete_clients_bulk(
+        &self,
+        workspace_id: WorkspaceId,
+        client_ids: Vec<ClientId>,
+    ) -> Result<()> {
         self.client.request_with_body_empty(
             Method::POST,
             &format!("workspaces/{}/clients/delete", workspace_id),
@@ -593,7 +642,7 @@ impl WorkspacesClient {
     }
 
     /// Get workspace preferences
-    pub fn get_preferences(&self, workspace_id: u64) -> Result<Logo> {
+    pub fn get_preferences(&self, workspace_id: WorkspaceId) -> Result<Logo> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/preferences", workspace_id),
@@ -603,7 +652,7 @@ impl WorkspacesClient {
     /// Update workspace preferences
     pub fn update_preferences(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         preferences: &WorkspacePreferences,
     ) -> Result<Logo> {
         self.client.request_with_body(
@@ -614,7 +663,10 @@ impl WorkspacesClient {
     }
 
     /// Get workspace subscription
-    pub fn get_subscription(&self, workspace_id: u64) -> Result<WorkspaceSubscriptionResponse> {
+    pub fn get_subscription(
+        &self,
+        workspace_id: WorkspaceId,
+    ) -> Result<WorkspaceSubscriptionResponse> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/subscription", workspace_id),
@@ -624,7 +676,7 @@ impl WorkspacesClient {
     /// Get purchase order PDF
     pub fn get_purchase_order_pdf(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         purchase_order_id: u64,
     ) -> Result<Vec<u8>> {
         self.client.request_binary(
@@ -639,7 +691,7 @@ impl WorkspacesClient {
     /// Get all goals for the requesting user in the workspace
     pub fn get_goals(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         query: Option<&WorkspaceGoalsQuery>,
     ) -> Result<Vec<WorkspaceGoal>> {
         let mut params = BTreeMap::new();
@@ -669,7 +721,7 @@ impl WorkspacesClient {
     /// Create a goal
     pub fn create_goal(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         goal: &CreateGoalRequest,
     ) -> Result<WorkspaceGoalModel> {
         self.client.request_with_body(
@@ -680,7 +732,7 @@ impl WorkspacesClient {
     }
 
     /// Get one goal
-    pub fn get_goal(&self, workspace_id: u64, goal_id: u64) -> Result<WorkspaceGoal> {
+    pub fn get_goal(&self, workspace_id: WorkspaceId, goal_id: GoalId) -> Result<WorkspaceGoal> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/goals/{}", workspace_id, goal_id),
@@ -690,8 +742,8 @@ impl WorkspacesClient {
     /// Update a goal
     pub fn update_goal(
         &self,
-        workspace_id: u64,
-        goal_id: u64,
+        workspace_id: WorkspaceId,
+        goal_id: GoalId,
         goal: &UpdateGoalRequest,
     ) -> Result<WorkspaceGoalModel> {
         self.client.request_with_body(
@@ -702,7 +754,7 @@ impl WorkspacesClient {
     }
 
     /// Delete a goal
-    pub fn delete_goal(&self, workspace_id: u64, goal_id: u64) -> Result<()> {
+    pub fn delete_goal(&self, workspace_id: WorkspaceId, goal_id: GoalId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/goals/{}", workspace_id, goal_id),
@@ -710,7 +762,7 @@ impl WorkspacesClient {
     }
 
     /// Get project groups
-    pub fn get_project_groups(&self, workspace_id: u64) -> Result<Vec<ProjectGroup>> {
+    pub fn get_project_groups(&self, workspace_id: WorkspaceId) -> Result<Vec<ProjectGroup>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/project_groups", workspace_id),
@@ -720,7 +772,7 @@ impl WorkspacesClient {
     /// Create project group
     pub fn create_project_group(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         project_group: &ProjectGroupPayload,
     ) -> Result<ProjectGroup> {
         self.client.request_with_body(
@@ -733,7 +785,7 @@ impl WorkspacesClient {
     /// Update project group
     pub fn update_project_group(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         project_group_id: u64,
         project_group: &ProjectGroupPayload,
     ) -> Result<ProjectGroup> {
@@ -748,7 +800,11 @@ impl WorkspacesClient {
     }
 
     /// Delete project group
-    pub fn delete_project_group(&self, workspace_id: u64, project_group_id: u64) -> Result<()> {
+    pub fn delete_project_group(
+        &self,
+        workspace_id: WorkspaceId,
+        project_group_id: u64,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!(
@@ -759,7 +815,7 @@ impl WorkspacesClient {
     }
 
     /// Get project users
-    pub fn get_project_users(&self, workspace_id: u64) -> Result<Vec<ProjectUser>> {
+    pub fn get_project_users(&self, workspace_id: WorkspaceId) -> Result<Vec<ProjectUser>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/project_users", workspace_id),
@@ -770,15 +826,15 @@ impl WorkspacesClient {
     #[allow(clippy::too_many_arguments)]
     pub fn get_project_users_paginated(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         page: Option<u32>,
         per_page: Option<u32>,
         sort_field: Option<&str>,
         sort_order: Option<&str>,
         only_templates: Option<bool>,
         only_active: Option<bool>,
-        project_ids: Option<Vec<u64>>,
-        user_ids: Option<Vec<u64>>,
+        project_ids: Option<Vec<ProjectId>>,
+        user_ids: Option<Vec<UserId>>,
     ) -> Result<Vec<ProjectUser>> {
         let mut params = BTreeMap::new();
         if let Some(page) = page {
@@ -829,7 +885,7 @@ impl WorkspacesClient {
     /// Create project user
     pub fn create_project_user(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         project_user: &CreateProjectUser,
     ) -> Result<ProjectUser> {
         self.client.request_with_body(
@@ -840,7 +896,11 @@ impl WorkspacesClient {
     }
 
     /// Get project user
-    pub fn get_project_user(&self, workspace_id: u64, project_user_id: u64) -> Result<ProjectUser> {
+    pub fn get_project_user(
+        &self,
+        workspace_id: WorkspaceId,
+        project_user_id: ProjectUserId,
+    ) -> Result<ProjectUser> {
         self.client.request(
             Method::GET,
             &format!(
@@ -853,8 +913,8 @@ impl WorkspacesClient {
     /// Update project user
     pub fn update_project_user(
         &self,
-        workspace_id: u64,
-        project_user_id: u64,
+        workspace_id: WorkspaceId,
+        project_user_id: ProjectUserId,
         project_user: &UpdateProjectUser,
     ) -> Result<ProjectUser> {
         self.client.request_with_body(
@@ -868,7 +928,11 @@ impl WorkspacesClient {
     }
 
     /// Delete project user
-    pub fn delete_project_user(&self, workspace_id: u64, project_user_id: u64) -> Result<()> {
+    pub fn delete_project_user(
+        &self,
+        workspace_id: WorkspaceId,
+        project_user_id: ProjectUserId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!(
@@ -881,8 +945,8 @@ impl WorkspacesClient {
     /// Update multiple project users
     pub fn update_project_users_batch(
         &self,
-        workspace_id: u64,
-        project_user_ids: &[u64],
+        workspace_id: WorkspaceId,
+        project_user_ids: &[ProjectUserId],
         operations: &[PatchOperation],
     ) -> Result<Vec<ProjectUser>> {
         let path = format!(
@@ -899,7 +963,10 @@ impl WorkspacesClient {
     }
 
     /// Get linked SSO profiles
-    pub fn get_linked_sso_profiles(&self, workspace_id: u64) -> Result<Vec<LinkedSsoProfile>> {
+    pub fn get_linked_sso_profiles(
+        &self,
+        workspace_id: WorkspaceId,
+    ) -> Result<Vec<LinkedSsoProfile>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/linked_sso_profiles", workspace_id),
@@ -909,7 +976,7 @@ impl WorkspacesClient {
     /// Link SSO profile
     pub fn link_sso_profile(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         link_profile: &LinkSsoProfile,
     ) -> Result<LinkedSsoProfile> {
         self.client.request_with_body(
@@ -922,8 +989,8 @@ impl WorkspacesClient {
     /// Get linked SSO profile
     pub fn get_linked_sso_profile(
         &self,
-        workspace_id: u64,
-        sso_profile_id: u64,
+        workspace_id: WorkspaceId,
+        sso_profile_id: SsoProfileId,
     ) -> Result<LinkedSsoProfile> {
         self.client.request(
             Method::GET,
@@ -937,8 +1004,8 @@ impl WorkspacesClient {
     /// Update linked SSO profile
     pub fn update_linked_sso_profile(
         &self,
-        workspace_id: u64,
-        sso_profile_id: u64,
+        workspace_id: WorkspaceId,
+        sso_profile_id: SsoProfileId,
         link_profile: &LinkSsoProfile,
     ) -> Result<LinkedSsoProfile> {
         self.client.request_with_body(
@@ -952,7 +1019,11 @@ impl WorkspacesClient {
     }
 
     /// Delete linked SSO profile
-    pub fn delete_linked_sso_profile(&self, workspace_id: u64, sso_profile_id: u64) -> Result<()> {
+    pub fn delete_linked_sso_profile(
+        &self,
+        workspace_id: WorkspaceId,
+        sso_profile_id: SsoProfileId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!(
@@ -963,13 +1034,13 @@ impl WorkspacesClient {
     }
 
     /// Get workspace logo
-    pub fn get_logo(&self, workspace_id: u64) -> Result<Vec<u8>> {
+    pub fn get_logo(&self, workspace_id: WorkspaceId) -> Result<Vec<u8>> {
         self.client
             .request_binary(Method::GET, &format!("workspaces/{}/logo", workspace_id))
     }
 
     /// Upload workspace logo
-    pub fn upload_logo(&self, workspace_id: u64, logo_data: &[u8]) -> Result<()> {
+    pub fn upload_logo(&self, workspace_id: WorkspaceId, logo_data: &[u8]) -> Result<()> {
         // Detect MIME type based on file data (simple detection)
         let mime_type = if logo_data.len() >= 4 {
             match &logo_data[0..4] {
@@ -992,7 +1063,7 @@ impl WorkspacesClient {
     }
 
     /// Update workspace logo
-    pub fn update_logo(&self, workspace_id: u64, logo_data: &[u8]) -> Result<()> {
+    pub fn update_logo(&self, workspace_id: WorkspaceId, logo_data: &[u8]) -> Result<()> {
         // Detect MIME type based on file data (simple detection)
         let mime_type = if logo_data.len() >= 4 {
             match &logo_data[0..4] {
@@ -1015,7 +1086,11 @@ impl WorkspacesClient {
     }
 
     /// Get payment receipt PDF
-    pub fn get_payment_receipt_pdf(&self, workspace_id: u64, payment_id: &str) -> Result<Vec<u8>> {
+    pub fn get_payment_receipt_pdf(
+        &self,
+        workspace_id: WorkspaceId,
+        payment_id: &str,
+    ) -> Result<Vec<u8>> {
         self.client.request_binary(
             Method::GET,
             &format!(
@@ -1026,7 +1101,7 @@ impl WorkspacesClient {
     }
 
     /// Upload expense
-    pub fn upload_expense(&self, workspace_id: u64, expense_data: &[u8]) -> Result<()> {
+    pub fn upload_expense(&self, workspace_id: WorkspaceId, expense_data: &[u8]) -> Result<()> {
         self.client.request_multipart(
             Method::POST,
             &format!("workspaces/{}/expenses/upload", workspace_id),
@@ -1039,9 +1114,9 @@ impl WorkspacesClient {
     #[allow(clippy::too_many_arguments)]
     pub fn get_timesheet_setups(
         &self,
-        workspace_id: u64,
-        member_ids: Option<&[u64]>,
-        approver_ids: Option<&[u64]>,
+        workspace_id: WorkspaceId,
+        member_ids: Option<&[UserId]>,
+        approver_ids: Option<&[UserId]>,
         page: Option<u32>,
         per_page: Option<u32>,
         sort_field: Option<&str>,
@@ -1090,7 +1165,7 @@ impl WorkspacesClient {
     /// Create timesheet setup
     pub fn create_timesheet_setup(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         setup: &CreateTimesheetSetupPayload,
     ) -> Result<Vec<APITimesheetSetup>> {
         self.client.request_with_body(
@@ -1103,8 +1178,8 @@ impl WorkspacesClient {
     /// Get timesheet setup
     pub fn get_timesheet_setup(
         &self,
-        workspace_id: u64,
-        setup_id: u64,
+        workspace_id: WorkspaceId,
+        setup_id: SetupId,
     ) -> Result<APITimesheetSetup> {
         self.client.request(
             Method::GET,
@@ -1115,8 +1190,8 @@ impl WorkspacesClient {
     /// Update timesheet setup
     pub fn update_timesheet_setup(
         &self,
-        workspace_id: u64,
-        setup_id: u64,
+        workspace_id: WorkspaceId,
+        setup_id: SetupId,
         setup: &UpdateTimesheetSetupPayload,
     ) -> Result<APITimesheetSetup> {
         self.client.request_with_body(
@@ -1127,7 +1202,11 @@ impl WorkspacesClient {
     }
 
     /// Delete timesheet setup
-    pub fn delete_timesheet_setup(&self, workspace_id: u64, setup_id: u64) -> Result<()> {
+    pub fn delete_timesheet_setup(
+        &self,
+        workspace_id: WorkspaceId,
+        setup_id: SetupId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/timesheet_setups/{}", workspace_id, setup_id),
@@ -1139,7 +1218,7 @@ impl WorkspacesClient {
     /// Get all activity dashboard
     pub fn get_dashboard_all_activity(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         period: Option<&str>,
     ) -> Result<AllActivity> {
         let mut params = BTreeMap::new();
@@ -1156,7 +1235,7 @@ impl WorkspacesClient {
     /// Get most active users dashboard
     pub fn get_dashboard_most_active(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         period: Option<&str>,
     ) -> Result<MostActive> {
         let mut params = BTreeMap::new();
@@ -1173,7 +1252,7 @@ impl WorkspacesClient {
     /// Get top activities dashboard
     pub fn get_dashboard_top_activity(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         period: Option<&str>,
     ) -> Result<TopActivities> {
         let mut params = BTreeMap::new();
@@ -1190,7 +1269,10 @@ impl WorkspacesClient {
     // Time Entry Constraints endpoints
 
     /// Get time entry constraints
-    pub fn get_time_entry_constraints(&self, workspace_id: u64) -> Result<TimeEntryConstraints> {
+    pub fn get_time_entry_constraints(
+        &self,
+        workspace_id: WorkspaceId,
+    ) -> Result<TimeEntryConstraints> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/time_entry_constraints", workspace_id),
@@ -1200,7 +1282,7 @@ impl WorkspacesClient {
     /// Create or update time entry constraints
     pub fn create_time_entry_constraints(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         constraints: &TimeEntryConstraints,
     ) -> Result<TimeEntryConstraints> {
         self.client.request_with_body(
@@ -1213,7 +1295,7 @@ impl WorkspacesClient {
     /// Update time entry constraints (PATCH)
     pub fn update_time_entry_constraints(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         constraints: &TimeEntryConstraints,
     ) -> Result<TimeEntryConstraints> {
         self.client.request_with_body(

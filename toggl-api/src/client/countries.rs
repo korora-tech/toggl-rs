@@ -1,5 +1,6 @@
 use super::TogglClient;
 use crate::models::api::country::{Country, Subdivision};
+use crate::models::api::ids::CountryId;
 use reqwest::Method;
 use toggl_core::Result;
 
@@ -18,7 +19,7 @@ impl CountriesClient {
     }
 
     /// Get country subdivisions
-    pub fn get_subdivisions(&self, country_id: u64) -> Result<Vec<Subdivision>> {
+    pub fn get_subdivisions(&self, country_id: CountryId) -> Result<Vec<Subdivision>> {
         self.client.request(
             Method::GET,
             &format!("countries/{}/subdivisions", country_id),

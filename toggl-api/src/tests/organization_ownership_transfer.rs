@@ -1,3 +1,4 @@
+use crate::models::api::ids::{OrganizationId, TransferId, UserId};
 use crate::models::api::organization::CreateOwnershipTransfer;
 use crate::tests::*;
 use reqwest::Method;
@@ -6,8 +7,8 @@ use toggl_core::Result;
 
 #[test]
 fn test_accept_ownership_transfer() -> Result<()> {
-    let organization_id = 12345;
-    let transfer_id = 67890;
+    let organization_id = OrganizationId(12345);
+    let transfer_id = TransferId(67890);
 
     with_mockito(
         Method::POST,
@@ -28,8 +29,8 @@ fn test_accept_ownership_transfer() -> Result<()> {
 
 #[test]
 fn test_reject_ownership_transfer() -> Result<()> {
-    let organization_id = 12345;
-    let transfer_id = 67890;
+    let organization_id = OrganizationId(12345);
+    let transfer_id = TransferId(67890);
 
     with_mockito(
         Method::POST,
@@ -50,8 +51,8 @@ fn test_reject_ownership_transfer() -> Result<()> {
 
 #[test]
 fn test_cancel_ownership_transfer() -> Result<()> {
-    let organization_id = 12345;
-    let transfer_id = 67890;
+    let organization_id = OrganizationId(12345);
+    let transfer_id = TransferId(67890);
 
     with_mockito(
         Method::POST,
@@ -72,9 +73,9 @@ fn test_cancel_ownership_transfer() -> Result<()> {
 
 #[test]
 fn test_ownership_transfer_workflow() -> Result<()> {
-    let organization_id = 12345;
-    let new_owner_id = 99999;
-    let transfer_id = 67890;
+    let organization_id = OrganizationId(12345);
+    let new_owner_id = UserId(99999);
+    let transfer_id = TransferId(67890);
 
     // First create a transfer
     let create_request = CreateOwnershipTransfer { new_owner_id };

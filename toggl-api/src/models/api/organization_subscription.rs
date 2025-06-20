@@ -1,5 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+use super::ids::{
+    CompanyId, CurrencyCode, CustomerId, InvoiceInfoId, PaymentRecordId, PricingPlanId,
+};
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationSubscription {
     pub active_users: u32,
@@ -8,25 +12,25 @@ pub struct OrganizationSubscription {
     pub campaign_available: Option<bool>,
     pub cancel_date: Option<String>,
     pub card_details: Option<CardDetails>,
-    pub company_id: Option<u64>,
+    pub company_id: Option<CompanyId>,
     pub contact_details: Option<ContactDetail>,
     pub currency: String,
     pub current_period_ends_at: Option<String>,
     pub current_period_starts_at: Option<String>,
-    pub customer_id: Option<u64>,
+    pub customer_id: Option<CustomerId>,
     pub end_date: Option<String>,
     pub enterprise: bool,
     pub is_subscription_beta: bool,
     pub is_unified: bool,
     pub last_invoice: Option<InvoiceInfo>,
     pub last_payment: Option<PaymentInfo>,
-    pub last_pricing_plan_id: Option<u32>,
+    pub last_pricing_plan_id: Option<PricingPlanId>,
     pub new_signup_trial: Option<bool>,
     pub next_payment_date: Option<String>,
     pub payment_failed: Option<bool>,
     pub payment_method: Option<String>,
     pub plan_name: String,
-    pub pricing_plan_id: u32,
+    pub pricing_plan_id: PricingPlanId,
     pub renewal_at: Option<String>,
     pub renewal_date: Option<String>,
     pub seat_cost_in_cents: i64,
@@ -57,9 +61,9 @@ pub struct ContactDetail {
 pub struct InvoiceInfo {
     pub amount: f64,
     pub created_at: String,
-    pub currency_id: String,
+    pub currency_id: CurrencyCode,
     pub due: Option<f64>,
-    pub id: u64,
+    pub id: InvoiceInfoId,
     pub paid_at: Option<String>,
     pub tax_percentage: Option<f64>,
     pub total_amount: f64,
@@ -101,7 +105,7 @@ pub struct FeedbackResponse {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Customer {
-    pub id: u64,
+    pub id: CustomerId,
     pub email: String,
     pub name: Option<String>,
     pub company_name: Option<String>,
@@ -182,7 +186,7 @@ pub struct SetupIntent {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct StartTrial {
-    pub pricing_plan_id: Option<u32>,
+    pub pricing_plan_id: Option<PricingPlanId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -193,17 +197,17 @@ pub struct UpgradeRequest {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PaymentRecord {
-    pub id: u64,
+    pub id: PaymentRecordId,
     pub amount: f64,
     pub currency: String,
     pub created_at: String,
     pub status: String,
-    pub invoice_id: Option<u64>,
+    pub invoice_id: Option<InvoiceInfoId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationPlan {
-    pub id: u32,
+    pub id: PricingPlanId,
     pub name: String,
     pub tag: String,
     pub currency: String,

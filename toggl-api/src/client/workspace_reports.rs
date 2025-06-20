@@ -1,4 +1,5 @@
 use super::TogglClient;
+use crate::models::api::ids::{ReportId, ScheduledReportId, WorkspaceId};
 use crate::models::api::scheduled_reports::*;
 use crate::models::api::shared_reports::*;
 use reqwest::Method;
@@ -17,7 +18,7 @@ impl WorkspaceReportsClient {
     /// Get shared reports
     pub fn get_shared_reports(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         query: Option<&SharedReportsQuery>,
     ) -> Result<Vec<SavedReport>> {
         let mut params = BTreeMap::new();
@@ -65,7 +66,7 @@ impl WorkspaceReportsClient {
     /// Create a shared report
     pub fn create_shared_report(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         report: &CreateSavedReportPayload,
     ) -> Result<SavedReport> {
         self.client.request_with_body(
@@ -78,7 +79,7 @@ impl WorkspaceReportsClient {
     /// Update shared reports
     pub fn update_shared_reports(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         reports: &[UpdateSavedReportPayload],
     ) -> Result<SavedReport> {
         self.client.request_with_body(
@@ -89,7 +90,11 @@ impl WorkspaceReportsClient {
     }
 
     /// Get a specific shared report
-    pub fn get_shared_report(&self, workspace_id: u64, report_id: u64) -> Result<SavedReport> {
+    pub fn get_shared_report(
+        &self,
+        workspace_id: WorkspaceId,
+        report_id: ReportId,
+    ) -> Result<SavedReport> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/reports/shared/{}", workspace_id, report_id),
@@ -99,8 +104,8 @@ impl WorkspaceReportsClient {
     /// Update a specific shared report
     pub fn update_shared_report(
         &self,
-        workspace_id: u64,
-        report_id: u64,
+        workspace_id: WorkspaceId,
+        report_id: ReportId,
         report: &UpdateSavedReportPayload,
     ) -> Result<SavedReport> {
         self.client.request_with_body(
@@ -111,7 +116,11 @@ impl WorkspaceReportsClient {
     }
 
     /// Delete a specific shared report
-    pub fn delete_shared_report(&self, workspace_id: u64, report_id: u64) -> Result<()> {
+    pub fn delete_shared_report(
+        &self,
+        workspace_id: WorkspaceId,
+        report_id: ReportId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/reports/shared/{}", workspace_id, report_id),
@@ -119,8 +128,14 @@ impl WorkspaceReportsClient {
     }
 
     /// Bulk delete shared reports
-    pub fn bulk_delete_shared_reports(&self, workspace_id: u64, ids: Vec<i64>) -> Result<()> {
-        let request = BulkDeleteRequest { ids };
+    pub fn bulk_delete_shared_reports(
+        &self,
+        workspace_id: WorkspaceId,
+        ids: Vec<ReportId>,
+    ) -> Result<()> {
+        let request = BulkDeleteRequest {
+            ids: ids.into_iter().map(|id| id.value() as i64).collect(),
+        };
         self.client.request_with_body_empty(
             Method::PATCH,
             &format!("workspaces/{}/reports/shared/bulk_delete", workspace_id),
@@ -129,7 +144,7 @@ impl WorkspaceReportsClient {
     }
 
     /// Get scheduled reports
-    pub fn get_scheduled_reports(&self, workspace_id: u64) -> Result<Vec<ScheduledReport>> {
+    pub fn get_scheduled_reports(&self, workspace_id: WorkspaceId) -> Result<Vec<ScheduledReport>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/scheduled_reports", workspace_id),
@@ -139,7 +154,7 @@ impl WorkspaceReportsClient {
     /// Create a scheduled report
     pub fn create_scheduled_report(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         report: &CreateScheduledReportPayload,
     ) -> Result<ScheduledReport> {
         self.client.request_with_body(
@@ -152,8 +167,8 @@ impl WorkspaceReportsClient {
     /// Get a specific scheduled report
     pub fn get_scheduled_report(
         &self,
-        workspace_id: u64,
-        report_id: u64,
+        workspace_id: WorkspaceId,
+        report_id: ScheduledReportId,
     ) -> Result<ScheduledReport> {
         self.client.request(
             Method::GET,
@@ -165,7 +180,11 @@ impl WorkspaceReportsClient {
     }
 
     /// Delete a scheduled report
-    pub fn delete_scheduled_report(&self, workspace_id: u64, report_id: u64) -> Result<()> {
+    pub fn delete_scheduled_report(
+        &self,
+        workspace_id: WorkspaceId,
+        report_id: ScheduledReportId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!(

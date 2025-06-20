@@ -1,4 +1,5 @@
 use crate::client::audit::AuditLogFilters;
+use crate::models::api::ids::{OrganizationId, UserId, WorkspaceId};
 use crate::tests::*;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
@@ -8,7 +9,7 @@ use toggl_core::Result;
 
 #[test]
 fn test_get_audit_logs() -> Result<()> {
-    let org_id = 12345;
+    let org_id = OrganizationId(12345);
     let from = DateTime::parse_from_rfc3339("2024-01-01T00:00:00Z")
         .unwrap()
         .with_timezone(&Utc);
@@ -57,10 +58,10 @@ fn test_get_audit_logs() -> Result<()> {
         |client| {
             let logs = client.audit().get_logs(org_id, from, to)?;
             assert_eq!(logs.len(), 2);
-            assert_eq!(logs[0].id, "log_123");
-            assert_eq!(logs[0].user_id, 98765);
+            assert_eq!(logs[0].id, "log_123".into());
+            assert_eq!(logs[0].user_id, 98765.into());
             assert_eq!(logs[0].event_type, "workspace.created");
-            assert_eq!(logs[1].id, "log_124");
+            assert_eq!(logs[1].id, "log_124".into());
             assert_eq!(logs[1].event_type, "project.updated");
             Ok(())
         },
@@ -69,7 +70,7 @@ fn test_get_audit_logs() -> Result<()> {
 
 #[test]
 fn test_get_audit_logs_with_filters() -> Result<()> {
-    let org_id = 12345;
+    let org_id = OrganizationId(12345);
     let from = DateTime::parse_from_rfc3339("2024-01-01T00:00:00Z")
         .unwrap()
         .with_timezone(&Utc);
@@ -109,11 +110,11 @@ fn test_get_audit_logs_with_filters() -> Result<()> {
         Some(response),
         |client| {
             let filters = AuditLogFilters {
-                workspace_id: Some(54321),
+                workspace_id: Some(WorkspaceId(54321)),
                 entity_type: Some("time_entry".to_string()),
                 entity_id: None,
                 action: Some("created".to_string()),
-                user_id: Some(98765),
+                user_id: Some(UserId(98765)),
                 page_size: None,
                 offset: None,
             };
@@ -129,7 +130,7 @@ fn test_get_audit_logs_with_filters() -> Result<()> {
 
 #[test]
 fn test_get_audit_logs_export() -> Result<()> {
-    let org_id = 12345;
+    let org_id = OrganizationId(12345);
     let from = DateTime::parse_from_rfc3339("2024-01-01T00:00:00Z")
         .unwrap()
         .with_timezone(&Utc);
@@ -173,7 +174,7 @@ fn test_get_audit_logs_export() -> Result<()> {
 
 #[test]
 fn test_get_audit_logs_pagination() -> Result<()> {
-    let org_id = 12345;
+    let org_id = OrganizationId(12345);
     let from = DateTime::parse_from_rfc3339("2024-01-01T00:00:00Z")
         .unwrap()
         .with_timezone(&Utc);
@@ -215,7 +216,7 @@ fn test_get_audit_logs_pagination() -> Result<()> {
 
 #[test]
 fn test_get_audit_logs_empty() -> Result<()> {
-    let org_id = 12345;
+    let org_id = OrganizationId(12345);
     let from = DateTime::parse_from_rfc3339("2024-01-01T00:00:00Z")
         .unwrap()
         .with_timezone(&Utc);

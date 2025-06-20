@@ -1,21 +1,25 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use super::ids::{
+    CreatorId, LevelId, ProjectId, ProjectUserId, RateId, TaskId, WorkspaceId, WorkspaceUserId,
+};
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Rate {
-    pub id: Option<u64>,
+    pub id: Option<RateId>,
     pub amount: Option<f64>,
     pub created_at: Option<DateTime<Utc>>,
-    pub creator_id: Option<u64>,
+    pub creator_id: Option<CreatorId>,
     pub deleted_at: Option<DateTime<Utc>>,
     pub end: Option<DateTime<Utc>>,
     pub start: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
-    pub workspace_id: Option<u64>,
-    pub project_id: Option<u64>,
-    pub planned_task_id: Option<u64>,
-    pub workspace_user_id: Option<u64>,
-    pub project_user_id: Option<u64>,
+    pub workspace_id: Option<WorkspaceId>,
+    pub project_id: Option<ProjectId>,
+    pub planned_task_id: Option<TaskId>,
+    pub workspace_user_id: Option<WorkspaceUserId>,
+    pub project_user_id: Option<ProjectUserId>,
     #[serde(rename = "type")]
     pub rate_type: Option<String>,
     pub rate_change_mode: Option<String>,
@@ -25,7 +29,7 @@ pub struct Rate {
 pub struct CreateRate {
     pub amount: f64,
     pub level: RateLevel,
-    pub level_id: u64,
+    pub level_id: LevelId,
     #[serde(rename = "type")]
     pub rate_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]

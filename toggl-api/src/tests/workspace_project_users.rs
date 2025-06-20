@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::{
+        models::api::ids::{ProjectId, ProjectUserId, UserId, WorkspaceId},
         models::api::project::{CreateProjectUser, PatchOperation, UpdateProjectUser},
         tests::with_mockito,
     };
@@ -31,11 +32,11 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let users = client.workspaces().get_project_users(123)?;
+                let users = client.workspaces().get_project_users(WorkspaceId(123))?;
                 assert_eq!(users.len(), 1);
-                assert_eq!(users[0].id, 1);
-                assert_eq!(users[0].project_id, 200);
-                assert_eq!(users[0].user_id, 300);
+                assert_eq!(users[0].id, ProjectUserId(1));
+                assert_eq!(users[0].project_id, ProjectId(200));
+                assert_eq!(users[0].user_id, UserId(300));
                 assert!(users[0].manager);
                 Ok(())
             },
@@ -45,8 +46,8 @@ mod tests {
     #[test]
     fn test_create_project_user() -> Result<()> {
         let create_data = CreateProjectUser {
-            project_id: 200,
-            user_id: 300,
+            project_id: ProjectId(200),
+            user_id: UserId(300),
             manager: Some(true),
             rate: Some(50.0),
             labour_cost: Some(45.0),
@@ -71,10 +72,12 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let user = client.workspaces().create_project_user(123, &create_data)?;
-                assert_eq!(user.id, 1);
-                assert_eq!(user.project_id, 200);
-                assert_eq!(user.user_id, 300);
+                let user = client
+                    .workspaces()
+                    .create_project_user(WorkspaceId(123), &create_data)?;
+                assert_eq!(user.id, ProjectUserId(1));
+                assert_eq!(user.project_id, ProjectId(200));
+                assert_eq!(user.user_id, UserId(300));
                 assert!(user.manager);
                 assert_eq!(user.rate, Some(50.0));
                 Ok(())
@@ -103,8 +106,10 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let user = client.workspaces().get_project_user(123, 1)?;
-                assert_eq!(user.id, 1);
+                let user = client
+                    .workspaces()
+                    .get_project_user(WorkspaceId(123), ProjectUserId(1))?;
+                assert_eq!(user.id, ProjectUserId(1));
                 assert!(!user.manager);
                 assert_eq!(user.rate, Some(60.0));
                 Ok(())
@@ -139,10 +144,12 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let user = client
-                    .workspaces()
-                    .update_project_user(123, 1, &update_data)?;
-                assert_eq!(user.id, 1);
+                let user = client.workspaces().update_project_user(
+                    WorkspaceId(123),
+                    ProjectUserId(1),
+                    &update_data,
+                )?;
+                assert_eq!(user.id, ProjectUserId(1));
                 assert!(!user.manager);
                 assert_eq!(user.rate, Some(75.0));
                 assert_eq!(user.labour_cost, Some(70.0));
@@ -159,7 +166,9 @@ mod tests {
             200,
             None::<serde_json::Value>,
             |client| {
-                client.workspaces().delete_project_user(123, 1)?;
+                client
+                    .workspaces()
+                    .delete_project_user(WorkspaceId(123), ProjectUserId(1))?;
                 Ok(())
             },
         )
@@ -213,10 +222,11 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let users =
-                    client
-                        .workspaces()
-                        .update_project_users_batch(123, &[1, 2], &operations)?;
+                let users = client.workspaces().update_project_users_batch(
+                    WorkspaceId(123),
+                    &[ProjectUserId(1), ProjectUserId(2)],
+                    &operations,
+                )?;
                 assert_eq!(users.len(), 2);
                 assert!(users[0].manager);
                 assert_eq!(users[0].rate, Some(80.0));

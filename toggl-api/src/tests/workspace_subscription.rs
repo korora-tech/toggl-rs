@@ -1,3 +1,4 @@
+use crate::models::api::ids::WorkspaceId;
 use serde_json::json;
 use toggl_core::Result;
 
@@ -99,7 +100,7 @@ fn test_get_workspace_subscription() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let subscription = client.workspaces().get_subscription(111)?;
+            let subscription = client.workspaces().get_subscription(WorkspaceId(111))?;
             assert_eq!(subscription.active_users, 5);
             assert!(subscription.auto_renew);
             assert_eq!(subscription.billing_period_in_months, 12);

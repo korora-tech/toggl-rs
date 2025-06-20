@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+    use crate::models::api::ids::{SsoProfileId, WorkspaceId};
     use crate::models::api::saml::*;
     use crate::tests::*;
     use reqwest::Method;
@@ -37,7 +38,7 @@ mod tests {
     fn test_saml2_callback() -> Result<()> {
         with_mockito(Method::POST, "/auth/saml2/login/123", 200, None, |client| {
             client.saml().saml2_callback(
-                123,
+                WorkspaceId(123),
                 "PHNhbWxwOlJlc3BvbnNlPi4uLjwvc2FtbHA6UmVzcG9uc2U+",
                 Some("original-request-url"),
             )?;
@@ -78,7 +79,7 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let profiles = client.saml().get_linked_sso_profiles(123)?;
+                let profiles = client.saml().get_linked_sso_profiles(WorkspaceId(123))?;
                 assert_eq!(profiles.len(), 2);
                 assert_eq!(profiles[0].sso_profile_id, Some(1));
                 assert_eq!(
@@ -103,7 +104,11 @@ mod tests {
             200,
             None,
             |client| {
-                client.saml().link_sso_profile(123, 456, &link_profile)?;
+                client.saml().link_sso_profile(
+                    WorkspaceId(123),
+                    SsoProfileId(456),
+                    &link_profile,
+                )?;
                 Ok(())
             },
         )
@@ -117,7 +122,9 @@ mod tests {
             204,
             None,
             |client| {
-                client.saml().unlink_sso_profile(123, 456)?;
+                client
+                    .saml()
+                    .unlink_sso_profile(WorkspaceId(123), SsoProfileId(456))?;
                 Ok(())
             },
         )

@@ -1,9 +1,10 @@
 use super::{ReportFilters, ReportGrouping, ReportOrdering, ReportTimeRange};
+use crate::models::api::ids::WorkspaceId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SummaryReportRequest {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     #[serde(flatten)]
     pub time_range: ReportTimeRange,
     #[serde(flatten)]

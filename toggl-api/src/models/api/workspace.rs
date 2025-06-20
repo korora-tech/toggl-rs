@@ -1,10 +1,14 @@
+use super::ids::{
+    CompanyId, CountryId, CustomerId, GroupId, OrganizationId, PricingPlanId, SubscriptionId,
+    UserId, WorkspaceId, WorkspaceUserId,
+};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Workspace {
-    pub id: u64,
-    pub organization_id: Option<u64>,
+    pub id: WorkspaceId,
+    pub organization_id: Option<OrganizationId>,
     pub name: String,
     pub profile: u64,
     pub premium: bool,
@@ -50,20 +54,20 @@ pub struct CSVUpload {
 pub struct WorkspaceSubscription {
     pub auto_renew: bool,
     pub card_details: Option<CardDetails>,
-    pub company_id: Option<u64>,
+    pub company_id: Option<CompanyId>,
     pub contact_detail: Option<ContactDetail>,
     pub created_at: DateTime<Utc>,
     pub currency: String,
-    pub customer_id: Option<u64>,
+    pub customer_id: Option<CustomerId>,
     pub deleted_at: Option<DateTime<Utc>>,
-    pub last_pricing_plan_id: Option<u32>,
-    pub organization_id: Option<u64>,
+    pub last_pricing_plan_id: Option<PricingPlanId>,
+    pub organization_id: Option<OrganizationId>,
     pub payment_details: Option<PaymentDetails>,
-    pub pricing_plan_id: u32,
+    pub pricing_plan_id: PricingPlanId,
     pub renewal_at: Option<DateTime<Utc>>,
-    pub subscription_id: Option<u64>,
+    pub subscription_id: Option<SubscriptionId>,
     pub subscription_period: Option<SubscriptionPeriod>,
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -71,7 +75,7 @@ pub struct CardDetails {
     pub added_at: DateTime<Utc>,
     pub card_number: String,
     pub card_type: String,
-    pub creator_id: u64,
+    pub creator_id: UserId,
     pub creator_name: String,
     pub expiry_date: String,
     pub holder_name: String,
@@ -84,7 +88,7 @@ pub struct ContactDetail {
     pub company_city: Option<String>,
     pub company_state: Option<String>,
     pub company_zip: Option<String>,
-    pub company_country_id: Option<u32>,
+    pub company_country_id: Option<CountryId>,
     pub contact_person: Option<String>,
     pub contact_email: Option<String>,
 }
@@ -101,8 +105,8 @@ pub struct PaymentDetails {
 pub struct SubscriptionPeriod {
     pub current_period_ends_at: Option<DateTime<Utc>>,
     pub current_period_starts_at: Option<DateTime<Utc>>,
-    pub last_pricing_plan_id: Option<u32>,
-    pub pricing_plan_id: u32,
+    pub last_pricing_plan_id: Option<PricingPlanId>,
+    pub pricing_plan_id: PricingPlanId,
     pub trial: bool,
     pub trial_ends_at: Option<DateTime<Utc>>,
     pub trial_extended_at: Option<DateTime<Utc>>,
@@ -111,7 +115,7 @@ pub struct SubscriptionPeriod {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateWorkspace {
     pub name: String,
-    pub initial_pricing_plan: Option<u32>,
+    pub initial_pricing_plan: Option<PricingPlanId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -134,9 +138,9 @@ pub struct UpdateWorkspace {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WorkspaceUser {
-    pub id: u64,
-    pub user_id: u64,
-    pub workspace_id: u64,
+    pub id: WorkspaceUserId,
+    pub user_id: UserId,
+    pub workspace_id: WorkspaceId,
     pub name: String,
     pub email: String,
     pub admin: bool,
@@ -144,7 +148,7 @@ pub struct WorkspaceUser {
     pub invite_url: Option<String>,
     pub at: DateTime<Utc>,
     pub avatar_file_name: Option<String>,
-    pub group_ids: Option<Vec<u64>>,
+    pub group_ids: Option<Vec<GroupId>>,
     pub inactive: bool,
     pub is_direct: bool,
     pub labour_cost: Option<f64>,

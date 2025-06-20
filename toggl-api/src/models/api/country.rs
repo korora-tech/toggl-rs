@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+use super::ids::{CountryId, CountrySubdivisionId};
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Country {
-    pub id: u32,
+    pub id: CountryId,
     pub name: String,
     pub code: String,
     pub vat_applicable: bool,
@@ -12,8 +14,8 @@ pub struct Country {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Subdivision {
-    pub id: u32,
+    pub id: CountrySubdivisionId,
     pub name: String,
     pub code: String,
-    pub country_id: u32,
+    pub country_id: CountryId,
 }

@@ -1,3 +1,4 @@
+use crate::models::api::ids::{OrganizationId, PricingPlanId};
 use crate::models::api::organization_subscription::*;
 use crate::tests::with_mockito;
 use reqwest::Method;
@@ -28,7 +29,9 @@ fn test_get_subscription() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let subscription = client.organizations().get_subscription(123)?;
+            let subscription = client
+                .organizations()
+                .get_subscription(OrganizationId(123))?;
             assert_eq!(subscription.active_users, 5);
             assert!(subscription.auto_renew);
             assert_eq!(subscription.plan_name, "Pro");
@@ -67,7 +70,7 @@ fn test_create_subscription() -> Result<()> {
         |client| {
             let subscription = client
                 .organizations()
-                .create_subscription(123, &create_subscription)?;
+                .create_subscription(OrganizationId(123), &create_subscription)?;
             assert_eq!(subscription.plan_name, "Pro");
             Ok(())
         },
@@ -104,7 +107,7 @@ fn test_update_subscription() -> Result<()> {
         |client| {
             let subscription = client
                 .organizations()
-                .update_subscription(123, &update_subscription)?;
+                .update_subscription(OrganizationId(123), &update_subscription)?;
             assert_eq!(subscription.plan_name, "Enterprise");
             assert!(subscription.enterprise);
             Ok(())
@@ -120,7 +123,9 @@ fn test_cancel_subscription() -> Result<()> {
         204,
         None,
         |client| {
-            client.organizations().cancel_subscription(123)?;
+            client
+                .organizations()
+                .cancel_subscription(OrganizationId(123))?;
             Ok(())
         },
     )
@@ -143,7 +148,7 @@ fn test_submit_cancellation_feedback() -> Result<()> {
         |client| {
             client
                 .organizations()
-                .submit_cancellation_feedback(123, &feedback)?;
+                .submit_cancellation_feedback(OrganizationId(123), &feedback)?;
             Ok(())
         },
     )
@@ -166,7 +171,9 @@ fn test_get_subscription_customer() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let customer = client.organizations().get_subscription_customer(123)?;
+            let customer = client
+                .organizations()
+                .get_subscription_customer(OrganizationId(123))?;
             assert_eq!(customer.email, "billing@company.com");
             assert_eq!(customer.name, Some("John Doe".to_string()));
             Ok(())
@@ -202,7 +209,7 @@ fn test_create_subscription_customer() -> Result<()> {
         |client| {
             let customer = client
                 .organizations()
-                .create_subscription_customer(123, &create_customer)?;
+                .create_subscription_customer(OrganizationId(123), &create_customer)?;
             assert_eq!(customer.email, "new@company.com");
             Ok(())
         },
@@ -237,7 +244,7 @@ fn test_update_subscription_customer() -> Result<()> {
         |client| {
             let customer = client
                 .organizations()
-                .update_subscription_customer(123, &update_customer)?;
+                .update_subscription_customer(OrganizationId(123), &update_customer)?;
             assert_eq!(customer.email, "updated@company.com");
             Ok(())
         },
@@ -264,7 +271,7 @@ fn test_request_discount() -> Result<()> {
         |client| {
             let result = client
                 .organizations()
-                .request_discount(123, &discount_request)?;
+                .request_discount(OrganizationId(123), &discount_request)?;
             assert!(result.success);
             Ok(())
         },
@@ -289,7 +296,7 @@ fn test_feature_upsell_multi() -> Result<()> {
         |client| {
             let result = client
                 .organizations()
-                .feature_upsell_multi(123, &upsell_request)?;
+                .feature_upsell_multi(OrganizationId(123), &upsell_request)?;
             assert!(result.success);
             Ok(())
         },
@@ -316,7 +323,9 @@ fn test_get_invoice_summary() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let summary = client.organizations().get_invoice_summary(123)?;
+            let summary = client
+                .organizations()
+                .get_invoice_summary(OrganizationId(123))?;
             assert_eq!(summary.amount_in_cents, 10000);
             assert_eq!(summary.currency, "USD");
             assert_eq!(summary.items.len(), 1);
@@ -339,7 +348,9 @@ fn test_get_payment_failed() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let payment_failed = client.organizations().get_payment_failed(123)?;
+            let payment_failed = client
+                .organizations()
+                .get_payment_failed(OrganizationId(123))?;
             assert_eq!(payment_failed.reason, "Card declined");
             Ok(())
         },
@@ -362,7 +373,9 @@ fn test_apply_promo_code() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let result = client.organizations().apply_promo_code(123, &promo_code)?;
+            let result = client
+                .organizations()
+                .apply_promo_code(OrganizationId(123), &promo_code)?;
             assert!(result.success);
             Ok(())
         },
@@ -377,7 +390,9 @@ fn test_remove_promo_code() -> Result<()> {
         204,
         None,
         |client| {
-            client.organizations().remove_promo_code(123)?;
+            client
+                .organizations()
+                .remove_promo_code(OrganizationId(123))?;
             Ok(())
         },
     )
@@ -401,7 +416,7 @@ fn test_apply_referral_bonus() -> Result<()> {
         |client| {
             let result = client
                 .organizations()
-                .apply_referral_bonus(123, &referral)?;
+                .apply_referral_bonus(OrganizationId(123), &referral)?;
             assert!(result.success);
             Ok(())
         },
@@ -421,7 +436,9 @@ fn test_create_setup_intent() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let intent = client.organizations().create_setup_intent(123)?;
+            let intent = client
+                .organizations()
+                .create_setup_intent(OrganizationId(123))?;
             assert_eq!(intent.client_secret, "pi_1234567890_secret");
             assert_eq!(intent.payment_method_types, vec!["card"]);
             Ok(())
@@ -432,7 +449,7 @@ fn test_create_setup_intent() -> Result<()> {
 #[test]
 fn test_start_trial() -> Result<()> {
     let trial = StartTrial {
-        pricing_plan_id: Some(2),
+        pricing_plan_id: Some(PricingPlanId(2)),
     };
 
     let response = json!({
@@ -458,7 +475,9 @@ fn test_start_trial() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let subscription = client.organizations().start_trial(123, &trial)?;
+            let subscription = client
+                .organizations()
+                .start_trial(OrganizationId(123), &trial)?;
             assert_eq!(subscription.state, "trial");
             Ok(())
         },
@@ -483,7 +502,7 @@ fn test_request_upgrade() -> Result<()> {
         Some(response),
         |client| {
             let result = client.organizations().request_upgrade(
-                123,
+                OrganizationId(123),
                 "advanced_reporting",
                 &upgrade_request,
             )?;
@@ -512,7 +531,9 @@ fn test_get_payment_records() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let records = client.organizations().get_payment_records(123, None)?;
+            let records = client
+                .organizations()
+                .get_payment_records(OrganizationId(123), None)?;
             assert_eq!(records.len(), 1);
             assert_eq!(records[0].amount, 100.00);
             assert_eq!(records[0].status, "paid");
@@ -542,7 +563,7 @@ fn test_get_payment_records_with_unified() -> Result<()> {
         |client| {
             let records = client
                 .organizations()
-                .get_payment_records(123, Some(true))?;
+                .get_payment_records(OrganizationId(123), Some(true))?;
             assert_eq!(records.len(), 1);
             assert_eq!(records[0].amount, 200.00);
             Ok(())
@@ -579,7 +600,7 @@ fn test_get_plans() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let plans = client.organizations().get_plans(123)?;
+            let plans = client.organizations().get_plans(OrganizationId(123))?;
             assert_eq!(plans.len(), 2);
             assert_eq!(plans[0].name, "Free");
             assert_eq!(plans[1].name, "Pro");
@@ -606,7 +627,9 @@ fn test_get_plan() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let plan = client.organizations().get_plan(123, 2)?;
+            let plan = client
+                .organizations()
+                .get_plan(OrganizationId(123), PricingPlanId(2))?;
             assert_eq!(plan.name, "Pro");
             assert_eq!(plan.amount_in_cents, 1000);
             Ok(())

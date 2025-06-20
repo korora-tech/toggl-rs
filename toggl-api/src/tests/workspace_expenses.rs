@@ -1,5 +1,6 @@
 use crate::client::TogglClient;
 use crate::models::api::expense::CreateExpense;
+use crate::models::api::ids::{CategoryId, ExpenseId, ProjectId, WorkspaceId};
 use crate::tests::*;
 use chrono::NaiveDate;
 use reqwest::Method;
@@ -8,7 +9,7 @@ use toggl_core::Result;
 
 #[test]
 fn test_get_expenses() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!([
         {
@@ -73,7 +74,7 @@ fn test_get_expenses() -> Result<()> {
 
 #[test]
 fn test_create_expense() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let new_expense = CreateExpense {
         workspace_id,
@@ -81,8 +82,8 @@ fn test_create_expense() -> Result<()> {
         description: "Software subscription".to_string(),
         amount: 49.99,
         currency: "USD".to_string(),
-        category_id: 3,
-        project_id: Some(54321),
+        category_id: CategoryId(3),
+        project_id: Some(ProjectId(54321)),
         task_id: None,
         billable: Some(true),
         payee: None,
@@ -117,7 +118,7 @@ fn test_create_expense() -> Result<()> {
             let expense = client
                 .workspaces()
                 .create_expense(workspace_id, &new_expense)?;
-            assert_eq!(expense.id, 1003);
+            assert_eq!(expense.id, ExpenseId(1003));
             assert_eq!(expense.description, "Software subscription");
             assert_eq!(expense.amount, 49.99);
             assert_eq!(expense.category_name, "Software");
@@ -129,7 +130,7 @@ fn test_create_expense() -> Result<()> {
 
 #[test]
 fn test_get_empty_expenses() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!([]);
 
@@ -148,7 +149,7 @@ fn test_get_empty_expenses() -> Result<()> {
 
 #[test]
 fn test_create_minimal_expense() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let new_expense = CreateExpense {
         workspace_id,
@@ -156,7 +157,7 @@ fn test_create_minimal_expense() -> Result<()> {
         description: "Office supplies".to_string(),
         amount: 25.00,
         currency: "USD".to_string(),
-        category_id: 4,
+        category_id: CategoryId(4),
         project_id: None,
         task_id: None,
         billable: None,
@@ -192,7 +193,7 @@ fn test_create_minimal_expense() -> Result<()> {
             let expense = client
                 .workspaces()
                 .create_expense(workspace_id, &new_expense)?;
-            assert_eq!(expense.id, 1004);
+            assert_eq!(expense.id, ExpenseId(1004));
             assert_eq!(expense.description, "Office supplies");
             assert_eq!(expense.project_id, None);
             assert!(!expense.billable);
@@ -203,7 +204,7 @@ fn test_create_minimal_expense() -> Result<()> {
 
 #[test]
 fn test_upload_expense() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
     let expense_data =
         b"date,description,amount,currency,category_id\n2024-01-20,Test expense,100.00,USD,1";
 

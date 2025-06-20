@@ -1,4 +1,5 @@
 use super::TogglClient;
+use crate::models::api::ids::WorkspaceId;
 use reqwest::Method;
 use toggl_core::Result;
 
@@ -20,7 +21,7 @@ impl ICalClient {
 
     /// Reset the iCal token for a workspace
     /// Returns the new token
-    pub fn reset_token(&self, workspace_id: u64) -> Result<String> {
+    pub fn reset_token(&self, workspace_id: WorkspaceId) -> Result<String> {
         self.client.request(
             Method::POST,
             &format!("workspaces/{}/ical/reset", workspace_id),
@@ -29,7 +30,7 @@ impl ICalClient {
 
     /// Toggle the iCal token on/off for a workspace
     /// Returns the status message
-    pub fn toggle_ical(&self, workspace_id: u64) -> Result<String> {
+    pub fn toggle_ical(&self, workspace_id: WorkspaceId) -> Result<String> {
         self.client.request(
             Method::POST,
             &format!("workspaces/{}/ical/toggle", workspace_id),

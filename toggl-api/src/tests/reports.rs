@@ -1,5 +1,8 @@
 #[cfg(test)]
 mod tests {
+    use crate::models::api::ids::{
+        ClientId, ExportId, ProjectId, TimeEntryId, UserId, WorkspaceId,
+    };
     use crate::tests::*;
     use reqwest::Method;
     use serde_json::json;
@@ -42,7 +45,7 @@ mod tests {
                 params.insert("start_date".to_string(), "2024-01-01".to_string());
                 params.insert("end_date".to_string(), "2024-01-31".to_string());
 
-                let result = client.reports().summary(123456, params)?;
+                let result = client.reports().summary(WorkspaceId(123456), params)?;
 
                 assert_eq!(result.groups.len(), 1);
                 assert_eq!(result.groups[0].id, Some(123));
@@ -109,10 +112,10 @@ mod tests {
                 params.insert("start_date".to_string(), "2024-01-01".to_string());
                 params.insert("end_date".to_string(), "2024-01-31".to_string());
 
-                let result = client.reports().detailed(123456, params)?;
+                let result = client.reports().detailed(WorkspaceId(123456), params)?;
 
                 assert_eq!(result.data.len(), 1);
-                assert_eq!(result.data[0].id, 111);
+                assert_eq!(result.data[0].id, TimeEntryId(111));
                 assert_eq!(
                     result.data[0].description,
                     Some("Working on task".to_string())
@@ -154,7 +157,7 @@ mod tests {
                 params.insert("start_date".to_string(), "2024-01-01".to_string());
                 params.insert("end_date".to_string(), "2024-01-31".to_string());
 
-                let result = client.reports().weekly(123456, params)?;
+                let result = client.reports().weekly(WorkspaceId(123456), params)?;
 
                 assert_eq!(result.week_totals.len(), 1);
                 assert_eq!(result.week_totals[0].seconds, 144000);
@@ -203,10 +206,12 @@ mod tests {
                 params.insert("end_date".to_string(), "2024-12-31".to_string());
                 params.insert("granularity".to_string(), "month".to_string());
 
-                let result = client.reports().project_trends(123456, params)?;
+                let result = client
+                    .reports()
+                    .project_trends(WorkspaceId(123456), params)?;
 
                 assert_eq!(result.projects.len(), 1);
-                assert_eq!(result.projects[0].project_id, Some(123));
+                assert_eq!(result.projects[0].project_id, Some(ProjectId(123)));
                 assert_eq!(
                     result.projects[0].project_name,
                     Some("Project A".to_string())
@@ -251,10 +256,12 @@ mod tests {
                 params.insert("end_date".to_string(), "2024-12-31".to_string());
                 params.insert("granularity".to_string(), "month".to_string());
 
-                let result = client.reports().client_trends(123456, params)?;
+                let result = client
+                    .reports()
+                    .client_trends(WorkspaceId(123456), params)?;
 
                 assert_eq!(result.clients.len(), 1);
-                assert_eq!(result.clients[0].client_id, Some(456));
+                assert_eq!(result.clients[0].client_id, Some(ClientId(456)));
                 assert_eq!(result.clients[0].client_name, Some("Client X".to_string()));
                 Ok(())
             },
@@ -296,10 +303,10 @@ mod tests {
                 params.insert("end_date".to_string(), "2024-12-31".to_string());
                 params.insert("granularity".to_string(), "month".to_string());
 
-                let result = client.reports().user_trends(123456, params)?;
+                let result = client.reports().user_trends(WorkspaceId(123456), params)?;
 
                 assert_eq!(result.users.len(), 1);
-                assert_eq!(result.users[0].user_id, 789);
+                assert_eq!(result.users[0].user_id, UserId(789));
                 assert_eq!(result.users[0].user_name, "John Doe");
                 Ok(())
             },
@@ -352,10 +359,12 @@ mod tests {
                 params.insert("start_date".to_string(), "2024-01-01".to_string());
                 params.insert("end_date".to_string(), "2024-01-31".to_string());
 
-                let result = client.reports().project_profitability(123456, params)?;
+                let result = client
+                    .reports()
+                    .project_profitability(WorkspaceId(123456), params)?;
 
                 assert_eq!(result.projects.len(), 1);
-                assert_eq!(result.projects[0].project_id, 123);
+                assert_eq!(result.projects[0].project_id, ProjectId(123));
                 assert_eq!(result.projects[0].billable_amount, 5000.0);
                 assert_eq!(result.projects[0].profit, 2000.0);
                 assert_eq!(result.totals.profit_margin, 0.4);
@@ -407,10 +416,12 @@ mod tests {
                 params.insert("start_date".to_string(), "2024-01-01".to_string());
                 params.insert("end_date".to_string(), "2024-01-31".to_string());
 
-                let result = client.reports().employee_profitability(123456, params)?;
+                let result = client
+                    .reports()
+                    .employee_profitability(WorkspaceId(123456), params)?;
 
                 assert_eq!(result.employees.len(), 1);
-                assert_eq!(result.employees[0].user_id, 789);
+                assert_eq!(result.employees[0].user_id, UserId(789));
                 assert_eq!(result.employees[0].billable_amount, 10000.0);
                 assert_eq!(result.employees[0].profit, 4000.0);
                 Ok(())
@@ -468,7 +479,7 @@ mod tests {
                 params.insert("period_2_start".to_string(), "2024-02-01".to_string());
                 params.insert("period_2_end".to_string(), "2024-02-29".to_string());
 
-                let result = client.reports().comparative(123456, params)?;
+                let result = client.reports().comparative(WorkspaceId(123456), params)?;
 
                 assert_eq!(result.base_period.total_seconds, 576000);
                 assert_eq!(result.comparison_period.total_seconds, 604800);
@@ -503,9 +514,11 @@ mod tests {
                 params.insert("start_date".to_string(), "2024-01-01".to_string());
                 params.insert("end_date".to_string(), "2024-01-31".to_string());
 
-                let result = client.reports().export(123456, "csv", params)?;
+                let result = client
+                    .reports()
+                    .export(WorkspaceId(123456), "csv", params)?;
 
-                assert_eq!(result.export_id, "exp_123456");
+                assert_eq!(result.export_id, ExportId::from("exp_123456"));
                 assert_eq!(result.download_url, "https://toggl.com/exports/exp_123456");
                 Ok(())
             },

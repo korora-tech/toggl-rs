@@ -1,4 +1,4 @@
-use crate::models::api::ids::{ProjectId, UserId};
+use crate::models::api::ids::{ProjectId, UserId, WorkspaceId};
 use crate::tests::*;
 use reqwest::Method;
 use serde_json::json;
@@ -6,7 +6,7 @@ use toggl_core::Result;
 
 #[test]
 fn test_get_all_activity() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!({
         "activity": [
@@ -48,7 +48,7 @@ fn test_get_all_activity() -> Result<()> {
 
 #[test]
 fn test_get_most_active() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!({
         "most_active": [
@@ -84,7 +84,7 @@ fn test_get_most_active() -> Result<()> {
 
 #[test]
 fn test_get_top_activity() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!({
         "top_activity": [
@@ -134,7 +134,7 @@ fn test_get_top_activity() -> Result<()> {
 
 #[test]
 fn test_get_empty_all_activity_dashboard() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!({
         "activity": []
@@ -157,7 +157,7 @@ fn test_get_empty_all_activity_dashboard() -> Result<()> {
 
 #[test]
 fn test_get_empty_most_active_dashboard() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!({
         "most_active": []
@@ -180,7 +180,7 @@ fn test_get_empty_most_active_dashboard() -> Result<()> {
 
 #[test]
 fn test_get_empty_top_activity_dashboard() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!({
         "top_activity": []

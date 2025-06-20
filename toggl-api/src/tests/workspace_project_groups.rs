@@ -1,6 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use crate::{models::api::project::ProjectGroupPayload, tests::with_mockito};
+    use crate::{
+        models::api::ids::{GroupId, ProjectGroupId, ProjectId, WorkspaceId},
+        models::api::project::ProjectGroupPayload,
+        tests::with_mockito,
+    };
     use reqwest::Method;
     use serde_json::json;
     use toggl_core::Result;
@@ -28,11 +32,11 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let groups = client.workspaces().get_project_groups(123)?;
+                let groups = client.workspaces().get_project_groups(WorkspaceId(123))?;
                 assert_eq!(groups.len(), 2);
-                assert_eq!(groups[0].id, 1);
-                assert_eq!(groups[0].group_id, 100);
-                assert_eq!(groups[0].project_id, 200);
+                assert_eq!(groups[0].id, ProjectGroupId(1));
+                assert_eq!(groups[0].group_id, GroupId(100));
+                assert_eq!(groups[0].project_id, ProjectId(200));
                 Ok(())
             },
         )
@@ -41,8 +45,8 @@ mod tests {
     #[test]
     fn test_create_project_group() -> Result<()> {
         let create_data = ProjectGroupPayload {
-            project_id: 200,
-            group_id: 100,
+            project_id: ProjectId(200),
+            group_id: GroupId(100),
         };
 
         let response = json!({
@@ -60,11 +64,11 @@ mod tests {
             |client| {
                 let group = client
                     .workspaces()
-                    .create_project_group(123, &create_data)?;
-                assert_eq!(group.id, 1);
-                assert_eq!(group.group_id, 100);
-                assert_eq!(group.project_id, 200);
-                assert_eq!(group.workspace_id, 123);
+                    .create_project_group(WorkspaceId(123), &create_data)?;
+                assert_eq!(group.id, ProjectGroupId(1));
+                assert_eq!(group.group_id, GroupId(100));
+                assert_eq!(group.project_id, ProjectId(200));
+                assert_eq!(group.workspace_id, WorkspaceId(123));
                 Ok(())
             },
         )
@@ -73,8 +77,8 @@ mod tests {
     #[test]
     fn test_update_project_group() -> Result<()> {
         let update_data = ProjectGroupPayload {
-            project_id: 202,
-            group_id: 102,
+            project_id: ProjectId(202),
+            group_id: GroupId(102),
         };
 
         let response = json!({
@@ -90,12 +94,13 @@ mod tests {
             200,
             Some(response),
             |client| {
-                let group = client
-                    .workspaces()
-                    .update_project_group(123, 1, &update_data)?;
-                assert_eq!(group.id, 1);
-                assert_eq!(group.group_id, 102);
-                assert_eq!(group.project_id, 202);
+                let group =
+                    client
+                        .workspaces()
+                        .update_project_group(WorkspaceId(123), 1, &update_data)?;
+                assert_eq!(group.id, ProjectGroupId(1));
+                assert_eq!(group.group_id, GroupId(102));
+                assert_eq!(group.project_id, ProjectId(202));
                 Ok(())
             },
         )
@@ -109,7 +114,9 @@ mod tests {
             200,
             None::<serde_json::Value>,
             |client| {
-                client.workspaces().delete_project_group(123, 1)?;
+                client
+                    .workspaces()
+                    .delete_project_group(WorkspaceId(123), 1)?;
                 Ok(())
             },
         )

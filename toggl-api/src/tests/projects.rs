@@ -1,3 +1,4 @@
+use crate::models::api::ids::{ProjectId, TaskId, WorkspaceId};
 use crate::models::api::project::*;
 use pretty_assertions::assert_eq;
 use reqwest::Method;
@@ -44,8 +45,10 @@ fn test_get_project() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let project = client.projects().get(1234567, 123456789)?;
-            assert_eq!(123456789, project.id);
+            let project = client
+                .projects()
+                .get(WorkspaceId(1234567), ProjectId(123456789))?;
+            assert_eq!(ProjectId(123456789), project.id);
             assert_eq!("Test Project", project.name);
             assert_eq!(true, project.active);
             Ok(())
@@ -56,7 +59,7 @@ fn test_get_project() -> Result<()> {
 #[test]
 fn test_create_project() -> Result<()> {
     let create_data = CreateProject {
-        workspace_id: 1234567,
+        workspace_id: WorkspaceId(1234567),
         name: "New Project".to_string(),
         client_id: None,
         is_private: Some(true),
@@ -111,8 +114,10 @@ fn test_create_project() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let project = client.projects().create(1234567, &create_data)?;
-            assert_eq!(999999999, project.id);
+            let project = client
+                .projects()
+                .create(WorkspaceId(1234567), &create_data)?;
+            assert_eq!(ProjectId(999999999), project.id);
             assert_eq!("New Project", project.name);
             assert_eq!("#ff0000", project.color);
             Ok(())
@@ -177,7 +182,11 @@ fn test_update_project() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let project = client.projects().update(1234567, 123456789, &update_data)?;
+            let project = client.projects().update(
+                WorkspaceId(1234567),
+                ProjectId(123456789),
+                &update_data,
+            )?;
             assert_eq!("Updated Project", project.name);
             assert_eq!(false, project.is_private);
             assert_eq!(Some(true), project.billable);
@@ -194,7 +203,9 @@ fn test_delete_project() -> Result<()> {
         200,
         None,
         |client| {
-            client.projects().delete(1234567, 123456789)?;
+            client
+                .projects()
+                .delete(WorkspaceId(1234567), ProjectId(123456789))?;
             Ok(())
         },
     )
@@ -235,7 +246,9 @@ fn test_get_project_tasks() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let tasks = client.projects().get_tasks(1234567, 123456789)?;
+            let tasks = client
+                .projects()
+                .get_tasks(WorkspaceId(1234567), ProjectId(123456789))?;
             assert_eq!(2, tasks.len());
             assert_eq!("Design", tasks[0].name);
             assert_eq!("Development", tasks[1].name);
@@ -265,10 +278,13 @@ fn test_create_project_task() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let task = client
-                .projects()
-                .create_task(1234567, 123456789, "Testing", true)?;
-            assert_eq!(333333, task.id);
+            let task = client.projects().create_task(
+                WorkspaceId(1234567),
+                ProjectId(123456789),
+                "Testing",
+                true,
+            )?;
+            assert_eq!(TaskId(333333), task.id);
             assert_eq!("Testing", task.name);
             assert_eq!(true, task.active);
             Ok(())
@@ -297,11 +313,14 @@ fn test_update_project_task() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let task =
-                client
-                    .projects()
-                    .update_task(1234567, 123456789, 333333, "QA Testing", false)?;
-            assert_eq!(333333, task.id);
+            let task = client.projects().update_task(
+                WorkspaceId(1234567),
+                ProjectId(123456789),
+                TaskId(333333),
+                "QA Testing",
+                false,
+            )?;
+            assert_eq!(TaskId(333333), task.id);
             assert_eq!("QA Testing", task.name);
             assert_eq!(false, task.active);
             Ok(())
@@ -317,7 +336,11 @@ fn test_delete_project_task() -> Result<()> {
         200,
         None,
         |client| {
-            client.projects().delete_task(1234567, 123456789, 333333)?;
+            client.projects().delete_task(
+                WorkspaceId(1234567),
+                ProjectId(123456789),
+                TaskId(333333),
+            )?;
             Ok(())
         },
     )
@@ -337,7 +360,9 @@ fn test_get_project_statistics() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let stats = client.projects().get_statistics(1234567, 123456789)?;
+            let stats = client
+                .projects()
+                .get_statistics(WorkspaceId(1234567), ProjectId(123456789))?;
             assert_eq!(Some(28800), stats.tracked_seconds);
             assert_eq!(Some(14400), stats.billable_seconds);
             Ok(())

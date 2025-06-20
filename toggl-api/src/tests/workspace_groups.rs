@@ -1,4 +1,5 @@
 use crate::models::api::group::{CreateGroup, UpdateGroup};
+use crate::models::api::ids::{GroupId, WorkspaceId};
 use crate::tests::*;
 use reqwest::Method;
 use serde_json::json;
@@ -6,7 +7,7 @@ use toggl_core::Result;
 
 #[test]
 fn test_get_groups() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!([
         {
@@ -36,7 +37,7 @@ fn test_get_groups() -> Result<()> {
             let groups = client.workspaces().get_groups(workspace_id)?;
             assert_eq!(groups.len(), 2);
             assert_eq!(groups[0].name, "Developers");
-            assert_eq!(groups[0].id, 101);
+            assert_eq!(groups[0].id, GroupId(101));
             assert_eq!(groups[1].name, "Managers");
             assert_eq!(groups[1].permissions.as_ref().unwrap().len(), 4);
             Ok(())
@@ -46,7 +47,7 @@ fn test_get_groups() -> Result<()> {
 
 #[test]
 fn test_create_group() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let new_group = CreateGroup {
         workspace_id,
@@ -69,7 +70,7 @@ fn test_create_group() -> Result<()> {
         Some(response),
         |client| {
             let group = client.workspaces().create_group(workspace_id, &new_group)?;
-            assert_eq!(group.id, 103);
+            assert_eq!(group.id, GroupId(103));
             assert_eq!(group.name, "QA Team");
             assert_eq!(group.workspace_id, workspace_id);
             Ok(())
@@ -79,8 +80,8 @@ fn test_create_group() -> Result<()> {
 
 #[test]
 fn test_get_group() -> Result<()> {
-    let workspace_id = 12345;
-    let group_id = 101;
+    let workspace_id = WorkspaceId(12345);
+    let group_id = GroupId(101);
 
     let response = json!({
         "id": 101,
@@ -108,8 +109,8 @@ fn test_get_group() -> Result<()> {
 
 #[test]
 fn test_update_group() -> Result<()> {
-    let workspace_id = 12345;
-    let group_id = 101;
+    let workspace_id = WorkspaceId(12345);
+    let group_id = GroupId(101);
 
     let update = UpdateGroup {
         name: "Senior Developers".to_string(),
@@ -142,8 +143,8 @@ fn test_update_group() -> Result<()> {
 
 #[test]
 fn test_delete_group() -> Result<()> {
-    let workspace_id = 12345;
-    let group_id = 101;
+    let workspace_id = WorkspaceId(12345);
+    let group_id = GroupId(101);
 
     with_mockito(
         Method::DELETE,
@@ -159,7 +160,7 @@ fn test_delete_group() -> Result<()> {
 
 #[test]
 fn test_get_empty_groups() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!([]);
 

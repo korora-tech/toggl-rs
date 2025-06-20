@@ -1,4 +1,5 @@
 use super::TogglClient;
+use crate::models::api::ids::{ReportId, WorkspaceId};
 use crate::models::api::shared_reports::{
     BulkDeleteRequest, CreateSavedReportPayload, SavedReport, SharedReportsQuery,
     UpdateSavedReportPayload,
@@ -19,7 +20,7 @@ impl SharedReportsClient {
     /// Get shared reports
     pub fn get_shared_reports(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         query: Option<SharedReportsQuery>,
     ) -> Result<Vec<SavedReport>> {
         let url = format!("/workspaces/{}/reports/shared", workspace_id);
@@ -64,7 +65,7 @@ impl SharedReportsClient {
     /// Create a shared report
     pub fn create_shared_report(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         report: CreateSavedReportPayload,
     ) -> Result<SavedReport> {
         let url = format!("/workspaces/{}/reports/shared", workspace_id);
@@ -74,7 +75,7 @@ impl SharedReportsClient {
     /// Update multiple shared reports
     pub fn update_shared_reports(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         reports: Vec<UpdateSavedReportPayload>,
     ) -> Result<SavedReport> {
         let url = format!("/workspaces/{}/reports/shared", workspace_id);
@@ -82,7 +83,11 @@ impl SharedReportsClient {
     }
 
     /// Get a specific shared report
-    pub fn get_shared_report(&self, workspace_id: u64, report_id: u64) -> Result<SavedReport> {
+    pub fn get_shared_report(
+        &self,
+        workspace_id: WorkspaceId,
+        report_id: ReportId,
+    ) -> Result<SavedReport> {
         let url = format!("/workspaces/{}/reports/shared/{}", workspace_id, report_id);
         self.client.request(Method::GET, &url)
     }
@@ -90,8 +95,8 @@ impl SharedReportsClient {
     /// Update a specific shared report
     pub fn update_shared_report(
         &self,
-        workspace_id: u64,
-        report_id: u64,
+        workspace_id: WorkspaceId,
+        report_id: ReportId,
         report: UpdateSavedReportPayload,
     ) -> Result<SavedReport> {
         let url = format!("/workspaces/{}/reports/shared/{}", workspace_id, report_id);
@@ -99,7 +104,11 @@ impl SharedReportsClient {
     }
 
     /// Delete a shared report
-    pub fn delete_shared_report(&self, workspace_id: u64, report_id: u64) -> Result<SavedReport> {
+    pub fn delete_shared_report(
+        &self,
+        workspace_id: WorkspaceId,
+        report_id: ReportId,
+    ) -> Result<SavedReport> {
         let url = format!("/workspaces/{}/reports/shared/{}", workspace_id, report_id);
         self.client.request(Method::DELETE, &url)
     }
@@ -107,7 +116,7 @@ impl SharedReportsClient {
     /// Bulk delete shared reports
     pub fn bulk_delete_shared_reports(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         request: BulkDeleteRequest,
     ) -> Result<Vec<SavedReport>> {
         let url = format!("/workspaces/{}/reports/shared/bulk_delete", workspace_id);

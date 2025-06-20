@@ -1,5 +1,6 @@
 use super::TogglClient;
 use crate::models::api::favorite::*;
+use crate::models::api::ids::FavoriteId;
 use reqwest::Method;
 use toggl_core::Result;
 
@@ -24,7 +25,7 @@ impl FavoritesClient {
     }
 
     /// Update favorite
-    pub fn update(&self, favorite_id: u64, favorite: &UpdateFavorite) -> Result<Favorite> {
+    pub fn update(&self, favorite_id: FavoriteId, favorite: &UpdateFavorite) -> Result<Favorite> {
         self.client.request_with_body(
             Method::PUT,
             &format!("me/favorites/{}", favorite_id),
@@ -33,7 +34,7 @@ impl FavoritesClient {
     }
 
     /// Delete favorite
-    pub fn delete(&self, favorite_id: u64) -> Result<()> {
+    pub fn delete(&self, favorite_id: FavoriteId) -> Result<()> {
         self.client
             .request_empty(Method::DELETE, &format!("me/favorites/{}", favorite_id))
     }

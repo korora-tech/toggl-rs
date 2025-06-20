@@ -1,3 +1,4 @@
+use crate::models::api::ids::{LevelId, ProjectId, WorkspaceId, WorkspaceUserId};
 use crate::models::api::rates::{CreateRate, RateLevel, RateMode};
 use crate::tests::with_mockito;
 use reqwest::Method;
@@ -15,12 +16,14 @@ fn test_create_workspace_rate() -> Result<()> {
             let new_rate = CreateRate {
                 amount: 150.0,
                 level: RateLevel::Project,
-                level_id: 555,
+                level_id: LevelId::new(555),
                 rate_type: "billable_rates".to_string(),
                 mode: Some(RateMode::StartToday),
                 start: None,
             };
-            client.workspaces().create_rate(12345, &new_rate)?;
+            client
+                .workspaces()
+                .create_rate(WorkspaceId(12345), &new_rate)?;
             Ok(())
         },
     )
@@ -57,12 +60,15 @@ fn test_get_workspace_rates() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let rates = client
-                .workspaces()
-                .get_rates(12345, &RateLevel::Project, 555, None)?;
+            let rates = client.workspaces().get_rates(
+                WorkspaceId(12345),
+                &RateLevel::Project,
+                555,
+                None,
+            )?;
             assert_eq!(rates.len(), 2);
             assert_eq!(rates[0].amount, Some(150.0));
-            assert_eq!(rates[0].project_id, Some(555));
+            assert_eq!(rates[0].project_id, Some(ProjectId::new(555)));
             assert_eq!(rates[1].amount, Some(200.0));
             Ok(())
         },
@@ -91,14 +97,14 @@ fn test_get_workspace_rates_with_type() -> Result<()> {
         Some(response),
         |client| {
             let rates = client.workspaces().get_rates(
-                12345,
+                WorkspaceId(12345),
                 &RateLevel::WorkspaceUser,
                 777,
                 Some("labor_costs"),
             )?;
             assert_eq!(rates.len(), 1);
             assert_eq!(rates[0].amount, Some(100.0));
-            assert_eq!(rates[0].workspace_user_id, Some(777));
+            assert_eq!(rates[0].workspace_user_id, Some(WorkspaceUserId::new(777)));
             assert_eq!(rates[0].rate_type, Some("labor_costs".to_string()));
             Ok(())
         },

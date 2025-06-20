@@ -1,3 +1,4 @@
+use crate::models::api::ids::{BookmarkId, ReportId, ScheduledReportId, UserId, WorkspaceId};
 use crate::models::api::scheduled_reports::*;
 use crate::tests::with_mockito;
 use reqwest::Method;
@@ -34,7 +35,9 @@ fn test_get_scheduled_reports() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let reports = client.workspace_reports().get_scheduled_reports(987654)?;
+            let reports = client
+                .workspace_reports()
+                .get_scheduled_reports(WorkspaceId(987654))?;
             assert_eq!(reports.len(), 2);
             assert_eq!(reports[0].frequency, Some(7)); // Weekly
             assert_eq!(reports[1].frequency, Some(30)); // Monthly
@@ -63,18 +66,18 @@ fn test_create_scheduled_report() -> Result<()> {
         Some(response),
         |client| {
             let report = CreateScheduledReportPayload {
-                bookmark_id: 102,
+                bookmark_id: BookmarkId(102),
                 frequency: 1, // Daily
-                user_ids: Some(vec![123456, 789012]),
+                user_ids: Some(vec![UserId(123456), UserId(789012)]),
                 group_ids: None,
             };
 
             let created = client
                 .workspace_reports()
-                .create_scheduled_report(987654, &report)?;
-            assert_eq!(created.bookmark_id, Some(102));
+                .create_scheduled_report(WorkspaceId(987654), &report)?;
+            assert_eq!(created.bookmark_id, Some(BookmarkId(102)));
             assert_eq!(created.frequency, Some(1));
-            assert_eq!(created.report_id, Some(3));
+            assert_eq!(created.report_id, Some(ReportId(3)));
             Ok(())
         },
     )
@@ -99,8 +102,10 @@ fn test_get_scheduled_report() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let report = client.workspace_reports().get_scheduled_report(987654, 4)?;
-            assert_eq!(report.report_id, Some(4));
+            let report = client
+                .workspace_reports()
+                .get_scheduled_report(WorkspaceId(987654), ScheduledReportId(4))?;
+            assert_eq!(report.report_id, Some(ReportId(4)));
             assert_eq!(report.frequency, Some(7)); // Weekly
             assert_eq!(report.group_ids.as_ref().unwrap().len(), 2);
             Ok(())
@@ -118,7 +123,7 @@ fn test_delete_scheduled_report() -> Result<()> {
         |client| {
             client
                 .workspace_reports()
-                .delete_scheduled_report(987654, 5)?;
+                .delete_scheduled_report(WorkspaceId(987654), ScheduledReportId(5))?;
             Ok(())
         },
     )

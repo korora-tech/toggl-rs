@@ -1,4 +1,5 @@
 use super::TogglClient;
+use crate::models::api::ids::{SetupId, WorkspaceId};
 use crate::models::api::time_entry::TimeEntry;
 use crate::models::api::timesheets::*;
 use reqwest::Method;
@@ -22,7 +23,7 @@ impl TimesheetsClient {
     /// Get timesheet setups for workspace
     pub fn get_timesheet_setups(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         page: Option<u32>,
         per_page: Option<u32>,
         sort_field: Option<&str>,
@@ -52,7 +53,7 @@ impl TimesheetsClient {
     /// Create timesheet setup
     pub fn create_timesheet_setup(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         payload: &CreateTimesheetSetupPayload,
     ) -> Result<Vec<APITimesheetSetup>> {
         self.client.request_with_body(
@@ -65,8 +66,8 @@ impl TimesheetsClient {
     /// Update timesheet setup
     pub fn update_timesheet_setup(
         &self,
-        workspace_id: u64,
-        setup_id: u64,
+        workspace_id: WorkspaceId,
+        setup_id: SetupId,
         payload: &UpdateTimesheetSetupPayload,
     ) -> Result<APITimesheetSetup> {
         self.client.request_with_body(
@@ -77,7 +78,11 @@ impl TimesheetsClient {
     }
 
     /// Delete timesheet setup
-    pub fn delete_timesheet_setup(&self, workspace_id: u64, setup_id: u64) -> Result<()> {
+    pub fn delete_timesheet_setup(
+        &self,
+        workspace_id: WorkspaceId,
+        setup_id: SetupId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("workspaces/{}/timesheet_setups/{}", workspace_id, setup_id),
@@ -87,7 +92,7 @@ impl TimesheetsClient {
     /// Get workspace timesheets
     pub fn get_timesheets(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         filter: &TimesheetFilter,
     ) -> Result<TimesheetsGetPaginatedResponse> {
         let mut params = BTreeMap::new();
@@ -153,7 +158,7 @@ impl TimesheetsClient {
     /// Update batch of timesheets
     pub fn update_batch_timesheets(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         payloads: &[PutBatchTimesheetPayload],
     ) -> Result<Vec<APITimesheet>> {
         self.client.request_with_body(
@@ -166,7 +171,7 @@ impl TimesheetsClient {
     /// Get timesheet hours
     pub fn get_timesheet_hours(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         payload: &PostTimesheetHoursPayload,
     ) -> Result<TimesheetHoursResponse> {
         self.client.request_with_body(
@@ -179,8 +184,8 @@ impl TimesheetsClient {
     /// Update single timesheet
     pub fn update_timesheet(
         &self,
-        workspace_id: u64,
-        setup_id: u64,
+        workspace_id: WorkspaceId,
+        setup_id: SetupId,
         start_date: &str,
         payload: &PutTimesheetPayload,
     ) -> Result<APITimesheet> {
@@ -197,8 +202,8 @@ impl TimesheetsClient {
     /// Get timesheet time entries
     pub fn get_timesheet_time_entries(
         &self,
-        workspace_id: u64,
-        setup_id: u64,
+        workspace_id: WorkspaceId,
+        setup_id: SetupId,
         start_date: &str,
     ) -> Result<Vec<TimeEntry>> {
         self.client.request(

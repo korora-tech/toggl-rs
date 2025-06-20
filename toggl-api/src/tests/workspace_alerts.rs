@@ -1,4 +1,5 @@
 use crate::models::api::alert::{CreateAlert, UpdateAlert};
+use crate::models::api::ids::{AlertId, WorkspaceId};
 use crate::tests::*;
 use reqwest::Method;
 use serde_json::json;
@@ -6,7 +7,7 @@ use toggl_core::Result;
 
 #[test]
 fn test_get_alerts() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!([
         {
@@ -45,12 +46,12 @@ fn test_get_alerts() -> Result<()> {
         |client| {
             let alerts = client.workspaces().get_alerts(workspace_id)?;
             assert_eq!(alerts.len(), 2);
-            assert_eq!(alerts[0].alert.id, 201);
+            assert_eq!(alerts[0].alert.id, AlertId(201));
             assert_eq!(alerts[0].alert.threshold, 40.0);
             assert_eq!(alerts[0].alert.alert_type, "weekly_time_limit");
             assert_eq!(alerts[0].meta.current_value, 35.5);
             assert!(!alerts[0].meta.triggered);
-            assert_eq!(alerts[1].alert.id, 202);
+            assert_eq!(alerts[1].alert.id, AlertId(202));
             assert_eq!(alerts[1].alert.threshold, 160.0);
             assert_eq!(alerts[1].alert.alert_type, "monthly_time_limit");
             Ok(())
@@ -60,7 +61,7 @@ fn test_get_alerts() -> Result<()> {
 
 #[test]
 fn test_create_alert() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let new_alert = CreateAlert {
         alert_type: "weekly_time_limit".to_string(),
@@ -85,7 +86,7 @@ fn test_create_alert() -> Result<()> {
         Some(response),
         |client| {
             let alert = client.workspaces().create_alert(workspace_id, &new_alert)?;
-            assert_eq!(alert.id, 203);
+            assert_eq!(alert.id, AlertId(203));
             assert_eq!(alert.threshold, 50.0);
             assert_eq!(alert.alert_type, "weekly_time_limit");
             assert!(alert.enabled);
@@ -96,8 +97,8 @@ fn test_create_alert() -> Result<()> {
 
 #[test]
 fn test_update_alert() -> Result<()> {
-    let workspace_id = 12345;
-    let alert_id = 201;
+    let workspace_id = WorkspaceId(12345);
+    let alert_id = AlertId(201);
 
     let update = UpdateAlert {
         threshold: Some(45.0),
@@ -133,8 +134,8 @@ fn test_update_alert() -> Result<()> {
 
 #[test]
 fn test_delete_alert() -> Result<()> {
-    let workspace_id = 12345;
-    let alert_id = 201;
+    let workspace_id = WorkspaceId(12345);
+    let alert_id = AlertId(201);
 
     with_mockito(
         Method::DELETE,
@@ -150,7 +151,7 @@ fn test_delete_alert() -> Result<()> {
 
 #[test]
 fn test_get_empty_alerts() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let response = json!([]);
 
@@ -169,7 +170,7 @@ fn test_get_empty_alerts() -> Result<()> {
 
 #[test]
 fn test_create_minimal_alert() -> Result<()> {
-    let workspace_id = 12345;
+    let workspace_id = WorkspaceId(12345);
 
     let new_alert = CreateAlert {
         alert_type: "monthly_time_limit".to_string(),
@@ -194,7 +195,7 @@ fn test_create_minimal_alert() -> Result<()> {
         Some(response),
         |client| {
             let alert = client.workspaces().create_alert(workspace_id, &new_alert)?;
-            assert_eq!(alert.id, 204);
+            assert_eq!(alert.id, AlertId(204));
             assert_eq!(alert.threshold, 80.0);
             assert_eq!(alert.alert_type, "monthly_time_limit");
             assert!(alert.enabled);

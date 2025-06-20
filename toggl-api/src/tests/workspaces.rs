@@ -1,4 +1,5 @@
 use crate::client::TogglClient;
+use crate::models::api::ids::{ClientId, TagId, UserId, WorkspaceId};
 use crate::models::api::workspace::*;
 use pretty_assertions::assert_eq;
 use reqwest::Method;
@@ -48,8 +49,8 @@ fn test_get_workspace() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let workspace = client.workspaces().get(1234567)?;
-            assert_eq!(1234567, workspace.id);
+            let workspace = client.workspaces().get(WorkspaceId(1234567))?;
+            assert_eq!(WorkspaceId(1234567), workspace.id);
             assert_eq!("My Workspace", workspace.name);
             assert_eq!(true, workspace.admin);
             Ok(())
@@ -115,7 +116,9 @@ fn test_update_workspace() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let workspace = client.workspaces().update(1234567, &update_data)?;
+            let workspace = client
+                .workspaces()
+                .update(WorkspaceId(1234567), &update_data)?;
             assert_eq!("Updated Workspace", workspace.name);
             assert_eq!(true, workspace.only_admins_may_create_projects);
             Ok(())
@@ -156,7 +159,7 @@ fn test_get_workspace_users() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let users = client.workspaces().get_users(1234567)?;
+            let users = client.workspaces().get_users(WorkspaceId(1234567))?;
             assert_eq!(1, users.len());
             assert_eq!("John Doe", users[0].name);
             assert_eq!(true, users[0].admin);
@@ -194,7 +197,9 @@ fn test_get_workspace_clients() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let clients = client.workspaces().get_clients(1234567, None)?;
+            let clients = client
+                .workspaces()
+                .get_clients(WorkspaceId(1234567), None)?;
             assert_eq!(2, clients.len());
             assert_eq!("Important Client", clients[0].name);
             assert_eq!("Another Client", clients[1].name);
@@ -243,7 +248,9 @@ fn test_get_workspace_projects() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let projects = client.workspaces().get_projects(1234567, None, None)?;
+            let projects = client
+                .workspaces()
+                .get_projects(WorkspaceId(1234567), None, None)?;
             assert_eq!(1, projects.len());
             assert_eq!("Test Project", projects[0].name);
             Ok(())
@@ -293,7 +300,7 @@ fn test_create_workspace() -> Result<()> {
 
     with_mockito(Method::POST, "/workspaces", 200, Some(response), |client| {
         let workspace = client.workspaces().create(&create_data)?;
-        assert_eq!(9999999, workspace.id);
+        assert_eq!(WorkspaceId(9999999), workspace.id);
         assert_eq!("New Workspace", workspace.name);
         Ok(())
     })
@@ -321,7 +328,7 @@ fn test_get_workspace_alerts() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let alerts = client.workspaces().get_alerts(1234567)?;
+            let alerts = client.workspaces().get_alerts(WorkspaceId(1234567))?;
             assert_eq!(1, alerts.len());
             assert_eq!("budget_exceeded", alerts[0].alert.alert_type);
             assert_eq!(true, alerts[0].meta.triggered);
@@ -358,7 +365,7 @@ fn test_get_workspace_expenses() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let expenses = client.workspaces().get_expenses(1234567)?;
+            let expenses = client.workspaces().get_expenses(WorkspaceId(1234567))?;
             assert_eq!(1, expenses.len());
             assert_eq!("Flight to conference", expenses[0].description);
             assert_eq!(500.0, expenses[0].amount);
@@ -388,7 +395,7 @@ fn test_get_workspace_currencies() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let currencies = client.workspaces().get_currencies(1234567)?;
+            let currencies = client.workspaces().get_currencies(WorkspaceId(1234567))?;
             assert_eq!(2, currencies.len());
             assert_eq!("USD", currencies[0].code);
             assert_eq!("Euro", currencies[1].name);
@@ -431,10 +438,11 @@ fn test_add_workspace_user() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let user = client
-                .workspaces()
-                .add_user(1234567, vec!["newuser@example.com".to_string()])?;
-            assert_eq!(888777, user.user_id);
+            let user = client.workspaces().add_user(
+                WorkspaceId(1234567),
+                vec!["newuser@example.com".to_string()],
+            )?;
+            assert_eq!(user.user_id, UserId(888777));
             assert_eq!("New User", user.name);
             Ok(())
         },
@@ -456,8 +464,10 @@ fn test_create_tag() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let tag = client.workspaces().create_tag(1234567, "Important")?;
-            assert_eq!(7777777, tag.id);
+            let tag = client
+                .workspaces()
+                .create_tag(WorkspaceId(1234567), "Important")?;
+            assert_eq!(TagId(7777777), tag.id);
             assert_eq!("Important", tag.name);
             Ok(())
         },
@@ -479,10 +489,12 @@ fn test_update_tag() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let tag = client
-                .workspaces()
-                .update_tag(1234567, 7777777, "Very Important")?;
-            assert_eq!(7777777, tag.id);
+            let tag = client.workspaces().update_tag(
+                WorkspaceId(1234567),
+                TagId(7777777),
+                "Very Important",
+            )?;
+            assert_eq!(TagId(7777777), tag.id);
             assert_eq!("Very Important", tag.name);
             Ok(())
         },
@@ -497,7 +509,9 @@ fn test_delete_tag() -> Result<()> {
         200,
         None,
         |client| {
-            client.workspaces().delete_tag(1234567, 7777777)?;
+            client
+                .workspaces()
+                .delete_tag(WorkspaceId(1234567), TagId(7777777))?;
             Ok(())
         },
     )
@@ -519,8 +533,10 @@ fn test_create_client() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let new_client = client.workspaces().create_client(1234567, "New Client")?;
-            assert_eq!(8888888, new_client.id);
+            let new_client = client
+                .workspaces()
+                .create_client(WorkspaceId(1234567), "New Client")?;
+            assert_eq!(new_client.id, ClientId(8888888));
             assert_eq!("New Client", new_client.name);
             Ok(())
         },
@@ -543,11 +559,12 @@ fn test_update_client() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let updated_client =
-                client
-                    .workspaces()
-                    .update_client(1234567, 8888888, "Updated Client")?;
-            assert_eq!(8888888, updated_client.id);
+            let updated_client = client.workspaces().update_client(
+                WorkspaceId(1234567),
+                ClientId(8888888),
+                "Updated Client",
+            )?;
+            assert_eq!(updated_client.id, ClientId(8888888));
             assert_eq!("Updated Client", updated_client.name);
             Ok(())
         },
@@ -562,7 +579,9 @@ fn test_delete_client() -> Result<()> {
         200,
         None,
         |client| {
-            client.workspaces().delete_client(1234567, 8888888)?;
+            client
+                .workspaces()
+                .delete_client(WorkspaceId(1234567), ClientId(8888888))?;
             Ok(())
         },
     )
@@ -584,8 +603,10 @@ fn test_archive_client() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let archived_client = client.workspaces().archive_client(1234567, 8888888)?;
-            assert_eq!(8888888, archived_client.id);
+            let archived_client = client
+                .workspaces()
+                .archive_client(WorkspaceId(1234567), ClientId(8888888))?;
+            assert_eq!(archived_client.id, ClientId(8888888));
             assert_eq!(true, archived_client.archived);
             Ok(())
         },
@@ -608,8 +629,10 @@ fn test_restore_client() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let restored_client = client.workspaces().restore_client(1234567, 8888888)?;
-            assert_eq!(8888888, restored_client.id);
+            let restored_client = client
+                .workspaces()
+                .restore_client(WorkspaceId(1234567), ClientId(8888888))?;
+            assert_eq!(restored_client.id, ClientId(8888888));
             assert_eq!(false, restored_client.archived);
             Ok(())
         },
@@ -628,7 +651,7 @@ fn test_get_workspace_preferences() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let preferences = client.workspaces().get_preferences(1234567)?;
+            let preferences = client.workspaces().get_preferences(WorkspaceId(1234567))?;
             assert_eq!(preferences.logo, "https://example.com/logo.png");
             Ok(())
         },
@@ -664,7 +687,7 @@ fn test_update_workspace_preferences() -> Result<()> {
         |client| {
             let result = client
                 .workspaces()
-                .update_preferences(1234567, &update_prefs)?;
+                .update_preferences(WorkspaceId(1234567), &update_prefs)?;
             assert_eq!(result.logo, "https://example.com/new-logo.png");
             Ok(())
         },
@@ -699,7 +722,7 @@ fn test_get_workspace_subscription() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let subscription = client.workspaces().get_subscription(1234567)?;
+            let subscription = client.workspaces().get_subscription(WorkspaceId(1234567))?;
             assert_eq!(5, subscription.active_users);
             assert_eq!(true, subscription.auto_renew);
             assert_eq!("Business", subscription.plan_name);
@@ -728,7 +751,7 @@ fn test_get_purchase_order_pdf() -> Result<()> {
     let toggl_client = TogglClient::new_with_base_url("test_api_token".to_string(), &server.url())?;
     let result = toggl_client
         .workspaces()
-        .get_purchase_order_pdf(1234567, 789)?;
+        .get_purchase_order_pdf(WorkspaceId(1234567), 789)?;
 
     // Verify we got PDF content back
     assert_eq!(result[0..4], pdf_content[..]);

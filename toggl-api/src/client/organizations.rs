@@ -1,4 +1,7 @@
 use super::TogglClient;
+use crate::models::api::ids::{
+    GroupId, OrganizationId, PricingPlanId, TransferId, UserId, WorkspaceId,
+};
 use crate::models::api::invitation::*;
 use crate::models::api::organization::*;
 use crate::models::api::organization_subscription::*;
@@ -17,7 +20,7 @@ impl OrganizationsClient {
     }
 
     /// Get organization
-    pub fn get(&self, organization_id: u64) -> Result<Organization> {
+    pub fn get(&self, organization_id: OrganizationId) -> Result<Organization> {
         self.client
             .request(Method::GET, &format!("organizations/{}", organization_id))
     }
@@ -25,7 +28,7 @@ impl OrganizationsClient {
     /// Update organization
     pub fn update(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         org_update: &UpdateOrganization,
     ) -> Result<Organization> {
         self.client.request_with_body(
@@ -38,7 +41,7 @@ impl OrganizationsClient {
     /// Get organization users
     pub fn get_users(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         filter: Option<&str>,
         page: Option<u32>,
     ) -> Result<Vec<OrganizationUser>> {
@@ -58,7 +61,10 @@ impl OrganizationsClient {
     }
 
     /// Get organization workspaces
-    pub fn get_workspaces(&self, organization_id: u64) -> Result<Vec<OrganizationWorkspace>> {
+    pub fn get_workspaces(
+        &self,
+        organization_id: OrganizationId,
+    ) -> Result<Vec<OrganizationWorkspace>> {
         self.client.request(
             Method::GET,
             &format!("organizations/{}/workspaces", organization_id),
@@ -66,7 +72,7 @@ impl OrganizationsClient {
     }
 
     /// Get organization groups
-    pub fn get_groups(&self, organization_id: u64) -> Result<Vec<OrganizationGroup>> {
+    pub fn get_groups(&self, organization_id: OrganizationId) -> Result<Vec<OrganizationGroup>> {
         self.client.request(
             Method::GET,
             &format!("organizations/{}/groups", organization_id),
@@ -76,7 +82,7 @@ impl OrganizationsClient {
     /// Create organization group
     pub fn create_group(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         group: &CreateOrganizationGroup,
     ) -> Result<OrganizationGroup> {
         self.client.request_with_body(
@@ -89,8 +95,8 @@ impl OrganizationsClient {
     /// Update organization group
     pub fn update_group(
         &self,
-        organization_id: u64,
-        group_id: u64,
+        organization_id: OrganizationId,
+        group_id: GroupId,
         group: &UpdateOrganizationGroup,
     ) -> Result<OrganizationGroup> {
         self.client.request_with_body(
@@ -103,8 +109,8 @@ impl OrganizationsClient {
     /// Update organization group with patch
     pub fn patch_group(
         &self,
-        organization_id: u64,
-        group_id: u64,
+        organization_id: OrganizationId,
+        group_id: GroupId,
         group: &UpdateOrganizationGroup,
     ) -> Result<OrganizationGroup> {
         self.client.request_with_body(
@@ -115,7 +121,7 @@ impl OrganizationsClient {
     }
 
     /// Delete organization group
-    pub fn delete_group(&self, organization_id: u64, group_id: u64) -> Result<()> {
+    pub fn delete_group(&self, organization_id: OrganizationId, group_id: GroupId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("organizations/{}/groups/{}", organization_id, group_id),
@@ -123,7 +129,7 @@ impl OrganizationsClient {
     }
 
     /// Get organization owner
-    pub fn get_owner(&self, organization_id: u64) -> Result<OrganizationOwner> {
+    pub fn get_owner(&self, organization_id: OrganizationId) -> Result<OrganizationOwner> {
         self.client.request(
             Method::GET,
             &format!("organizations/{}/owner", organization_id),
@@ -137,7 +143,7 @@ impl OrganizationsClient {
     }
 
     /// Get organization invitations
-    pub fn get_invitations(&self, organization_id: u64) -> Result<Vec<Invitation>> {
+    pub fn get_invitations(&self, organization_id: OrganizationId) -> Result<Vec<Invitation>> {
         self.client.request(
             Method::GET,
             &format!("organizations/{}/invitations", organization_id),
@@ -147,7 +153,7 @@ impl OrganizationsClient {
     /// Create organization invitation
     pub fn create_invitation(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         invitation: &CreateInvitation,
     ) -> Result<Invitation> {
         self.client.request_with_body(
@@ -158,7 +164,11 @@ impl OrganizationsClient {
     }
 
     /// Resend organization invitation
-    pub fn resend_invitation(&self, organization_id: u64, invitation_id: u64) -> Result<()> {
+    pub fn resend_invitation(
+        &self,
+        organization_id: OrganizationId,
+        invitation_id: u64,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::PUT,
             &format!(
@@ -185,7 +195,7 @@ impl OrganizationsClient {
     }
 
     /// Leave organization
-    pub fn leave(&self, organization_id: u64) -> Result<()> {
+    pub fn leave(&self, organization_id: OrganizationId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("organizations/{}/users/leave", organization_id),
@@ -195,7 +205,7 @@ impl OrganizationsClient {
     /// Get detailed organization users
     pub fn get_users_detailed(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         filter: Option<&str>,
         page: Option<u32>,
         per_page: Option<u32>,
@@ -229,8 +239,8 @@ impl OrganizationsClient {
     /// Update organization user
     pub fn update_user(
         &self,
-        organization_id: u64,
-        organization_user_id: u64,
+        organization_id: OrganizationId,
+        organization_user_id: UserId,
         update: &UpdateOrganizationUser,
     ) -> Result<OrganizationUser> {
         self.client.request_with_body(
@@ -244,7 +254,7 @@ impl OrganizationsClient {
     }
 
     /// Get organization roles
-    pub fn get_roles(&self, organization_id: u64) -> Result<Vec<OrganizationRole>> {
+    pub fn get_roles(&self, organization_id: OrganizationId) -> Result<Vec<OrganizationRole>> {
         self.client.request(
             Method::GET,
             &format!("organizations/{}/roles", organization_id),
@@ -254,7 +264,7 @@ impl OrganizationsClient {
     /// Get workspace statistics
     pub fn get_workspace_statistics(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
     ) -> Result<Vec<WorkspaceStatistics>> {
         self.client.request(
             Method::GET,
@@ -265,7 +275,7 @@ impl OrganizationsClient {
     /// Create workspace
     pub fn create_workspace(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         workspace: &crate::models::api::workspace::CreateWorkspace,
     ) -> Result<crate::models::api::workspace::Workspace> {
         self.client.request_with_body(
@@ -278,7 +288,7 @@ impl OrganizationsClient {
     /// Get ownership transfer requests
     pub fn get_ownership_transfers(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
     ) -> Result<Vec<OwnershipTransferRequest>> {
         self.client.request(
             Method::GET,
@@ -289,7 +299,7 @@ impl OrganizationsClient {
     /// Create ownership transfer request
     pub fn create_ownership_transfer(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         transfer: &CreateOwnershipTransfer,
     ) -> Result<OwnershipTransferRequest> {
         self.client.request_with_body(
@@ -302,8 +312,8 @@ impl OrganizationsClient {
     /// Get specific ownership transfer request
     pub fn get_ownership_transfer(
         &self,
-        organization_id: u64,
-        transfer_id: u64,
+        organization_id: OrganizationId,
+        transfer_id: TransferId,
     ) -> Result<OwnershipTransferRequest> {
         self.client.request(
             Method::GET,
@@ -317,8 +327,8 @@ impl OrganizationsClient {
     /// Accept or reject ownership transfer
     pub fn handle_ownership_transfer(
         &self,
-        organization_id: u64,
-        transfer_id: u64,
+        organization_id: OrganizationId,
+        transfer_id: TransferId,
         action: &str,
     ) -> Result<()> {
         self.client.request_empty(
@@ -331,24 +341,39 @@ impl OrganizationsClient {
     }
 
     /// Accept ownership transfer
-    pub fn accept_ownership_transfer(&self, organization_id: u64, transfer_id: u64) -> Result<()> {
+    pub fn accept_ownership_transfer(
+        &self,
+        organization_id: OrganizationId,
+        transfer_id: TransferId,
+    ) -> Result<()> {
         self.handle_ownership_transfer(organization_id, transfer_id, "accept")
     }
 
     /// Reject ownership transfer
-    pub fn reject_ownership_transfer(&self, organization_id: u64, transfer_id: u64) -> Result<()> {
+    pub fn reject_ownership_transfer(
+        &self,
+        organization_id: OrganizationId,
+        transfer_id: TransferId,
+    ) -> Result<()> {
         self.handle_ownership_transfer(organization_id, transfer_id, "reject")
     }
 
     /// Cancel ownership transfer
-    pub fn cancel_ownership_transfer(&self, organization_id: u64, transfer_id: u64) -> Result<()> {
+    pub fn cancel_ownership_transfer(
+        &self,
+        organization_id: OrganizationId,
+        transfer_id: TransferId,
+    ) -> Result<()> {
         self.handle_ownership_transfer(organization_id, transfer_id, "cancel")
     }
 
     // Subscription Management
 
     /// Get organization subscription
-    pub fn get_subscription(&self, organization_id: u64) -> Result<OrganizationSubscription> {
+    pub fn get_subscription(
+        &self,
+        organization_id: OrganizationId,
+    ) -> Result<OrganizationSubscription> {
         self.client.request(
             Method::GET,
             &format!("organizations/{}/subscription", organization_id),
@@ -358,7 +383,7 @@ impl OrganizationsClient {
     /// Create organization subscription
     pub fn create_subscription(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         subscription: &CreateOrganizationSubscription,
     ) -> Result<OrganizationSubscription> {
         self.client.request_with_body(
@@ -371,7 +396,7 @@ impl OrganizationsClient {
     /// Update organization subscription
     pub fn update_subscription(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         subscription: &UpdateOrganizationSubscription,
     ) -> Result<OrganizationSubscription> {
         self.client.request_with_body(
@@ -382,7 +407,7 @@ impl OrganizationsClient {
     }
 
     /// Cancel organization subscription
-    pub fn cancel_subscription(&self, organization_id: u64) -> Result<()> {
+    pub fn cancel_subscription(&self, organization_id: OrganizationId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("organizations/{}/subscription", organization_id),
@@ -392,7 +417,7 @@ impl OrganizationsClient {
     /// Submit cancellation feedback
     pub fn submit_cancellation_feedback(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         feedback: &CancellationFeedback,
     ) -> Result<()> {
         self.client.request_with_body_empty(
@@ -406,7 +431,7 @@ impl OrganizationsClient {
     }
 
     /// Get subscription customer
-    pub fn get_subscription_customer(&self, organization_id: u64) -> Result<Customer> {
+    pub fn get_subscription_customer(&self, organization_id: OrganizationId) -> Result<Customer> {
         self.client.request(
             Method::GET,
             &format!("organizations/{}/subscription/customer", organization_id),
@@ -416,7 +441,7 @@ impl OrganizationsClient {
     /// Create subscription customer
     pub fn create_subscription_customer(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         customer: &CreateCustomer,
     ) -> Result<Customer> {
         self.client.request_with_body(
@@ -429,7 +454,7 @@ impl OrganizationsClient {
     /// Update subscription customer
     pub fn update_subscription_customer(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         customer: &UpdateCustomer,
     ) -> Result<Customer> {
         self.client.request_with_body(
@@ -442,7 +467,7 @@ impl OrganizationsClient {
     /// Request discount
     pub fn request_discount(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         request: &DiscountRequest,
     ) -> Result<SuccessResponse> {
         self.client.request_with_body(
@@ -458,7 +483,7 @@ impl OrganizationsClient {
     /// Feature upsell multi
     pub fn feature_upsell_multi(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         request: &FeatureUpsellRequest,
     ) -> Result<SuccessResponse> {
         self.client.request_with_body(
@@ -472,7 +497,7 @@ impl OrganizationsClient {
     }
 
     /// Get invoice summary
-    pub fn get_invoice_summary(&self, organization_id: u64) -> Result<InvoiceSummary> {
+    pub fn get_invoice_summary(&self, organization_id: OrganizationId) -> Result<InvoiceSummary> {
         self.client.request(
             Method::GET,
             &format!(
@@ -483,7 +508,7 @@ impl OrganizationsClient {
     }
 
     /// Get payment failed status
-    pub fn get_payment_failed(&self, organization_id: u64) -> Result<PaymentFailed> {
+    pub fn get_payment_failed(&self, organization_id: OrganizationId) -> Result<PaymentFailed> {
         self.client.request(
             Method::GET,
             &format!(
@@ -496,7 +521,7 @@ impl OrganizationsClient {
     /// Apply promo code
     pub fn apply_promo_code(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         promo_code: &OrganizationPromoCode,
     ) -> Result<SuccessResponse> {
         self.client.request_with_body(
@@ -507,7 +532,7 @@ impl OrganizationsClient {
     }
 
     /// Remove promo code
-    pub fn remove_promo_code(&self, organization_id: u64) -> Result<()> {
+    pub fn remove_promo_code(&self, organization_id: OrganizationId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!("organizations/{}/subscription/promocode", organization_id),
@@ -517,7 +542,7 @@ impl OrganizationsClient {
     /// Get purchase order PDF
     pub fn get_purchase_order_pdf(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         purchase_order_uid: &str,
     ) -> Result<Vec<u8>> {
         self.client.request_binary(
@@ -532,7 +557,7 @@ impl OrganizationsClient {
     /// Apply referral bonus
     pub fn apply_referral_bonus(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         referral: &ReferralBonus,
     ) -> Result<SuccessResponse> {
         self.client.request_with_body(
@@ -546,7 +571,7 @@ impl OrganizationsClient {
     }
 
     /// Create setup intent
-    pub fn create_setup_intent(&self, organization_id: u64) -> Result<SetupIntent> {
+    pub fn create_setup_intent(&self, organization_id: OrganizationId) -> Result<SetupIntent> {
         self.client.request(
             Method::POST,
             &format!(
@@ -559,7 +584,7 @@ impl OrganizationsClient {
     /// Start trial
     pub fn start_trial(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         trial: &StartTrial,
     ) -> Result<OrganizationSubscription> {
         self.client.request_with_body(
@@ -572,7 +597,7 @@ impl OrganizationsClient {
     /// Request upgrade
     pub fn request_upgrade(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         feature_id: &str,
         request: &UpgradeRequest,
     ) -> Result<SuccessResponse> {
@@ -589,7 +614,7 @@ impl OrganizationsClient {
     /// Get payment records
     pub fn get_payment_records(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         is_unified: Option<bool>,
     ) -> Result<Vec<PaymentRecord>> {
         let mut params = BTreeMap::new();
@@ -605,7 +630,7 @@ impl OrganizationsClient {
     }
 
     /// Get organization plans
-    pub fn get_plans(&self, organization_id: u64) -> Result<Vec<OrganizationPlan>> {
+    pub fn get_plans(&self, organization_id: OrganizationId) -> Result<Vec<OrganizationPlan>> {
         self.client.request(
             Method::GET,
             &format!("organizations/{}/plans", organization_id),
@@ -613,7 +638,11 @@ impl OrganizationsClient {
     }
 
     /// Get specific organization plan
-    pub fn get_plan(&self, organization_id: u64, plan_id: u32) -> Result<OrganizationPlan> {
+    pub fn get_plan(
+        &self,
+        organization_id: OrganizationId,
+        plan_id: PricingPlanId,
+    ) -> Result<OrganizationPlan> {
         self.client.request(
             Method::GET,
             &format!("organizations/{}/plans/{}", organization_id, plan_id),
@@ -621,7 +650,10 @@ impl OrganizationsClient {
     }
 
     /// Get organization segmentation
-    pub fn get_segmentation(&self, organization_id: u64) -> Result<OrganizationSegmentation> {
+    pub fn get_segmentation(
+        &self,
+        organization_id: OrganizationId,
+    ) -> Result<OrganizationSegmentation> {
         self.client.request(
             Method::GET,
             &format!("organizations/{}/segmentation", organization_id),
@@ -631,7 +663,7 @@ impl OrganizationsClient {
     /// Update organization segmentation
     pub fn update_segmentation(
         &self,
-        organization_id: u64,
+        organization_id: OrganizationId,
         segmentation: &OrganizationSegmentation,
     ) -> Result<OrganizationSegmentation> {
         self.client.request_with_body(
@@ -644,8 +676,8 @@ impl OrganizationsClient {
     /// Get workspace assignments
     pub fn get_workspace_assignments(
         &self,
-        organization_id: u64,
-        workspace_id: u64,
+        organization_id: OrganizationId,
+        workspace_id: WorkspaceId,
     ) -> Result<Vec<WorkspaceAssignment>> {
         self.client.request(
             Method::GET,
@@ -659,8 +691,8 @@ impl OrganizationsClient {
     /// Create workspace assignment
     pub fn create_workspace_assignment(
         &self,
-        organization_id: u64,
-        workspace_id: u64,
+        organization_id: OrganizationId,
+        workspace_id: WorkspaceId,
         assignment: &CreateWorkspaceAssignment,
     ) -> Result<WorkspaceAssignment> {
         self.client.request_with_body(
@@ -676,8 +708,8 @@ impl OrganizationsClient {
     /// Get workspace groups
     pub fn get_workspace_groups(
         &self,
-        organization_id: u64,
-        workspace_id: u64,
+        organization_id: OrganizationId,
+        workspace_id: WorkspaceId,
     ) -> Result<Vec<OrganizationGroup>> {
         self.client.request(
             Method::GET,
@@ -691,9 +723,9 @@ impl OrganizationsClient {
     /// Create workspace group assignment
     pub fn create_workspace_group(
         &self,
-        organization_id: u64,
-        workspace_id: u64,
-        group_id: u64,
+        organization_id: OrganizationId,
+        workspace_id: WorkspaceId,
+        group_id: GroupId,
     ) -> Result<OrganizationGroup> {
         self.client.request_with_body(
             Method::POST,

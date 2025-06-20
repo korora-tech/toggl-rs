@@ -1,3 +1,4 @@
+use crate::models::api::ids::{TimeEntryInvitationId, WorkspaceId};
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
@@ -50,11 +51,19 @@ fn test_get_time_entry_invitations() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let invitations = client.time_entry_invitations().get_invitations(987654)?;
+            let invitations = client
+                .time_entry_invitations()
+                .get_invitations(WorkspaceId(987654))?;
             assert_eq!(invitations.len(), 2);
-            assert_eq!(invitations[0].time_entry_invitation_id, 1);
+            assert_eq!(
+                invitations[0].time_entry_invitation_id,
+                TimeEntryInvitationId(1)
+            );
             assert_eq!(invitations[0].shared_by_user_name, "John Doe");
-            assert_eq!(invitations[1].time_entry_invitation_id, 2);
+            assert_eq!(
+                invitations[1].time_entry_invitation_id,
+                TimeEntryInvitationId(2)
+            );
             assert_eq!(invitations[1].shared_by_user_name, "Jane Smith");
             Ok(())
         },
@@ -71,7 +80,7 @@ fn test_accept_time_entry_invitation() -> Result<()> {
         |client| {
             client
                 .time_entry_invitations()
-                .accept_invitation(987654, 3)?;
+                .accept_invitation(WorkspaceId(987654), TimeEntryInvitationId(3))?;
             Ok(())
         },
     )
@@ -87,7 +96,7 @@ fn test_reject_time_entry_invitation() -> Result<()> {
         |client| {
             client
                 .time_entry_invitations()
-                .reject_invitation(987654, 4)?;
+                .reject_invitation(WorkspaceId(987654), TimeEntryInvitationId(4))?;
             Ok(())
         },
     )

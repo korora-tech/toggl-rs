@@ -1,4 +1,5 @@
 use super::TogglClient;
+use crate::models::api::ids::WorkspaceId;
 use crate::models::reports::*;
 use reqwest::Method;
 use std::collections::BTreeMap;
@@ -16,7 +17,7 @@ impl ReportsClient {
     /// Get summary report
     pub fn summary(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         params: BTreeMap<String, String>,
     ) -> Result<summary::SummaryReportResponse> {
         self.client.request_with_params(
@@ -29,7 +30,7 @@ impl ReportsClient {
     /// Get detailed report
     pub fn detailed(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         params: BTreeMap<String, String>,
     ) -> Result<detailed::DetailedReportResponse> {
         self.client.request_with_params(
@@ -42,7 +43,7 @@ impl ReportsClient {
     /// Get weekly report
     pub fn weekly(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         params: BTreeMap<String, String>,
     ) -> Result<weekly::WeeklyReportResponse> {
         self.client.request_with_params(
@@ -55,7 +56,7 @@ impl ReportsClient {
     /// Get project trends report
     pub fn project_trends(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         params: BTreeMap<String, String>,
     ) -> Result<trends::ProjectTrendsResponse> {
         self.client.request_with_params(
@@ -68,7 +69,7 @@ impl ReportsClient {
     /// Get client trends report
     pub fn client_trends(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         params: BTreeMap<String, String>,
     ) -> Result<trends::ClientTrendsResponse> {
         self.client.request_with_params(
@@ -81,7 +82,7 @@ impl ReportsClient {
     /// Get user trends report
     pub fn user_trends(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         params: BTreeMap<String, String>,
     ) -> Result<trends::UserTrendsResponse> {
         self.client.request_with_params(
@@ -94,7 +95,7 @@ impl ReportsClient {
     /// Get project profitability report
     pub fn project_profitability(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         params: BTreeMap<String, String>,
     ) -> Result<profitability::ProjectProfitabilityResponse> {
         self.client.request_with_params(
@@ -110,7 +111,7 @@ impl ReportsClient {
     /// Get employee profitability report
     pub fn employee_profitability(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         params: BTreeMap<String, String>,
     ) -> Result<profitability::EmployeeProfitabilityResponse> {
         self.client.request_with_params(
@@ -126,7 +127,7 @@ impl ReportsClient {
     /// Get comparative report
     pub fn comparative(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         params: BTreeMap<String, String>,
     ) -> Result<comparative::ComparativeReportResponse> {
         self.client.request_with_params(
@@ -139,7 +140,7 @@ impl ReportsClient {
     /// Export report
     pub fn export(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         export_type: &str,
         params: BTreeMap<String, String>,
     ) -> Result<export::ExportResponse> {

@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::models::api::favorite::*;
+    use crate::models::api::ids::{FavoriteId, ProjectId, TagId, TaskId, WorkspaceId};
     use crate::tests::*;
     use reqwest::Method;
     use serde_json::json;
@@ -47,15 +48,15 @@ mod tests {
                 let favorites = client.favorites().list()?;
 
                 assert_eq!(favorites.len(), 2);
-                assert_eq!(favorites[0].id, 1);
+                assert_eq!(favorites[0].id, FavoriteId::new(1));
                 assert_eq!(favorites[0].description, Some("Task 1".to_string()));
-                assert_eq!(favorites[0].project_id, Some(111));
+                assert_eq!(favorites[0].project_id, Some(ProjectId::new(111)));
                 assert!(favorites[0].billable);
 
-                assert_eq!(favorites[1].id, 2);
+                assert_eq!(favorites[1].id, FavoriteId::new(2));
                 assert_eq!(favorites[1].description, Some("Task 2".to_string()));
-                assert_eq!(favorites[1].project_id, Some(222));
-                assert_eq!(favorites[1].task_id, Some(333));
+                assert_eq!(favorites[1].project_id, Some(ProjectId::new(222)));
+                assert_eq!(favorites[1].task_id, Some(TaskId::new(333)));
                 assert!(!favorites[1].billable);
 
                 Ok(())
@@ -87,19 +88,19 @@ mod tests {
             Some(response),
             |client| {
                 let new_favorite = CreateFavorite {
-                    workspace_id: 123456,
+                    workspace_id: WorkspaceId::new(123456),
                     description: Some("New favorite".to_string()),
-                    project_id: Some(111),
+                    project_id: Some(ProjectId::new(111)),
                     task_id: None,
-                    tag_ids: Some(vec![1, 2]),
+                    tag_ids: Some(vec![TagId::new(1), TagId::new(2)]),
                     billable: Some(true),
                 };
 
                 let favorite = client.favorites().create(&new_favorite)?;
 
-                assert_eq!(favorite.id, 123);
+                assert_eq!(favorite.id, FavoriteId::new(123));
                 assert_eq!(favorite.description, Some("New favorite".to_string()));
-                assert_eq!(favorite.project_id, Some(111));
+                assert_eq!(favorite.project_id, Some(ProjectId::new(111)));
                 assert!(favorite.billable);
                 Ok(())
             },
@@ -131,17 +132,19 @@ mod tests {
             |client| {
                 let update_favorite = UpdateFavorite {
                     description: Some("Updated favorite".to_string()),
-                    project_id: Some(222),
+                    project_id: Some(ProjectId::new(222)),
                     task_id: None,
-                    tag_ids: Some(vec![3, 4]),
+                    tag_ids: Some(vec![TagId::new(3), TagId::new(4)]),
                     billable: Some(false),
                 };
 
-                let favorite = client.favorites().update(123, &update_favorite)?;
+                let favorite = client
+                    .favorites()
+                    .update(FavoriteId::new(123), &update_favorite)?;
 
-                assert_eq!(favorite.id, 123);
+                assert_eq!(favorite.id, FavoriteId::new(123));
                 assert_eq!(favorite.description, Some("Updated favorite".to_string()));
-                assert_eq!(favorite.project_id, Some(222));
+                assert_eq!(favorite.project_id, Some(ProjectId::new(222)));
                 assert!(!favorite.billable);
                 Ok(())
             },
@@ -151,7 +154,7 @@ mod tests {
     #[test]
     fn test_delete_favorite() -> Result<()> {
         with_mockito(Method::DELETE, "/me/favorites/123", 200, None, |client| {
-            client.favorites().delete(123)?;
+            client.favorites().delete(FavoriteId::new(123))?;
             Ok(())
         })
     }

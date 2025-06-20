@@ -1,3 +1,4 @@
+use crate::models::api::ids::{GroupId, ProjectId, ProjectUserId, TaskId, UserId, WorkspaceId};
 use crate::models::api::project::*;
 use crate::tests::{with_mockito, with_mockito_params};
 use reqwest::Method;
@@ -51,7 +52,11 @@ fn test_bulk_edit_projects() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let projects = client.projects().bulk_edit(1, &[123, 124], &operations)?;
+            let projects = client.projects().bulk_edit(
+                WorkspaceId(1),
+                &[ProjectId(123), ProjectId(124)],
+                &operations,
+            )?;
             assert_eq!(projects.len(), 2);
             assert_eq!(projects[0].color, "#FF0000");
             assert!(projects[0].active);
@@ -79,7 +84,10 @@ fn test_get_project_periods() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let periods = client.projects().get_periods(1, 123, None, None)?;
+            let periods =
+                client
+                    .projects()
+                    .get_periods(WorkspaceId(1), ProjectId(123), None, None)?;
             assert_eq!(periods.len(), 2);
             Ok(())
         },
@@ -106,10 +114,12 @@ fn test_get_project_periods_with_dates() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let periods =
-                client
-                    .projects()
-                    .get_periods(1, 123, Some("2023-01-01"), Some("2023-12-31"))?;
+            let periods = client.projects().get_periods(
+                WorkspaceId(1),
+                ProjectId(123),
+                Some("2023-01-01"),
+                Some("2023-12-31"),
+            )?;
             assert_eq!(periods.len(), 1);
             Ok(())
         },
@@ -124,7 +134,7 @@ fn test_pin_project() -> Result<()> {
         204,
         None,
         |client| {
-            client.projects().pin(1, 123)?;
+            client.projects().pin(WorkspaceId(1), ProjectId(123))?;
             Ok(())
         },
     )
@@ -138,7 +148,7 @@ fn test_unpin_project() -> Result<()> {
         204,
         None,
         |client| {
-            client.projects().unpin(1, 123)?;
+            client.projects().unpin(WorkspaceId(1), ProjectId(123))?;
             Ok(())
         },
     )
@@ -179,9 +189,12 @@ fn test_bulk_edit_tasks() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let tasks = client
-                .projects()
-                .bulk_edit_tasks(1, 123, &[456, 457], &operations)?;
+            let tasks = client.projects().bulk_edit_tasks(
+                WorkspaceId(1),
+                ProjectId(123),
+                &[TaskId(456), TaskId(457)],
+                &operations,
+            )?;
             assert_eq!(tasks.len(), 2);
             assert!(!tasks[0].active);
             Ok(())
@@ -215,7 +228,9 @@ fn test_get_billable_amounts() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let projects = client.projects().get_billable_amounts(1, &[123, 124])?;
+            let projects = client
+                .projects()
+                .get_billable_amounts(WorkspaceId(1), &[ProjectId(123), ProjectId(124)])?;
             assert_eq!(projects.len(), 1);
             assert_eq!(projects[0].billable, Some(true));
             Ok(())
@@ -239,7 +254,7 @@ fn test_get_task_count() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let count = client.projects().get_task_count(1)?;
+            let count = client.projects().get_task_count(WorkspaceId(1))?;
             assert_eq!(count["total"], 42);
             Ok(())
         },
@@ -268,7 +283,7 @@ fn test_get_templates() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let templates = client.projects().get_templates(1)?;
+            let templates = client.projects().get_templates(WorkspaceId(1))?;
             assert_eq!(templates.len(), 1);
             assert_eq!(templates[0].name, "Template 1");
             Ok(())
@@ -292,7 +307,7 @@ fn test_get_user_count() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let count = client.projects().get_user_count(1)?;
+            let count = client.projects().get_user_count(WorkspaceId(1))?;
             assert_eq!(count["total"], 15);
             Ok(())
         },
@@ -316,9 +331,9 @@ fn test_get_project_groups() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let groups = client.projects().get_groups(1)?;
+            let groups = client.projects().get_groups(WorkspaceId(1))?;
             assert_eq!(groups.len(), 1);
-            assert_eq!(groups[0].group_id, 10);
+            assert_eq!(groups[0].group_id, GroupId(10));
             Ok(())
         },
     )
@@ -327,8 +342,8 @@ fn test_get_project_groups() -> Result<()> {
 #[test]
 fn test_create_project_group() -> Result<()> {
     let payload = ProjectGroupPayload {
-        project_id: 123,
-        group_id: 10,
+        project_id: ProjectId(123),
+        group_id: GroupId(10),
     };
 
     let response = json!({
@@ -344,9 +359,9 @@ fn test_create_project_group() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let group = client.projects().create_group(1, &payload)?;
-            assert_eq!(group.group_id, 10);
-            assert_eq!(group.project_id, 123);
+            let group = client.projects().create_group(WorkspaceId(1), &payload)?;
+            assert_eq!(group.group_id, GroupId(10));
+            assert_eq!(group.project_id, ProjectId(123));
             Ok(())
         },
     )
@@ -360,7 +375,7 @@ fn test_delete_project_group() -> Result<()> {
         204,
         None,
         |client| {
-            client.projects().delete_group(1, 1)?;
+            client.projects().delete_group(WorkspaceId(1), GroupId(1))?;
             Ok(())
         },
     )
@@ -386,7 +401,7 @@ fn test_list_project_users() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let users = client.projects().list_project_users(1)?;
+            let users = client.projects().list_project_users(WorkspaceId(1))?;
             assert_eq!(users.len(), 1);
             assert!(users[0].manager);
             Ok(())
@@ -422,7 +437,7 @@ fn test_list_project_users_paginated() -> Result<()> {
         Some(response),
         |client| {
             let users = client.projects().list_project_users_paginated(
-                1,
+                WorkspaceId(1),
                 Some(1),
                 Some(10),
                 Some("name"),
@@ -437,8 +452,8 @@ fn test_list_project_users_paginated() -> Result<()> {
 #[test]
 fn test_create_project_user() -> Result<()> {
     let create_user = CreateProjectUser {
-        project_id: 123,
-        user_id: 456,
+        project_id: ProjectId(123),
+        user_id: UserId(456),
         manager: Some(true),
         rate: Some(100.0),
         labour_cost: None,
@@ -460,8 +475,10 @@ fn test_create_project_user() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let user = client.projects().create_project_user(1, &create_user)?;
-            assert_eq!(user.project_id, 123);
+            let user = client
+                .projects()
+                .create_project_user(WorkspaceId(1), &create_user)?;
+            assert_eq!(user.project_id, ProjectId(123));
             assert!(user.manager);
             Ok(())
         },
@@ -494,9 +511,11 @@ fn test_bulk_edit_project_users() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let users = client
-                .projects()
-                .bulk_edit_project_users(1, &[1, 2], &operations)?;
+            let users = client.projects().bulk_edit_project_users(
+                WorkspaceId(1),
+                &[ProjectUserId(1), ProjectUserId(2)],
+                &operations,
+            )?;
             assert_eq!(users.len(), 1);
             assert!(!users[0].manager);
             Ok(())
@@ -528,7 +547,10 @@ fn test_update_project_user() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let user = client.projects().update_project_user(1, 1, &update)?;
+            let user =
+                client
+                    .projects()
+                    .update_project_user(WorkspaceId(1), ProjectUserId(1), &update)?;
             assert!(!user.manager);
             assert_eq!(user.rate, Some(150.0));
             Ok(())
@@ -544,7 +566,9 @@ fn test_delete_project_user() -> Result<()> {
         204,
         None,
         |client| {
-            client.projects().delete_project_user(1, 1)?;
+            client
+                .projects()
+                .delete_project_user(WorkspaceId(1), ProjectUserId(1))?;
             Ok(())
         },
     )

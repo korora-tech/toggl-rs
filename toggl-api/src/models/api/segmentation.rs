@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::ids::{GroupId, UserId, WorkspaceId};
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OrganizationSegmentation {
     pub demo_requested: Option<bool>,
@@ -16,13 +18,13 @@ pub struct OrganizationSegmentation {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkspaceAssignment {
-    pub group_id: u64,
-    pub user_id: u64,
-    pub workspace_id: u64,
+    pub group_id: GroupId,
+    pub user_id: UserId,
+    pub workspace_id: WorkspaceId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateWorkspaceAssignment {
-    pub user_id: u64,
-    pub group_id: u64,
+    pub user_id: UserId,
+    pub group_id: GroupId,
 }

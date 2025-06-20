@@ -1,15 +1,16 @@
+use crate::models::api::ids::{FavoriteId, ProjectId, TagId, TaskId, UserId, WorkspaceId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Favorite {
-    pub id: u64,
-    pub workspace_id: u64,
-    pub user_id: u64,
+    pub id: FavoriteId,
+    pub workspace_id: WorkspaceId,
+    pub user_id: UserId,
     pub description: Option<String>,
-    pub project_id: Option<u64>,
-    pub task_id: Option<u64>,
-    pub tag_ids: Option<Vec<u64>>,
+    pub project_id: Option<ProjectId>,
+    pub task_id: Option<TaskId>,
+    pub tag_ids: Option<Vec<TagId>>,
     pub billable: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -19,19 +20,19 @@ pub struct Favorite {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateFavorite {
-    pub workspace_id: u64,
+    pub workspace_id: WorkspaceId,
     pub description: Option<String>,
-    pub project_id: Option<u64>,
-    pub task_id: Option<u64>,
-    pub tag_ids: Option<Vec<u64>>,
+    pub project_id: Option<ProjectId>,
+    pub task_id: Option<TaskId>,
+    pub tag_ids: Option<Vec<TagId>>,
     pub billable: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UpdateFavorite {
     pub description: Option<String>,
-    pub project_id: Option<u64>,
-    pub task_id: Option<u64>,
-    pub tag_ids: Option<Vec<u64>>,
+    pub project_id: Option<ProjectId>,
+    pub task_id: Option<TaskId>,
+    pub tag_ids: Option<Vec<TagId>>,
     pub billable: Option<bool>,
 }

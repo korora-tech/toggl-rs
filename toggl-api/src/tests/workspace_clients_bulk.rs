@@ -1,3 +1,4 @@
+use crate::models::api::ids::{ClientId, WorkspaceId};
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
@@ -16,12 +17,15 @@ fn test_archive_clients_bulk() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let client_ids = vec![123, 456, 789];
+            let client_ids = vec![ClientId(123), ClientId(456), ClientId(789)];
             let result = client
                 .workspaces()
-                .archive_clients_bulk(12345, client_ids)?;
+                .archive_clients_bulk(WorkspaceId(12345), client_ids)?;
 
-            assert_eq!(result.client_ids, Some(vec![123, 456, 789]));
+            assert_eq!(
+                result.client_ids,
+                Some(vec![ClientId(123), ClientId(456), ClientId(789)])
+            );
             assert_eq!(result.project_ids, Some(vec![111, 222, 333]));
             Ok(())
         },
@@ -57,14 +61,16 @@ fn test_get_clients_data() -> Result<()> {
         200,
         Some(response),
         |client| {
-            let client_ids = vec![123, 456];
-            let clients = client.workspaces().get_clients_data(12345, client_ids)?;
+            let client_ids = vec![ClientId(123), ClientId(456)];
+            let clients = client
+                .workspaces()
+                .get_clients_data(WorkspaceId(12345), client_ids)?;
 
             assert_eq!(clients.len(), 2);
-            assert_eq!(clients[0].id, 123);
+            assert_eq!(clients[0].id, ClientId(123));
             assert_eq!(clients[0].name, "Client A");
             assert!(!clients[0].archived);
-            assert_eq!(clients[1].id, 456);
+            assert_eq!(clients[1].id, ClientId(456));
             assert_eq!(clients[1].name, "Client B");
             assert!(clients[1].archived);
             Ok(())
@@ -80,8 +86,10 @@ fn test_delete_clients_bulk() -> Result<()> {
         200,
         None,
         |client| {
-            let client_ids = vec![123, 456, 789];
-            client.workspaces().delete_clients_bulk(12345, client_ids)?;
+            let client_ids = vec![ClientId(123), ClientId(456), ClientId(789)];
+            client
+                .workspaces()
+                .delete_clients_bulk(WorkspaceId(12345), client_ids)?;
             Ok(())
         },
     )

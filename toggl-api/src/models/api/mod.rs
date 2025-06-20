@@ -45,10 +45,14 @@ pub mod workspace_subscription;
 
 // Re-export ID types
 pub use ids::{
-    AlertId, ApiKeyId, AssigneeId, AvatarId, CalendarId, ClientId, CountryId, CreatorId,
-    CurrencyId, DashboardId, ExportId, GoalId, GroupId, InvitationId, InvoiceId, OrganizationId,
-    PricingPlanId, ProjectId, ProviderUserId, SamlConfigurationId, SmailId, SubscriptionId, TagId,
-    TaskId, TimeEntryId, TimelineId, UserId, WorkspaceId,
+    AlertId, ApiKeyId, AssigneeId, AvatarId, BookmarkId, CalendarId, CategoryId, ClientId, 
+    CompanyId, ContactDetailId, CountryId, CountrySubdivisionId, CreatorId, CurrencyId, 
+    CustomerId, DashboardId, ExpenseId, ExportId, FavoriteId, GoalId, GroupId, 
+    IntegrationId, InvitationId, InvitationItemId, InvoiceId, InvoiceLineItemId, LevelId, OrganizationId, 
+    PricingPlanId, ProjectId, ProjectUserId, ProviderUserId, RateId, ReminderId, ReportId, 
+    SamlConfigurationId, ScheduledReportId, SetupId, SmailId, SubscriptionId, 
+    SubscriptionPeriodId, TagId, TaskId, TimeEntryId, TimeEntryInvitationId, TimelineId, 
+    TransferId, UserId, WebhookId, WorkspaceId, WorkspaceUserId,
 };
 
 // Re-export specific types to avoid conflicts

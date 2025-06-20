@@ -1,4 +1,5 @@
 use super::TogglClient;
+use crate::models::api::ids::{SsoProfileId, WorkspaceId};
 use crate::models::api::saml::*;
 use reqwest::Method;
 use std::collections::BTreeMap;
@@ -25,7 +26,7 @@ impl SamlClient {
     /// SAML2 Identity Provider Callback
     pub fn saml2_callback(
         &self,
-        workspace_id: u64,
+        workspace_id: WorkspaceId,
         saml_response: &str,
         relay_state: Option<&str>,
     ) -> Result<()> {
@@ -49,7 +50,10 @@ impl SamlClient {
     }
 
     /// Get linked SSO profiles for workspace
-    pub fn get_linked_sso_profiles(&self, workspace_id: u64) -> Result<Vec<LinkedSsoProfile>> {
+    pub fn get_linked_sso_profiles(
+        &self,
+        workspace_id: WorkspaceId,
+    ) -> Result<Vec<LinkedSsoProfile>> {
         self.client.request(
             Method::GET,
             &format!("workspaces/{}/linked_sso_profiles", workspace_id),
@@ -59,8 +63,8 @@ impl SamlClient {
     /// Link SSO profile to workspace
     pub fn link_sso_profile(
         &self,
-        workspace_id: u64,
-        sso_profile_id: u64,
+        workspace_id: WorkspaceId,
+        sso_profile_id: SsoProfileId,
         link_profile: &LinkSsoProfile,
     ) -> Result<()> {
         self.client.request_with_body_empty(
@@ -74,7 +78,11 @@ impl SamlClient {
     }
 
     /// Unlink SSO profile from workspace
-    pub fn unlink_sso_profile(&self, workspace_id: u64, sso_profile_id: u64) -> Result<()> {
+    pub fn unlink_sso_profile(
+        &self,
+        workspace_id: WorkspaceId,
+        sso_profile_id: SsoProfileId,
+    ) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
             &format!(

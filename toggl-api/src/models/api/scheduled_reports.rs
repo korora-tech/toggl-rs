@@ -1,24 +1,25 @@
+use super::ids::{BookmarkId, CreatorId, GroupId, ReportId, UserId, WorkspaceId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ScheduledReport {
-    pub bookmark_id: Option<i64>,
+    pub bookmark_id: Option<BookmarkId>,
     pub created_at: Option<String>,
-    pub creator_id: Option<i64>,
+    pub creator_id: Option<CreatorId>,
     pub deleted_at: Option<String>,
     pub frequency: Option<i32>,
-    pub group_ids: Option<Vec<i64>>,
-    pub report_id: Option<i64>,
-    pub user_ids: Option<Vec<i64>>,
-    pub workspace_id: Option<i64>,
+    pub group_ids: Option<Vec<GroupId>>,
+    pub report_id: Option<ReportId>,
+    pub user_ids: Option<Vec<UserId>>,
+    pub workspace_id: Option<WorkspaceId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateScheduledReportPayload {
-    pub bookmark_id: i64,
+    pub bookmark_id: BookmarkId,
     pub frequency: i32,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub group_ids: Option<Vec<i64>>,
+    pub group_ids: Option<Vec<GroupId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<i64>>,
+    pub user_ids: Option<Vec<UserId>>,
 }

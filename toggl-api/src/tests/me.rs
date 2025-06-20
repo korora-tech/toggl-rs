@@ -1,3 +1,7 @@
+use crate::models::api::ids::{
+    ClientId, OrganizationId, ProjectId, ReminderId, TagId, TaskId, TimeEntryId, UserId,
+    WorkspaceId,
+};
 use crate::models::api::user::{ResetToken, UpdateUser};
 use pretty_assertions::assert_eq;
 use reqwest::Method;
@@ -32,7 +36,7 @@ fn test_get_me() -> Result<()> {
 
     with_mockito(Method::GET, "/me", 200, Some(response), |client| {
         let user = client.me().get()?;
-        assert_eq!(1234567, user.id);
+        assert_eq!(user.id, UserId(1234567));
         assert_eq!("test@example.com", user.email);
         assert_eq!("Test User", user.fullname);
         assert_eq!(true, user.has_password);
@@ -107,9 +111,9 @@ fn test_get_clients() -> Result<()> {
     with_mockito(Method::GET, "/me/clients", 200, Some(response), |client| {
         let clients = client.me().get_clients(None)?;
         assert_eq!(2, clients.len());
-        assert_eq!(1234567, clients[0].id);
+        assert_eq!(clients[0].id, ClientId(1234567));
         assert_eq!("Client One", clients[0].name);
-        assert_eq!(7654321, clients[1].id);
+        assert_eq!(clients[1].id, ClientId(7654321));
         assert_eq!("Client Two", clients[1].name);
         Ok(())
     })
@@ -141,7 +145,7 @@ fn test_get_features() -> Result<()> {
     with_mockito(Method::GET, "/me/features", 200, Some(response), |client| {
         let features = client.me().get_features()?;
         assert_eq!(1, features.len());
-        assert_eq!(1234567, features[0].workspace_id);
+        assert_eq!(features[0].workspace_id, WorkspaceId(1234567));
         assert_eq!(3, features[0].features.len());
         assert_eq!("free", features[0].features[0].name);
         assert_eq!(true, features[0].features[0].enabled);
@@ -213,7 +217,7 @@ fn test_get_organizations() -> Result<()> {
         |client| {
             let orgs = client.me().get_organizations()?;
             assert_eq!(1, orgs.len());
-            assert_eq!(1234567, orgs[0].id);
+            assert_eq!(OrganizationId(1234567), orgs[0].id);
             assert_eq!("My Organization", orgs[0].name);
             assert_eq!(true, orgs[0].admin);
             assert_eq!(true, orgs[0].owner);
@@ -259,7 +263,7 @@ fn test_get_projects() -> Result<()> {
     with_mockito(Method::GET, "/me/projects", 200, Some(response), |client| {
         let projects = client.me().get_projects(None, None)?;
         assert_eq!(1, projects.len());
-        assert_eq!(123456789, projects[0].id);
+        assert_eq!(ProjectId(123456789), projects[0].id);
         assert_eq!("Test Project", projects[0].name);
         assert_eq!(true, projects[0].active);
         Ok(())
@@ -290,9 +294,9 @@ fn test_get_tags() -> Result<()> {
     with_mockito(Method::GET, "/me/tags", 200, Some(response), |client| {
         let tags = client.me().get_tags(None)?;
         assert_eq!(2, tags.len());
-        assert_eq!(1234, tags[0].id);
+        assert_eq!(tags[0].id, TagId(1234));
         assert_eq!("important", tags[0].name);
-        assert_eq!(1235, tags[1].id);
+        assert_eq!(tags[1].id, TagId(1235));
         assert_eq!("urgent", tags[1].name);
         Ok(())
     })
@@ -334,7 +338,7 @@ fn test_get_tasks() -> Result<()> {
     with_mockito(Method::GET, "/me/tasks", 200, Some(response), |client| {
         let tasks = client.me().get_tasks(None, None)?;
         assert_eq!(2, tasks.len());
-        assert_eq!(1234, tasks[0].id);
+        assert_eq!(TaskId(1234), tasks[0].id);
         assert_eq!("Task One", tasks[0].name);
         assert_eq!(true, tasks[0].active);
         assert_eq!(false, tasks[1].active);
@@ -364,7 +368,7 @@ fn test_get_track_reminders() -> Result<()> {
         |client| {
             let reminders = client.me().get_track_reminders()?;
             assert_eq!(1, reminders.len());
-            assert_eq!(5490, reminders[0].reminder_id);
+            assert_eq!(reminders[0].reminder_id, ReminderId(5490));
             assert_eq!(1, reminders[0].frequency);
             assert_eq!(2, reminders[0].threshold);
             Ok(())
@@ -417,7 +421,7 @@ fn test_get_workspaces() -> Result<()> {
         |client| {
             let workspaces = client.me().get_workspaces(None)?;
             assert_eq!(1, workspaces.len());
-            assert_eq!(1234567, workspaces[0].id);
+            assert_eq!(WorkspaceId(1234567), workspaces[0].id);
             assert_eq!("My Workspace", workspaces[0].name);
             assert_eq!(true, workspaces[0].admin);
             Ok(())
@@ -571,7 +575,7 @@ fn test_get_shared_time_entries() -> Result<()> {
         |client| {
             let shared = client.me().get_shared_time_entries()?;
             assert_eq!(1, shared.len());
-            assert_eq!(987654321, shared[0].time_entry_id.value());
+            assert_eq!(shared[0].time_entry_id, TimeEntryId(987654321));
             assert_eq!("John Doe", shared[0].user_name);
             Ok(())
         },
@@ -656,7 +660,7 @@ fn test_reset_token() -> Result<()> {
         Some(response),
         |client| {
             let user = client.me().reset_token(&reset_request)?;
-            assert_eq!(user.id, 98765);
+            assert_eq!(user.id, UserId(98765));
             assert_eq!(user.api_token, Some("new-token-12345".to_string()));
             Ok(())
         },

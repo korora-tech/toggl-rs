@@ -1,3 +1,4 @@
+use crate::models::api::ids::{ProjectId, TimelineId};
 use crate::models::api::timeline::CreateTimelineEvent;
 use pretty_assertions::assert_eq;
 use reqwest::Method;
@@ -52,7 +53,7 @@ fn test_list_timeline_events() -> Result<()> {
             );
             assert_eq!(5400, events[0].duration);
             assert!(events[0].project_id.is_none());
-            assert_eq!(Some(123456), events[1].project_id);
+            assert_eq!(Some(ProjectId::new(123456)), events[1].project_id);
             Ok(())
         },
     )
@@ -65,7 +66,7 @@ fn test_create_timeline_event() -> Result<()> {
         end_time: Some("2024-01-01T15:00:00Z".to_string()),
         description: Some("Meeting with client".to_string()),
         activity_type: "meeting".to_string(),
-        project_id: Some(123456),
+        project_id: Some(ProjectId::new(123456)),
         task_id: None,
     };
 
@@ -82,10 +83,10 @@ fn test_create_timeline_event() -> Result<()> {
 
     with_mockito(Method::POST, "/timeline", 200, Some(response), |client| {
         let event = client.timeline().create(&create_event)?;
-        assert_eq!(3333, event.id);
+        assert_eq!(TimelineId::new(3333), event.id);
         assert_eq!("Meeting with client", event.description.as_ref().unwrap());
         assert_eq!(3600, event.duration);
-        assert_eq!(Some(123456), event.project_id);
+        assert_eq!(Some(ProjectId::new(123456)), event.project_id);
         Ok(())
     })
 }
@@ -93,7 +94,7 @@ fn test_create_timeline_event() -> Result<()> {
 #[test]
 fn test_delete_timeline_event() -> Result<()> {
     with_mockito(Method::DELETE, "/timeline/3333", 200, None, |client| {
-        client.timeline().delete(3333)?;
+        client.timeline().delete(TimelineId::new(3333))?;
         Ok(())
     })
 }

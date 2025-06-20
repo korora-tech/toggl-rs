@@ -1,3 +1,7 @@
+use super::ids::{
+    CompanyId, ContactDetailId, CountryId, CountrySubdivisionId, CreatorId, CurrencyId, CustomerId,
+    PricingPlanId, SubscriptionId, SubscriptionPeriodId, UserId,
+};
 use serde::{Deserialize, Serialize};
 
 /// Workspace subscription response from API
@@ -12,7 +16,7 @@ pub struct WorkspaceSubscriptionResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_details: Option<SubscriptionCardDetails>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_id: Option<i64>,
+    pub company_id: Option<CompanyId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contact_details: Option<SubscriptionContactDetail>,
     pub currency: String,
@@ -21,7 +25,7 @@ pub struct WorkspaceSubscriptionResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_period_starts_at: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub customer_id: Option<i64>,
+    pub customer_id: Option<CustomerId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_date: Option<String>, // deprecated
     pub enterprise: bool,
@@ -32,7 +36,7 @@ pub struct WorkspaceSubscriptionResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_payment: Option<PaymentInfo>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub last_pricing_plan_id: Option<i64>,
+    pub last_pricing_plan_id: Option<PricingPlanId>,
     pub new_signup_trial: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub next_payment_date: Option<String>,
@@ -40,7 +44,7 @@ pub struct WorkspaceSubscriptionResponse {
     pub payment_method: String,
     pub plan_name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pricing_plan_id: Option<i64>, // legacy
+    pub pricing_plan_id: Option<PricingPlanId>, // legacy
     #[serde(skip_serializing_if = "Option::is_none")]
     pub renewal_at: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -67,7 +71,7 @@ pub struct SubscriptionCardDetails {
     pub added_at: String,
     pub card_number: String,
     pub card_type: String,
-    pub creator_id: i64,
+    pub creator_id: CreatorId,
     pub creator_name: String,
     pub expiry_date: String,
     pub holder_name: String,
@@ -81,19 +85,19 @@ pub struct SubscriptionContactDetail {
     pub company_city: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub company_name: Option<String>,
-    pub contact_detail_id: i64,
+    pub contact_detail_id: ContactDetailId,
     pub contact_email: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contact_person: Option<String>,
-    pub country_id: i32,
+    pub country_id: CountryId,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_subdivision_id: Option<i32>,
+    pub country_subdivision_id: Option<CountrySubdivisionId>,
     pub created_at: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub customer_id: Option<i64>,
+    pub customer_id: Option<CustomerId>,
     pub is_eu_resident: bool,
     pub updated_at: String,
-    pub user_id: i64,
+    pub user_id: UserId,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vat_number: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -106,7 +110,7 @@ pub struct SubscriptionContactDetail {
 pub struct InvoiceInfo {
     pub amount: i64,
     pub created_at: String,
-    pub currency_id: i32,
+    pub currency_id: CurrencyId,
     pub due: String,
     pub id: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -129,8 +133,8 @@ pub struct SubscriptionPeriod {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finished_on: Option<String>,
     pub started_on: String,
-    pub subscription_id: i64,
-    pub subscription_period_id: i64,
+    pub subscription_id: SubscriptionId,
+    pub subscription_period_id: SubscriptionPeriodId,
     pub trial: bool,
     pub user_count: i32,
 }

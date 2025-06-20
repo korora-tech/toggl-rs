@@ -1,3 +1,4 @@
+use crate::models::api::ids::WorkspaceId;
 use crate::tests::with_mockito;
 use reqwest::Method;
 use serde_json::json;
@@ -45,7 +46,7 @@ fn test_reset_ical_token() -> Result<()> {
         200,
         Some(json!(new_token)),
         |client| {
-            let token = client.ical().reset_token(987654)?;
+            let token = client.ical().reset_token(WorkspaceId(987654))?;
             assert_eq!(token, "new-token-456");
             Ok(())
         },
@@ -62,7 +63,7 @@ fn test_toggle_ical() -> Result<()> {
         200,
         Some(json!(status_message)),
         |client| {
-            let status = client.ical().toggle_ical(987654)?;
+            let status = client.ical().toggle_ical(WorkspaceId(987654))?;
             assert_eq!(status, "iCal feed enabled");
             Ok(())
         },

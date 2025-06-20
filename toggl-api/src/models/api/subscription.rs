@@ -1,13 +1,17 @@
+use super::ids::{
+    CustomerId, InvoiceItemId, OrganizationId, PaymentMethodId, PricingPlanId, SubscriptionId,
+    WorkspaceId,
+};
 use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Subscription {
-    pub id: u64,
-    pub workspace_id: Option<u64>,
-    pub organization_id: Option<u64>,
-    pub customer_id: u64,
-    pub pricing_plan_id: u32,
+    pub id: SubscriptionId,
+    pub workspace_id: Option<WorkspaceId>,
+    pub organization_id: Option<OrganizationId>,
+    pub customer_id: CustomerId,
+    pub pricing_plan_id: PricingPlanId,
     pub renewal_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
     pub deleted_at: Option<DateTime<Utc>>,
@@ -27,31 +31,31 @@ pub struct SubscriptionPeriod {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PaymentDetails {
-    pub payment_method_id: Option<u64>,
+    pub payment_method_id: Option<PaymentMethodId>,
     pub next_payment_date: Option<DateTime<Utc>>,
     pub next_payment_amount: Option<f64>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateSubscription {
-    pub workspace_id: Option<u64>,
-    pub organization_id: Option<u64>,
-    pub pricing_plan_id: u32,
-    pub payment_method_id: Option<u64>,
+    pub workspace_id: Option<WorkspaceId>,
+    pub organization_id: Option<OrganizationId>,
+    pub pricing_plan_id: PricingPlanId,
+    pub payment_method_id: Option<PaymentMethodId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UpdateSubscription {
-    pub pricing_plan_id: Option<u32>,
-    pub payment_method_id: Option<u64>,
+    pub pricing_plan_id: Option<PricingPlanId>,
+    pub payment_method_id: Option<PaymentMethodId>,
     pub auto_renew: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Invoice {
-    pub id: u64,
-    pub subscription_id: u64,
-    pub customer_id: u64,
+    pub id: InvoiceItemId,
+    pub subscription_id: SubscriptionId,
+    pub customer_id: CustomerId,
     pub currency: String,
     pub amount: f64,
     pub status: String,
@@ -83,7 +87,7 @@ pub struct ApplyCoupon {
 pub struct SubscriptionPlan {
     pub plan_id: String,
     pub name: String,
-    pub pricing_plan_id: u64,
+    pub pricing_plan_id: PricingPlanId,
     pub price: f64,
     pub currency: String,
     pub workspace_limit: Option<u64>,
