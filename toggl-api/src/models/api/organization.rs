@@ -6,27 +6,66 @@ use toggl_core::{
     WorkspaceUserId,
 };
 
+/// Represents a Toggl organization.
+///
+/// Organizations allow managing multiple workspaces under a single billing entity.
+/// They provide centralized user management, billing, and administrative features.
+///
+/// # Example
+/// ```no_run
+/// use toggl_api::prelude::*;
+///
+/// # async fn example() -> Result<()> {
+/// let client = TogglClient::new("your-api-token");
+/// let orgs = client.get_me_organizations().await?;
+///
+/// for org in orgs {
+///     println!("Organization: {} (ID: {})", org.name, org.id);
+///     println!("User count: {}", org.user_count);
+///     println!("Admin: {}, Owner: {}", org.admin, org.owner);
+/// }
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Organization {
+    /// Unique identifier for the organization
     pub id: OrganizationId,
+    /// Organization name
     pub name: String,
+    /// Current pricing plan
     pub pricing_plan_id: PricingPlanId,
+    /// When the organization was created
     pub created_at: DateTime<Utc>,
+    /// Server timestamp when this data was retrieved
     pub at: DateTime<Utc>,
+    /// When the organization was deleted (if applicable)
     pub server_deleted_at: Option<DateTime<Utc>>,
+    /// Whether this is a unified organization
     pub is_unified: bool,
+    /// Whether multiple workspaces are enabled
     pub is_multi_workspace_enabled: bool,
+    /// Whether using Chargify for billing
     pub is_chargify: bool,
+    /// Maximum number of workspaces allowed
     pub max_workspaces: u32,
+    /// Whether the current user is an admin
     pub admin: bool,
+    /// Whether the current user is the owner
     pub owner: bool,
+    /// When the organization was suspended (if applicable)
     pub suspended_at: Option<DateTime<Utc>>,
+    /// Total number of users in the organization
     pub user_count: u32,
+    /// Trial subscription information
     pub trial_info: TrialInfo,
+    /// Available payment methods
     pub payment_methods: Option<String>,
+    /// User's permissions in this organization
     pub permissions: Option<Vec<String>>,
 }
 
+/// Trial subscription information for an organization.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TrialInfo {
     pub trial: bool,
@@ -36,17 +75,24 @@ pub struct TrialInfo {
     pub last_pricing_plan_id: Option<PricingPlanId>,
 }
 
+/// Request structure for creating a new organization.
+///
+/// Creates an organization with an initial workspace.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateOrganization {
     pub name: String,
     pub workspace_name: String,
 }
 
+/// Request structure for updating organization settings.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UpdateOrganization {
     pub name: Option<String>,
 }
 
+/// Represents a user within an organization.
+///
+/// Contains the user's role, permissions, and workspace assignments.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationUser {
     pub id: WorkspaceUserId,
@@ -64,6 +110,9 @@ pub struct OrganizationUser {
     pub workspaces: Option<Vec<OrganizationWorkspace>>,
 }
 
+/// Represents a group within an organization.
+///
+/// Groups are used to manage permissions and access for multiple users.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationGroup {
     pub id: GroupId,
@@ -71,17 +120,20 @@ pub struct OrganizationGroup {
     pub workspace_id: WorkspaceId,
 }
 
+/// Request structure for creating a new organization group.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateOrganizationGroup {
     pub name: String,
     pub workspace_id: WorkspaceId,
 }
 
+/// Request structure for updating an organization group.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UpdateOrganizationGroup {
     pub name: String,
 }
 
+/// Represents a workspace within an organization.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationWorkspace {
     pub id: WorkspaceId,
@@ -89,6 +141,7 @@ pub struct OrganizationWorkspace {
     pub admin: bool,
 }
 
+/// Information about an organization's owner.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OrganizationOwner {
     pub id: UserId,

@@ -52,22 +52,32 @@ impl MeClient {
         self.client.request(Method::GET, "me/features")
     }
 
-    /// Get location
+    /// Get the user's current location information.
+    ///
+    /// Returns geographic location data based on IP address.
     pub fn get_location(&self) -> Result<Location> {
         self.client.request(Method::GET, "me/location")
     }
 
-    /// Check if logged in
+    /// Check if the current API token is valid and the user is logged in.
+    ///
+    /// Returns an empty response on success, or an error if not authenticated.
     pub fn get_logged(&self) -> Result<()> {
         self.client.request_empty(Method::GET, "me/logged")
     }
 
-    /// Get organizations user is part of
+    /// Get all organizations the current user belongs to.
+    ///
+    /// Organizations are used to manage multiple workspaces under a single entity.
     pub fn get_organizations(&self) -> Result<Vec<Organization>> {
         self.client.request(Method::GET, "me/organizations")
     }
 
-    /// Get projects
+    /// Get all projects accessible to the current user across all workspaces.
+    ///
+    /// # Arguments
+    /// * `include_archived` - Include archived projects in the results
+    /// * `since` - Unix timestamp to retrieve projects modified after this time
     pub fn get_projects(
         &self,
         include_archived: Option<bool>,
@@ -84,7 +94,11 @@ impl MeClient {
             .request_with_params(Method::GET, "me/projects", &params)
     }
 
-    /// Get projects paginated
+    /// Get projects with pagination support.
+    ///
+    /// # Arguments
+    /// * `start_project_id` - ID of the project to start from for pagination
+    /// * `since` - Unix timestamp to retrieve projects modified after this time
     pub fn get_projects_paginated(
         &self,
         start_project_id: Option<i64>,
@@ -101,7 +115,10 @@ impl MeClient {
             .request_with_params(Method::GET, "me/projects", &params)
     }
 
-    /// Get tags
+    /// Get all tags accessible to the current user across all workspaces.
+    ///
+    /// # Arguments
+    /// * `since` - Unix timestamp to retrieve tags modified after this time
     pub fn get_tags(&self, since: Option<i64>) -> Result<Vec<Tag>> {
         let mut params = BTreeMap::new();
         if let Some(since) = since {
@@ -111,7 +128,11 @@ impl MeClient {
             .request_with_params(Method::GET, "me/tags", &params)
     }
 
-    /// Get tasks
+    /// Get all tasks accessible to the current user.
+    ///
+    /// # Arguments
+    /// * `include_not_active` - Include inactive tasks in the results
+    /// * `since` - Unix timestamp to retrieve tasks modified after this time
     pub fn get_tasks(
         &self,
         include_not_active: Option<bool>,
@@ -131,12 +152,17 @@ impl MeClient {
             .request_with_params(Method::GET, "me/tasks", &params)
     }
 
-    /// Get track reminders
+    /// Get the user's configured time tracking reminders.
+    ///
+    /// Track reminders help users remember to track their time.
     pub fn get_track_reminders(&self) -> Result<Vec<TrackReminder>> {
         self.client.request(Method::GET, "me/track_reminders")
     }
 
-    /// Get workspaces
+    /// Get all workspaces the current user has access to.
+    ///
+    /// # Arguments
+    /// * `since` - Unix timestamp to retrieve workspaces modified after this time
     pub fn get_workspaces(&self, since: Option<i64>) -> Result<Vec<Workspace>> {
         let mut params = BTreeMap::new();
         if let Some(since) = since {
@@ -146,22 +172,33 @@ impl MeClient {
             .request_with_params(Method::GET, "me/workspaces", &params)
     }
 
-    /// Get web timer
+    /// Get the user's web timer information.
+    ///
+    /// Web timer tracks time spent on web-based activities.
     pub fn get_web_timer(&self) -> Result<UserWebTimer> {
         self.client.request(Method::GET, "me/web-timer")
     }
 
-    /// Close account
+    /// Permanently close the user's account.
+    ///
+    /// **Warning**: This action cannot be undone.
     pub fn close_account(&self) -> Result<()> {
         self.client.request_empty(Method::POST, "me/close_account")
     }
 
-    /// Accept terms of service
+    /// Accept the current terms of service.
+    ///
+    /// Required when terms have been updated.
     pub fn accept_tos(&self) -> Result<()> {
         self.client.request_empty(Method::GET, "me/accept_tos")
     }
 
-    /// Request data export
+    /// Request an export of the user's data.
+    ///
+    /// # Arguments
+    /// * `export_type` - Type of export to request (e.g., "json", "csv")
+    ///
+    /// Returns a UUID that can be used to download the export when ready.
     pub fn request_export(&self, export_type: &str) -> Result<String> {
         let mut params = BTreeMap::new();
         params.insert("export_type".to_string(), export_type.to_string());
@@ -169,13 +206,20 @@ impl MeClient {
             .request_with_params(Method::GET, "me/export", &params)
     }
 
-    /// Download export data
+    /// Download a previously requested data export.
+    ///
+    /// # Arguments
+    /// * `uuid` - The UUID returned from the export request
+    ///
+    /// Returns the export data as a ZIP file in bytes.
     pub fn download_export(&self, uuid: &str) -> Result<Vec<u8>> {
         self.client
             .request_binary(Method::GET, &format!("me/export/data/{}.zip", uuid))
     }
 
-    /// Lost password
+    /// Initiate password reset process.
+    ///
+    /// Sends a password reset email to the specified email address.
     pub fn lost_password(&self, lost_password: &LostPassword) -> Result<()> {
         self.client
             .request_with_body_empty(Method::POST, "me/lost_password", lost_password)

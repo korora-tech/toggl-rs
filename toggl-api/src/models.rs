@@ -1,8 +1,7 @@
-//! API models and types
+//! API models and types for Toggl Track
 //!
-//! This module organizes all API models into logical groups.
-//! Instead of using wildcard re-exports, we use explicit exports
-//! to avoid naming conflicts and make the API clearer.
+//! This module provides all the data structures used by the Toggl API, organized
+//! into logical groups to make them easy to find and use.
 //!
 //! # Module Organization
 //!
@@ -12,19 +11,59 @@
 //!
 //! # Common Types
 //!
-//! The most commonly used types are re-exported at the module root:
-//! - IDs: `WorkspaceId`, `ProjectId`, `TimeEntryId`, etc.
-//! - Core models: `User`, `Workspace`, `Project`, `TimeEntry`
-//! - Create/Update types: `CreateProject`, `UpdateProject`, etc.
+//! The most commonly used types are re-exported at the module root for convenience:
+//! - **IDs**: `WorkspaceId`, `ProjectId`, `TimeEntryId`, `ClientId`, `TagId`, etc.
+//! - **Core models**: `User`, `Workspace`, `Project`, `TimeEntry`, `Client`, `Tag`
+//! - **Create/Update types**: `CreateProject`, `UpdateProject`, `CreateTimeEntry`, etc.
+//!
+//! # Example Usage
+//!
+//! ```no_run
+//! use toggl_api::models::{
+//!     Workspace, Project, TimeEntry,
+//!     CreateProject, CreateTimeEntry,
+//!     WorkspaceId, ProjectId
+//! };
+//! use chrono::Utc;
+//!
+//! // Create a new project
+//! let project = CreateProject {
+//!     workspace_id: WorkspaceId(123456),
+//!     name: "My Project".to_string(),
+//!     active: Some(true),
+//!     billable: Some(true),
+//!     color: Some("#06aaf5".to_string()),
+//!     // ... other fields
+//! };
+//!
+//! // Create a time entry
+//! let entry = CreateTimeEntry {
+//!     workspace_id: WorkspaceId(123456),
+//!     start: Utc::now(),
+//!     duration: -1, // Running
+//!     description: Some("Working".to_string()),
+//!     created_with: "my-app".to_string(),
+//!     // ... other fields  
+//! };
+//! ```
 //!
 //! # Handling Naming Conflicts
 //!
 //! Some types have naming conflicts between modules. These are organized
 //! into sub-modules with clear namespacing:
-//! - `organization::` - Organization-specific types
+//!
+//! - `organization::` - Organization-specific types (e.g., `organization::Group`)
 //! - `workspace_types::` - Workspace-specific types that conflict with organization
 //! - `goals_types::` - Goal types from different modules
 //! - `subscription_types::` - Subscription-related types
+//!
+//! ## Example with Namespaced Types
+//!
+//! ```no_run
+//! use toggl_api::models::organization::{Organization, OrganizationUser};
+//! use toggl_api::models::workspace_types::{WorkspaceStatistics, WorkspaceSubscription};
+//! use toggl_api::models::goals_types::{WorkspaceGoal, SyncServerGoal};
+//! ```
 
 pub mod api {
     // Module declarations

@@ -44,13 +44,32 @@ impl WorkspacesClient {
         Self { client }
     }
 
-    /// Get workspace
+    /// Get detailed information about a specific workspace.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The ID of the workspace to retrieve
+    ///
+    /// # Example
+    /// ```no_run
+    /// # use toggl_api::prelude::*;
+    /// # fn example() -> Result<()> {
+    /// let client = TogglClient::new("your-api-token")?;
+    /// let workspace_id = WorkspaceId(123456);
+    /// let workspace = client.workspaces().get(workspace_id)?;
+    /// println!("Workspace: {}", workspace.name);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn get(&self, workspace_id: WorkspaceId) -> Result<Workspace> {
         self.client
             .request(Method::GET, &format!("workspaces/{}", workspace_id))
     }
 
-    /// Update workspace
+    /// Update workspace settings.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The ID of the workspace to update
+    /// * `workspace_update` - The fields to update
     pub fn update(
         &self,
         workspace_id: WorkspaceId,
@@ -63,13 +82,20 @@ impl WorkspacesClient {
         )
     }
 
-    /// Get workspace users
+    /// Get all users in a workspace.
+    ///
+    /// Returns a list of all users who have access to the workspace,
+    /// including their roles and permissions.
     pub fn get_users(&self, workspace_id: WorkspaceId) -> Result<Vec<WorkspaceUser>> {
         self.client
             .request(Method::GET, &format!("workspaces/{}/users", workspace_id))
     }
 
-    /// Get workspace clients
+    /// Get all clients in a workspace.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The ID of the workspace
+    /// * `status` - Optional filter for client status ("active", "archived", or "both")
     pub fn get_clients(
         &self,
         workspace_id: WorkspaceId,
@@ -87,7 +113,11 @@ impl WorkspacesClient {
         )
     }
 
-    /// Create workspace client
+    /// Create a new client in the workspace.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The ID of the workspace
+    /// * `name` - The name of the new client
     pub fn create_client(&self, workspace_id: WorkspaceId, name: &str) -> Result<Client> {
         let body = serde_json::json!({ "name": name });
         self.client.request_with_body(
@@ -97,7 +127,12 @@ impl WorkspacesClient {
         )
     }
 
-    /// Update workspace client
+    /// Update an existing client.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The ID of the workspace
+    /// * `client_id` - The ID of the client to update
+    /// * `name` - The new name for the client
     pub fn update_client(
         &self,
         workspace_id: WorkspaceId,

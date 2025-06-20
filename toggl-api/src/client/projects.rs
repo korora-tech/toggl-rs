@@ -15,7 +15,11 @@ impl ProjectsClient {
         Self { client }
     }
 
-    /// Get project
+    /// Get detailed information about a specific project.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace containing the project
+    /// * `project_id` - The ID of the project to retrieve
     pub fn get(&self, workspace_id: WorkspaceId, project_id: ProjectId) -> Result<Project> {
         self.client.request(
             Method::GET,
@@ -23,7 +27,11 @@ impl ProjectsClient {
         )
     }
 
-    /// Create project
+    /// Create a new project in the workspace.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace to create the project in
+    /// * `project` - Project creation parameters
     pub fn create(&self, workspace_id: WorkspaceId, project: &CreateProject) -> Result<Project> {
         self.client.request_with_body(
             Method::POST,
@@ -32,7 +40,12 @@ impl ProjectsClient {
         )
     }
 
-    /// Update project
+    /// Update an existing project.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace containing the project
+    /// * `project_id` - The ID of the project to update
+    /// * `project` - Fields to update (all optional)
     pub fn update(
         &self,
         workspace_id: WorkspaceId,
@@ -46,7 +59,13 @@ impl ProjectsClient {
         )
     }
 
-    /// Delete project
+    /// Delete a project.
+    ///
+    /// **Warning**: This permanently deletes the project and all associated data.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace containing the project
+    /// * `project_id` - The ID of the project to delete
     pub fn delete(&self, workspace_id: WorkspaceId, project_id: ProjectId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
@@ -54,7 +73,13 @@ impl ProjectsClient {
         )
     }
 
-    /// Get project users
+    /// Get all users assigned to a project.
+    ///
+    /// Returns user-specific settings like rates and permissions for the project.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace containing the project
+    /// * `project_id` - The ID of the project
     pub fn get_users(
         &self,
         workspace_id: WorkspaceId,
@@ -66,7 +91,13 @@ impl ProjectsClient {
         )
     }
 
-    /// Get project statistics
+    /// Get project statistics.
+    ///
+    /// Returns tracked vs estimated time and billable hours.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace containing the project
+    /// * `project_id` - The ID of the project
     pub fn get_statistics(
         &self,
         workspace_id: WorkspaceId,
@@ -81,7 +112,11 @@ impl ProjectsClient {
         )
     }
 
-    /// Get project tasks
+    /// Get all tasks for a project.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace containing the project
+    /// * `project_id` - The ID of the project
     pub fn get_tasks(&self, workspace_id: WorkspaceId, project_id: ProjectId) -> Result<Vec<Task>> {
         self.client.request(
             Method::GET,
@@ -89,7 +124,13 @@ impl ProjectsClient {
         )
     }
 
-    /// Create project task
+    /// Create a new task for a project.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace containing the project
+    /// * `project_id` - The ID of the project
+    /// * `name` - Name of the new task
+    /// * `active` - Whether the task is active
     pub fn create_task(
         &self,
         workspace_id: WorkspaceId,

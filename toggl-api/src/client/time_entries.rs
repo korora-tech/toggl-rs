@@ -15,12 +15,18 @@ impl TimeEntriesClient {
         Self { client }
     }
 
-    /// Get current time entry
+    /// Get the currently running time entry.
+    ///
+    /// Returns None if no time entry is currently running.
     pub fn current(&self) -> Result<Option<TimeEntry>> {
         self.client.request(Method::GET, "me/time_entries/current")
     }
 
-    /// Get time entries
+    /// Get time entries for the current user.
+    ///
+    /// # Arguments
+    /// * `start_date` - Optional start date filter (ISO 8601 format)
+    /// * `end_date` - Optional end date filter (ISO 8601 format)
     pub fn list(&self, start_date: Option<&str>, end_date: Option<&str>) -> Result<Vec<TimeEntry>> {
         let mut params = BTreeMap::new();
         if let Some(start) = start_date {
@@ -34,13 +40,20 @@ impl TimeEntriesClient {
             .request_with_params(Method::GET, "me/time_entries", &params)
     }
 
-    /// Get time entry
+    /// Get a specific time entry by ID.
+    ///
+    /// # Arguments
+    /// * `time_entry_id` - The ID of the time entry to retrieve
     pub fn get(&self, time_entry_id: TimeEntryId) -> Result<TimeEntry> {
         self.client
             .request(Method::GET, &format!("me/time_entries/{}", time_entry_id))
     }
 
-    /// Create time entry
+    /// Create a new time entry.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace to create the entry in
+    /// * `time_entry` - Time entry creation parameters
     pub fn create(
         &self,
         workspace_id: WorkspaceId,
@@ -53,7 +66,14 @@ impl TimeEntriesClient {
         )
     }
 
-    /// Start time entry
+    /// Start a new time entry (creates and starts it).
+    ///
+    /// This is a convenience method that creates a time entry with a negative
+    /// duration, indicating it's currently running.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace to create the entry in
+    /// * `time_entry` - Time entry creation parameters
     pub fn start(
         &self,
         workspace_id: WorkspaceId,
@@ -66,7 +86,11 @@ impl TimeEntriesClient {
         )
     }
 
-    /// Stop time entry
+    /// Stop a running time entry.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace containing the entry
+    /// * `time_entry_id` - The ID of the running time entry to stop
     pub fn stop(&self, workspace_id: WorkspaceId, time_entry_id: TimeEntryId) -> Result<TimeEntry> {
         self.client.request(
             Method::PATCH,
@@ -77,7 +101,12 @@ impl TimeEntriesClient {
         )
     }
 
-    /// Update time entry
+    /// Update an existing time entry.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace containing the entry
+    /// * `time_entry_id` - The ID of the time entry to update
+    /// * `time_entry` - Fields to update (all optional)
     pub fn update(
         &self,
         workspace_id: WorkspaceId,
@@ -91,7 +120,11 @@ impl TimeEntriesClient {
         )
     }
 
-    /// Delete time entry
+    /// Delete a time entry.
+    ///
+    /// # Arguments
+    /// * `workspace_id` - The workspace containing the entry
+    /// * `time_entry_id` - The ID of the time entry to delete
     pub fn delete(&self, workspace_id: WorkspaceId, time_entry_id: TimeEntryId) -> Result<()> {
         self.client.request_empty(
             Method::DELETE,
